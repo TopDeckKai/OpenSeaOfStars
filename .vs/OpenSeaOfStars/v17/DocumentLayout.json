@@ -1,0 +1,110 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\nicho\\source\\repos\\SeaOfStarsArchipelago\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{D55E63F8-AD80-488C-8270-B6C6619A11AB}|OpenSeaOfStars\\OpenSeaOfStars.csproj|c:\\users\\nicho\\source\\repos\\seaofstarsarchipelago\\openseaofstars\\helpers\\activityhelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D55E63F8-AD80-488C-8270-B6C6619A11AB}|OpenSeaOfStars\\OpenSeaOfStars.csproj|solutionrelative:openseaofstars\\helpers\\activityhelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D55E63F8-AD80-488C-8270-B6C6619A11AB}|OpenSeaOfStars\\OpenSeaOfStars.csproj|c:\\users\\nicho\\source\\repos\\seaofstarsarchipelago\\openseaofstars\\openseaofstarsmod.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D55E63F8-AD80-488C-8270-B6C6619A11AB}|OpenSeaOfStars\\OpenSeaOfStars.csproj|solutionrelative:openseaofstars\\openseaofstarsmod.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D55E63F8-AD80-488C-8270-B6C6619A11AB}|OpenSeaOfStars\\OpenSeaOfStars.csproj|c:\\users\\nicho\\source\\repos\\seaofstarsarchipelago\\openseaofstars\\helpers\\savehelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D55E63F8-AD80-488C-8270-B6C6619A11AB}|OpenSeaOfStars\\OpenSeaOfStars.csproj|solutionrelative:openseaofstars\\helpers\\savehelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D55E63F8-AD80-488C-8270-B6C6619A11AB}|OpenSeaOfStars\\OpenSeaOfStars.csproj|c:\\users\\nicho\\source\\repos\\seaofstarsarchipelago\\openseaofstars\\helpers\\cutscenehelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D55E63F8-AD80-488C-8270-B6C6619A11AB}|OpenSeaOfStars\\OpenSeaOfStars.csproj|solutionrelative:openseaofstars\\helpers\\cutscenehelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D55E63F8-AD80-488C-8270-B6C6619A11AB}|OpenSeaOfStars\\OpenSeaOfStars.csproj|c:\\users\\nicho\\source\\repos\\seaofstarsarchipelago\\openseaofstars\\helpers\\blackboardhelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D55E63F8-AD80-488C-8270-B6C6619A11AB}|OpenSeaOfStars\\OpenSeaOfStars.csproj|solutionrelative:openseaofstars\\helpers\\blackboardhelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 4,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "OpenSeaOfStarsMod.cs",
+              "DocumentMoniker": "C:\\Users\\nicho\\source\\repos\\SeaOfStarsArchipelago\\OpenSeaOfStars\\OpenSeaOfStarsMod.cs",
+              "RelativeDocumentMoniker": "OpenSeaOfStars\\OpenSeaOfStarsMod.cs",
+              "ToolTip": "C:\\Users\\nicho\\source\\repos\\SeaOfStarsArchipelago\\OpenSeaOfStars\\OpenSeaOfStarsMod.cs",
+              "RelativeToolTip": "OpenSeaOfStars\\OpenSeaOfStarsMod.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-10T23:31:52.325Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "SaveHelper.cs",
+              "DocumentMoniker": "C:\\Users\\nicho\\source\\repos\\SeaOfStarsArchipelago\\OpenSeaOfStars\\Helpers\\SaveHelper.cs",
+              "RelativeDocumentMoniker": "OpenSeaOfStars\\Helpers\\SaveHelper.cs",
+              "ToolTip": "C:\\Users\\nicho\\source\\repos\\SeaOfStarsArchipelago\\OpenSeaOfStars\\Helpers\\SaveHelper.cs",
+              "RelativeToolTip": "OpenSeaOfStars\\Helpers\\SaveHelper.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-10T23:31:57.679Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "CutsceneHelper.cs",
+              "DocumentMoniker": "C:\\Users\\nicho\\source\\repos\\SeaOfStarsArchipelago\\OpenSeaOfStars\\Helpers\\CutsceneHelper.cs",
+              "RelativeDocumentMoniker": "OpenSeaOfStars\\Helpers\\CutsceneHelper.cs",
+              "ToolTip": "C:\\Users\\nicho\\source\\repos\\SeaOfStarsArchipelago\\OpenSeaOfStars\\Helpers\\CutsceneHelper.cs",
+              "RelativeToolTip": "OpenSeaOfStars\\Helpers\\CutsceneHelper.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-10T23:31:57.075Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "BlackboardHelper.cs",
+              "DocumentMoniker": "C:\\Users\\nicho\\source\\repos\\SeaOfStarsArchipelago\\OpenSeaOfStars\\Helpers\\BlackboardHelper.cs",
+              "RelativeDocumentMoniker": "OpenSeaOfStars\\Helpers\\BlackboardHelper.cs",
+              "ToolTip": "C:\\Users\\nicho\\source\\repos\\SeaOfStarsArchipelago\\OpenSeaOfStars\\Helpers\\BlackboardHelper.cs",
+              "RelativeToolTip": "OpenSeaOfStars\\Helpers\\BlackboardHelper.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-10T23:31:56.439Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ActivityHelper.cs",
+              "DocumentMoniker": "C:\\Users\\nicho\\source\\repos\\SeaOfStarsArchipelago\\OpenSeaOfStars\\Helpers\\ActivityHelper.cs",
+              "RelativeDocumentMoniker": "OpenSeaOfStars\\Helpers\\ActivityHelper.cs",
+              "ToolTip": "C:\\Users\\nicho\\source\\repos\\SeaOfStarsArchipelago\\OpenSeaOfStars\\Helpers\\ActivityHelper.cs",
+              "RelativeToolTip": "OpenSeaOfStars\\Helpers\\ActivityHelper.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACYAAAAxAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-10T23:31:55.791Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

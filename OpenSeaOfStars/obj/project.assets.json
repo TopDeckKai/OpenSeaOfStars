@@ -1,0 +1,139 @@
+{
+  "version": 3,
+  "targets": {
+    "net6.0": {
+      "Archipelago.MultiClient.Net/6.6.0": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/Archipelago.MultiClient.Net.dll": {
+            "related": ".pdb;.xml"
+          },
+          "lib/net6.0/Newtonsoft.Json.dll": {}
+        },
+        "runtime": {
+          "lib/net6.0/Archipelago.MultiClient.Net.dll": {
+            "related": ".pdb;.xml"
+          },
+          "lib/net6.0/Newtonsoft.Json.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Archipelago.MultiClient.Net/6.6.0": {
+      "sha512": "ZUNmgZg1zsMwoRaTFz0rqm9UwpUcqCkAsW6GAgLwE749dRmonPLimhYU/AryA4BagTGblL5ce9euwWU4Oj1YSw==",
+      "type": "package",
+      "path": "archipelago.multiclient.net/6.6.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "archipelago.multiclient.net.6.6.0.nupkg.sha512",
+        "archipelago.multiclient.net.nuspec",
+        "blue-icon.png",
+        "lib/net35/Archipelago.MultiClient.Net.dll",
+        "lib/net35/Archipelago.MultiClient.Net.pdb",
+        "lib/net35/Archipelago.MultiClient.Net.xml",
+        "lib/net35/Newtonsoft.Json.dll",
+        "lib/net35/websocket-sharp.dll",
+        "lib/net40/Archipelago.MultiClient.Net.dll",
+        "lib/net40/Archipelago.MultiClient.Net.pdb",
+        "lib/net40/Archipelago.MultiClient.Net.xml",
+        "lib/net40/Newtonsoft.Json.dll",
+        "lib/net40/websocket-sharp.dll",
+        "lib/net45/Archipelago.MultiClient.Net.dll",
+        "lib/net45/Archipelago.MultiClient.Net.pdb",
+        "lib/net45/Archipelago.MultiClient.Net.xml",
+        "lib/net45/Newtonsoft.Json.dll",
+        "lib/net6.0/Archipelago.MultiClient.Net.dll",
+        "lib/net6.0/Archipelago.MultiClient.Net.pdb",
+        "lib/net6.0/Archipelago.MultiClient.Net.xml",
+        "lib/net6.0/Newtonsoft.Json.dll",
+        "lib/netstandard2.0/Archipelago.MultiClient.Net.dll",
+        "lib/netstandard2.0/Archipelago.MultiClient.Net.pdb",
+        "lib/netstandard2.0/Archipelago.MultiClient.Net.xml",
+        "lib/netstandard2.0/Newtonsoft.Json.dll"
+      ]
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net6.0": [
+      "Archipelago.MultiClient.Net >= 6.6.0"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\nicho\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "C:\\Users\\nicho\\source\\repos\\SeaOfStarsArchipelago\\OpenSeaOfStars\\OpenSeaOfStars.csproj",
+      "projectName": "OpenSeaOfStars",
+      "projectPath": "C:\\Users\\nicho\\source\\repos\\SeaOfStarsArchipelago\\OpenSeaOfStars\\OpenSeaOfStars.csproj",
+      "packagesPath": "C:\\Users\\nicho\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\nicho\\source\\repos\\SeaOfStarsArchipelago\\OpenSeaOfStars\\obj\\",
+      "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
+      "configFilePaths": [
+        "C:\\Users\\nicho\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net6.0"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "projectReferences": {}
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "9.0.200"
+    },
+    "frameworks": {
+      "net6.0": {
+        "targetAlias": "net6.0",
+        "dependencies": {
+          "Archipelago.MultiClient.Net": {
+            "target": "Package",
+            "version": "[6.6.0, )"
+          }
+        },
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.202\\RuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}

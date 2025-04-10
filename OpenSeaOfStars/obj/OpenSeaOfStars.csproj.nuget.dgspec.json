@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\nicho\\source\\repos\\SeaOfStarsArchipelago\\OpenSeaOfStars\\OpenSeaOfStars.csproj": {}
+    "C:\\Users\\nicho\\source\\repos\\OpenSeaOfStars\\OpenSeaOfStars\\OpenSeaOfStars.csproj": {}
   },
   "projects": {
-    "C:\\Users\\nicho\\source\\repos\\SeaOfStarsArchipelago\\OpenSeaOfStars\\OpenSeaOfStars.csproj": {
+    "C:\\Users\\nicho\\source\\repos\\OpenSeaOfStars\\OpenSeaOfStars\\OpenSeaOfStars.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\nicho\\source\\repos\\SeaOfStarsArchipelago\\OpenSeaOfStars\\OpenSeaOfStars.csproj",
+        "projectUniqueName": "C:\\Users\\nicho\\source\\repos\\OpenSeaOfStars\\OpenSeaOfStars\\OpenSeaOfStars.csproj",
         "projectName": "OpenSeaOfStars",
-        "projectPath": "C:\\Users\\nicho\\source\\repos\\SeaOfStarsArchipelago\\OpenSeaOfStars\\OpenSeaOfStars.csproj",
+        "projectPath": "C:\\Users\\nicho\\source\\repos\\OpenSeaOfStars\\OpenSeaOfStars\\OpenSeaOfStars.csproj",
         "packagesPath": "C:\\Users\\nicho\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\nicho\\source\\repos\\SeaOfStarsArchipelago\\OpenSeaOfStars\\obj\\",
+        "outputPath": "C:\\Users\\nicho\\source\\repos\\OpenSeaOfStars\\OpenSeaOfStars\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

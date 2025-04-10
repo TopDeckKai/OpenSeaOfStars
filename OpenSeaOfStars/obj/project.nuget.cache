@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "S6VayD/fn/8=",
+  "dgSpecHash": "lphY1KW5Vok=",
   "success": true,
-  "projectFilePath": "C:\\Users\\nicho\\source\\repos\\SeaOfStarsArchipelago\\OpenSeaOfStars\\OpenSeaOfStars.csproj",
+  "projectFilePath": "C:\\Users\\nicho\\source\\repos\\OpenSeaOfStars\\OpenSeaOfStars\\OpenSeaOfStars.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\nicho\\.nuget\\packages\\archipelago.multiclient.net\\6.6.0\\archipelago.multiclient.net.6.6.0.nupkg.sha512"
   ],

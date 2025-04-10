@@ -36,6 +36,7 @@ namespace OpenSeaOfStars.Helpers
                 archipelagoActivity.activityNameLoc = LocalizationId.Empty;
                 archipelagoActivity.subActivities = new Il2CppSystem.Collections.Generic.List<ActivityData.SubActivity>();
 
+                // TODO: Make this actually work!
                 activityManager.allActivityData.Add(new ActivityReference("ce3bffc8dd7d47a4b9f49d5a85bb218d"), archipelagoActivity);
 
                 if (debug)

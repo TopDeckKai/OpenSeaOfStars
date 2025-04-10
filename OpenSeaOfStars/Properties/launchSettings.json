@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SeaOfStarsArchipelago": {
+      "commandName": "Project",
+      "remoteDebugEnabled": false
+    }
+  }
+}

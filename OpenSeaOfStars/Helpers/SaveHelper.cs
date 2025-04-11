@@ -27,7 +27,7 @@ namespace OpenSeaOfStars.Helpers
             saveManager.lastSelectedSlotIndex = index;
         }
 
-        internal void createOpenSaveSlot(bool debug = false)
+        internal void createOpenSaveSlot(List<CharacterDefinitionId> randomizerParty, bool debug = false)
         {
             try
             {
@@ -43,7 +43,7 @@ namespace OpenSeaOfStars.Helpers
             {
                 SaveGameSlot sgs = null;
 
-                CharacterDefinitionId initialCharacter = CharacterDefinitionId.Zale;
+                CharacterDefinitionId initialCharacter = randomizerParty[0];
 
                 try
                 {
@@ -214,6 +214,7 @@ namespace OpenSeaOfStars.Helpers
             // Forbidden Cavern
             ret.Add("4cdb3f4e790033f4f93c97ba0b0ac2f1", 1); // Kid Entrance Door
             ret.Add("42dd882ecad4c304f98556b30c1ad1f5", 1); // Entrance Door
+            ret.Add("5cbf24a710e8156409bffb38edec491d", 1); // Light Bridge
 
             // Prologue & Mooncradle
             ret.Add("54c150f4b5ad60540a82ffeff0b2e202", 1); // Erlina and Brugraves intro

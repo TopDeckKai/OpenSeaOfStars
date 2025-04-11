@@ -52,7 +52,7 @@ namespace OpenSeaOfStars
                     ActivityHelper.initActivityManager(debug);
                     BlackboardHelper.initBlackboardManager(debug);
                     CutsceneHelper.initCutsceneManager(debug);
-                    SaveHelper.createOpenSaveSlot(debug);
+                    SaveHelper.createOpenSaveSlot(randomizerParty, debug);
                     initLoaded = true;
                 }
                 else
@@ -95,7 +95,15 @@ namespace OpenSeaOfStars
         public override void OnUpdate()
         {
             base.OnUpdate();
-            CutsceneHelper.checkCutsceneFinished();
+            if (CutsceneHelper.currentCutsceneType == CutsceneHelper.CutsceneType.Story)
+            {
+                CutsceneHelper.checkCutsceneFinished();
+            }
+            else if (CutsceneHelper.currentCutsceneType == CutsceneHelper.CutsceneType.World)
+            {
+                CutsceneHelper.skipWorldCutscene();
+            }
+
             if (!debug)
             {
                 return;

@@ -1,4 +1,5 @@
-﻿using MelonLoader;
+﻿// #define HAS_UNITY_EXPLORER
+using MelonLoader;
 using Il2Cpp;
 using Unity;
 using UnityEngine;
@@ -20,6 +21,17 @@ namespace OpenSeaOfStars
         bool initLoaded = false;
         public static bool debug = true;
         public static List<CharacterDefinitionId> randomizerParty = new List<CharacterDefinitionId> { CharacterDefinitionId.Zale };
+        
+        
+        private readonly Dictionary<string, int> charMap = new()
+        {
+            { CharacterDefinitionId.Zale.ToString(), 0 },
+            { CharacterDefinitionId.Valere.ToString(), 1 },
+            { CharacterDefinitionId.Garl.ToString(), 2 },
+            { CharacterDefinitionId.Serai.ToString(), 3 },
+            { CharacterDefinitionId.Reshan.ToString(), 4 },
+            { CharacterDefinitionId.Bst.ToString(), 5 }
+        };
 
         public OpenSeaOfStarsMod()
         {
@@ -84,45 +96,100 @@ namespace OpenSeaOfStars
         {
             base.OnUpdate();
             CutsceneHelper.checkCutsceneFinished();
-            if (debug)
+            if (!debug)
             {
-                if (UnityEngine.Input.GetKeyDown(KeyCode.K))
-                {
-                    SaveHelper.save();
-                }
-                if (UnityEngine.Input.GetKeyDown(KeyCode.L))
-                {
-                    BlackboardHelper.tryReadBlackboardManager();
-                }
-                if (UnityEngine.Input.GetKeyDown(KeyCode.O))
-                {
-                    CharacterDefinitionId id = CharacterDefinitionId.Valere;
-                    PlayerPartyManager ppm = PlayerPartyManager.Instance;
+                return;
+            }
+            
+            if (Input.GetKeyDown(KeyCode.K))
+            {
+                SaveHelper.save();
+            }
+            if (UnityEngine.Input.GetKeyDown(KeyCode.L))
+            {
+                BlackboardHelper.tryReadBlackboardManager();
+            }
 
-                    if (ppm.combatParty.Count < 2)
-                    {
-                        LoggerInstance.Msg("Adding character for debug " + id.ToString());
-
-                        ppm.currentParty.Add(id);
-                        ppm.AddToCombatParty(id);
-                        CharacterDefinitionId.FirstFollower = id;
-                        GameObject partyHandler = GameObject.Find("CapsuleParty(Clone)");
-                        if (partyHandler != null)
-                        {
-                            LoggerInstance.Msg("PartyFound! Game Objects: " + partyHandler.transform.childCount);
-                            GameObject sunboy = partyHandler.transform.GetChild(0).gameObject;
-                            GameObject moongirl = partyHandler.transform.GetChild(1).gameObject;
-                            moongirl.SetActive(true);
-                            moongirl.GetComponent<PartyCharacterFollower>().enabled = true;
-                            moongirl.GetComponent<PlayerController>().enabled = true;
-                            moongirl.transform.FindChild("CharacterOffset").FindChild("Character").GetComponent<Animator>().enabled = true;
-                            moongirl.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").GetComponent<CharacterVisual>().enabled = true;
-                            moongirl.transform.localPosition = sunboy.transform.localPosition;
-                            //moongirl.GetComponent<PartyCharacterFollower>().FollowTarget(sunboy.GetComponent<FollowerLeader>(), true, true);
-                        }
-                    }
-                }
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                #if HAS_UNITY_EXPLORER
+                HideUnityExplorer();
+                #endif
+                
+                GameObject.FindObjectOfType<PauseMenu>(true).ReturnToTitle();
+            }
+            
+            
+            if (UnityEngine.Input.GetKeyDown(KeyCode.Z))
+            {
+                AddPartyMember(CharacterDefinitionId.Zale);
+            }
+            else if (UnityEngine.Input.GetKeyDown(KeyCode.V))
+            {
+                AddPartyMember(CharacterDefinitionId.Valere);
+            }
+            else if (Input.GetKeyDown(KeyCode.G))
+            {
+                AddPartyMember(CharacterDefinitionId.Garl);
+            }
+            else if (Input.GetKeyDown(KeyCode.S))
+            {
+                AddPartyMember(CharacterDefinitionId.Serai);
+            }
+            else if (Input.GetKeyDown(KeyCode.R))
+            {
+                AddPartyMember(CharacterDefinitionId.Reshan);
+            }
+            else if (Input.GetKeyDown(KeyCode.B))
+            {
+                AddPartyMember(CharacterDefinitionId.Bst);
             }
         }
+        
+        private void AddPartyMember(CharacterDefinitionId character)
+        {
+            PlayerPartyManager ppm = PlayerPartyManager.Instance;
+            if (ppm.currentParty.Contains(character))
+            {
+                return;
+            }
+            LoggerInstance.Msg($"Adding {character.ToString()} for debug");
+            ppm.currentParty.Add(character);
+            
+            GameObject partyHandler = GameObject.Find("CapsuleParty(Clone)");
+            
+            // adding a 4th character works, but looks weird so just exit
+            if (partyHandler == null || ppm.currentParty.Count > 3)
+            {
+                return;
+            }
+
+            ppm.AddToCombatParty(character);
+            LoggerInstance.Msg("PartyFound! Game Objects: " + partyHandler.transform.childCount);
+            GameObject charToAdd = partyHandler.transform.GetChild(charMap[character.ToString()]).gameObject;
+            charToAdd.SetActive(true);
+            charToAdd.GetComponent<PartyCharacterFollower>().enabled = true;
+            charToAdd.transform.localPosition = ppm.leader.transform.localPosition;
+            charToAdd.GetComponent<PartyCharacterFollower>().FollowTarget(ppm.leader.followableTarget, true, false);
+            charToAdd.GetComponent<PlayerController>().enabled = true;
+            Transform charObj = charToAdd.transform.FindChild("CharacterOffset").FindChild("Character");
+            charObj.GetComponent<Animator>().enabled = true;
+            charObj.FindChild("Sprite").GetComponent<CharacterVisual>().enabled = true;
+        }
+
+        #if HAS_UNITY_EXPLORER
+        /// <summary>
+        /// Same as pressing F7 (or whatever keybind you've changed UE to)
+        /// This exists because there's a bug with UE that prevents all inputs when opening game menus
+        /// </summary>
+        public static void HideUnityExplorer()
+        {
+            MelonBase ue = FindMelon("UnityExplorer", "Sinai");
+            if (ue != null)
+            {
+                UnityExplorer.UI.UIManager.ShowMenu = false;
+            }
+        }
+        #endif
     }
 }

@@ -48,7 +48,13 @@ namespace OpenSeaOfStars.Helpers
                 try
                 {
                     SaveGameSlot defaultSave = saveManager.GetSaveSlot(99);
-                    sgs = saveManager.Clone(defaultSave);
+                    if (!saveManager.CopySaveToSlotIndex(defaultSave, modInitSaveSlot).Result)
+                    {
+                        mod.LoggerInstance.Msg("Failed to copy save file");
+                        return;
+                    }
+
+                    sgs = saveManager.GetSaveSlot(modInitSaveSlot);
                     mod.LoggerInstance.Msg($"Loading Temp Slot at index: " + sgs.slotIndex);
 
                     sgs.slotIndex = modInitSaveSlot;
@@ -210,6 +216,9 @@ namespace OpenSeaOfStars.Helpers
             ret.Add("42dd882ecad4c304f98556b30c1ad1f5", 1); // Entrance Door
 
             // Prologue & Mooncradle
+            ret.Add("54c150f4b5ad60540a82ffeff0b2e202", 1); // Erlina and Brugraves intro
+            ret.Add("d5e47da78cf42e84c95bffcd01b66dae", 0); // testing, argument with Moraine
+            ret.Add("0143bd6816480ba4982009e7b52f9099", 1); // cooking tutorial
             ret.Add("7ea13775cb23fba49a758c2a48ec4038", 1);
             ret.Add("8bf2351d237202145a8f7698d9ee3658", 1);
             ret.Add("487b80dac3d19314793684db783ca1aa", 1);

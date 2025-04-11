@@ -83,6 +83,7 @@ namespace OpenSeaOfStars
         public override void OnUpdate()
         {
             base.OnUpdate();
+            CutsceneHelper.checkCutsceneFinished();
             if (debug)
             {
                 if (UnityEngine.Input.GetKeyDown(KeyCode.K))

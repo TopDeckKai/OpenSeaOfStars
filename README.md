@@ -5,6 +5,7 @@ The idea of this mod for Sea of Stars is to offer an open world save and experie
 
 ## Save File Warning
 As this is in development, we need to be cautious with save files. Before installing this mod, PLEASE back up the save files in the AppData\LocalLow\Sabotage Studio\Sea of Stars location on your PC.
+If you have no save files, create save files in the first 3 slots of the game before loading the mod.
 
 ## Goals
 The goals for this project include:

@@ -1,3 +1,5 @@
+# THIS MOD IS EARLY IN DEVELOPMENT AND IS NOT READY FOR USE!
+
 # Open Sea of Stars
 The idea of this mod for Sea of Stars is to offer an open world save and experience, removing blocking cutscenes / scenes that don't make sense for open world, and working around the codebase to provide a clean base for a Randomizer (Be it standalone or Archipelago). 
 

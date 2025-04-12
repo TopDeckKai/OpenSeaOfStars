@@ -162,32 +162,13 @@ namespace OpenSeaOfStars
                 return;
             }
             LoggerInstance.Msg($"Adding {character.ToString()} for debug");
-            ppm.currentParty.Add(character);
-            
-            GameObject partyHandler = GameObject.Find("CapsuleParty(Clone)");
-            
-            // adding a 4th character works, but looks weird so just exit
-            if (partyHandler == null || ppm.currentParty.Count > 3)
-            {
-                return;
-            }
-
-            ppm.AddToCombatParty(character);
-            LoggerInstance.Msg("PartyFound! Game Objects: " + partyHandler.transform.childCount);
-            GameObject charToAdd = partyHandler.transform.GetChild(charMap[character.ToString()]).gameObject;
-            charToAdd.SetActive(true);
-            charToAdd.GetComponent<PartyCharacterFollower>().enabled = true;
-            charToAdd.transform.localPosition = ppm.leader.transform.localPosition;
-            charToAdd.GetComponent<PartyCharacterFollower>().FollowTarget(ppm.leader.followableTarget, true, false);
-            charToAdd.GetComponent<PlayerController>().enabled = true;
-            Transform charObj = charToAdd.transform.FindChild("CharacterOffset").FindChild("Character");
-            charObj.GetComponent<Animator>().enabled = true;
-            charObj.FindChild("Sprite").GetComponent<CharacterVisual>().enabled = true;
+            ppm.AddPartyMember(character, ppm.currentParty.Count < 3, true, true);
+            ppm.SetupParty(true);
         }
 
         #if HAS_UNITY_EXPLORER
         /// <summary>
-        /// Same as pressing F7 (or whatever keybind you've changed UE to)
+        /// Same as pressing F7 (or whatever keybind you've changed UE to)<br/>
         /// This exists because there's a bug with UE that prevents all inputs when opening game menus
         /// </summary>
         public static void HideUnityExplorer()

@@ -308,36 +308,6 @@ namespace OpenSeaOfStars.Helpers
             return ret;
         }
 
-        private static string getCharacterIdleString(CharacterDefinitionId id)
-        {
-            string ret = "";
-            if (id == CharacterDefinitionId.Zale)
-            {
-                ret = characterIdleString[0];
-            }
-            else if (id == CharacterDefinitionId.Valere)
-            {
-                ret = characterIdleString[1];
-            }
-            else if (id == CharacterDefinitionId.Garl)
-            {
-                ret = characterIdleString[2];
-            }
-            else if (id == CharacterDefinitionId.Serai)
-            {
-                ret = characterIdleString[3];
-            }
-            else if (id == CharacterDefinitionId.Reshan)
-            {
-                ret = characterIdleString[4];
-            }
-            else if (id == CharacterDefinitionId.Bst)
-            {
-                ret = characterIdleString[5];
-            }
-
-            return ret;
-        }
 
         [HarmonyPatch(typeof(GraphControllerBase), "StartTree")]
         private static class StartCutscenePatch

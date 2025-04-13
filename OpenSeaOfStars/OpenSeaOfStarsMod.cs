@@ -44,7 +44,9 @@ namespace OpenSeaOfStars
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
         {
             base.OnSceneWasLoaded(buildIndex, sceneName);
-            if (sceneName != null && sceneName.ToLower().Equals("titlescreen"))
+            if (string.IsNullOrEmpty(sceneName)) return;
+
+            if (sceneName.ToLower().Equals("titlescreen"))
             {
                 if (!initLoaded)
                 {
@@ -61,7 +63,7 @@ namespace OpenSeaOfStars
                 }
             }
 
-            if (!string.IsNullOrEmpty(sceneName) && sceneName.ToLower().Equals("eldermisttrials_gameplay"))
+            if (sceneName.ToLower().Equals("eldermisttrials_gameplay"))
             {
                 LoggerInstance.Msg($"Scene {sceneName} with build index {buildIndex} has been loaded!");
                 
@@ -76,7 +78,7 @@ namespace OpenSeaOfStars
                 }
             }
 
-            if (sceneName != null && sceneName.ToLower().Equals("kilnmountain_cutscene"))
+            if (sceneName.ToLower().Equals("kilnmountain_cutscene"))
             {
                 LoggerInstance.Msg($"Scene {sceneName} with build index {buildIndex} has been loaded!");
 
@@ -88,7 +90,7 @@ namespace OpenSeaOfStars
                 }
             }
 
-            if (sceneName != null && sceneName.ToLower().Equals("forbiddencavern_cutscene"))
+            if (sceneName.ToLower().Equals("forbiddencavern_cutscene"))
             {
                 LoggerInstance.Msg($"Scene {sceneName} with build index {buildIndex} has been loaded!");
 
@@ -104,6 +106,30 @@ namespace OpenSeaOfStars
                 {
                     GameObject.Destroy(bossBlocker);
                     LoggerInstance.Msg($"Unloaded blocking cutscene");
+                }
+            }
+
+            if (sceneName.ToLower().Equals("forbiddencavern_gameplay"))
+            {
+                GameObject bossSlots = GameObject.Find("ENCOUNTERS_STUFF/ENC_04 (Boss)/Encounter/PlayerSlots/FrontRowSlots");
+                GameObject encounterObj = GameObject.Find("ENCOUNTERS_STUFF/ENC_04 (Boss)/Encounter");
+                if (bossSlots != null && encounterObj != null)
+                {
+                    GameObject bossSlot3 = new GameObject("EncounterPlayerSlot2");
+
+                    bossSlot3.AddComponent<GameObjectSpriteDrawer>();
+                    bossSlot3.transform.parent = bossSlots.transform;
+                    bossSlot3.transform.position = new Vector3(-39.5f, 2f, 228.91f);
+                    EncounterCharacterSlot thirdSlot = bossSlot3.AddComponent<EncounterCharacterSlot>();
+
+                    Encounter encounter = encounterObj.GetComponent<Encounter>();
+                    Il2CppSystem.Collections.Generic.List<EncounterCharacterSlot> slots = encounter.playerSlots;
+                    slots.Add(thirdSlot);
+                    encounter.playerSlots = slots;
+                }
+                else
+                {
+                    LoggerInstance.Msg($"BOSS SLOTS NOT FOUND");
                 }
             }
         }

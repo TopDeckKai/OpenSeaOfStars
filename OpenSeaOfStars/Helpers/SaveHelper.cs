@@ -66,12 +66,12 @@ namespace OpenSeaOfStars.Helpers
 
                     CheckpointData checkpointData = sgs.checkpointData;
                     LevelReference lev = new LevelReference();
-                    lev.levelDefinitionGuid = "72e9f2699f7c8394b93afa1d273ce67a";
+                    lev.levelDefinitionGuid = "4776b2f6ccdb0fe4195c6c0d89206875";
                     checkpointData.level = lev;
 
-                    checkpointData.savepointId = ESavepointId.SAVEPOINT_B;
-                    checkpointData.position = new Vector3(167.3300018310547f, 6f, 134.9199981689453f);
-                    checkpointData.isBoat = false;
+                    checkpointData.savepointId = ESavepointId.NONE;
+                    checkpointData.position = new Vector3(0f, 0f, 0f);
+                    checkpointData.isBoat = true;
 
                     sgs.checkpointData = checkpointData;
 

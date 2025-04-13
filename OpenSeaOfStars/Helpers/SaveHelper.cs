@@ -66,12 +66,12 @@ namespace OpenSeaOfStars.Helpers
 
                     CheckpointData checkpointData = sgs.checkpointData;
                     LevelReference lev = new LevelReference();
-                    lev.levelDefinitionGuid = "4776b2f6ccdb0fe4195c6c0d89206875";
+                    lev.levelDefinitionGuid = "72e9f2699f7c8394b93afa1d273ce67a";
                     checkpointData.level = lev;
 
-                    checkpointData.savepointId = ESavepointId.NONE;
-                    checkpointData.position = new Vector3(0f, 0f, 0f);
-                    checkpointData.isBoat = true;
+                    checkpointData.savepointId = ESavepointId.SAVEPOINT_B;
+                    checkpointData.position = new Vector3(167.3300018310547f, 6f, 134.9199981689453f);
+                    checkpointData.isBoat = false;
 
                     sgs.checkpointData = checkpointData;
 
@@ -103,7 +103,7 @@ namespace OpenSeaOfStars.Helpers
                     // sgs.InventorySaveData.ownedInventoryItems.Add(weaponVal, 1);
                     // sgs.InventorySaveData.ownedInventoryItems.Add(weaponZale, 1);
 
-                    sgs.blackboardDictionary = createDefaultBlackboardData();
+                    sgs.blackboardDictionary = createDefaultBlackboardData(randomizerParty);
                     ActivitySaveData activitySaveData = new ActivitySaveData();
 
                     activitySaveData.mainActivityReference = new ActivityReference("ce3bffc8dd7d47a4b9f49d5a85bb218d"); //239dd33e0c77af042b0abd2943e15417
@@ -153,12 +153,12 @@ namespace OpenSeaOfStars.Helpers
             saveManager.SaveLoadedSaveSlot();
         }
 
-        internal BlackboardDictionary createDefaultBlackboardData()
+        internal BlackboardDictionary createDefaultBlackboardData(List<CharacterDefinitionId> party)
         {
             BlackboardDictionary ret = new BlackboardDictionary();
 
             //Debug can fly
-            if (OpenSeaOfStarsMod.debug)
+            if (OpenSeaOfStarsMod.debug && party.Any(character => character == CharacterDefinitionId.Zale || character == CharacterDefinitionId.Valere))
             {
                 ret.Add("eade193956f385243bbd0ab47aee2ee9", 1);
             }
@@ -173,6 +173,8 @@ namespace OpenSeaOfStars.Helpers
             ret.Add("1b9a8febc97662c4abefc3990a8f3b13", 0); // NecromancerLair_GetGraplou_Done
             ret.Add("dd9e2a3bb5f9bb64b9474557c1bf132c", 0); // Bvar_Mines_GetPushBracelet_Done
             ret.Add("767078e1d423a5040b2c9cb4317da3b5", 1); // Evermist Docs
+            ret.Add("7d2f0bce0c57c4b4cbb6c525e5b6bc2b", 1); // Bvar_Global_TeaksCamping_On
+            ret.Add("0143bd6816480ba4982009e7b52f9099", 1); // CookSnacksUnlocked
 
             // Unsorted, various cutscene info
             ret.Add("84534192eff14c645b7af6248d3cde17", 1);
@@ -207,7 +209,6 @@ namespace OpenSeaOfStars.Helpers
             ret.Add("7bd4347bdbff8af4a9e90918ab45ab07", 1);
             ret.Add("0be099e5b7be9ed4485bd80110104a99", 1);
             ret.Add("09a0c341be0a35d4abb4ab92702ccf11", 1);
-            ret.Add("eed8215f5de6b324bad36b1d9b3ecf7a", 1);
             ret.Add("4600a6cd24212f1488fe7dcd92d5cb5b", 1);
             ret.Add("01d073ab77f40c7459cef473f6a64044", 1);
 
@@ -219,21 +220,32 @@ namespace OpenSeaOfStars.Helpers
             // Prologue & Mooncradle
             ret.Add("54c150f4b5ad60540a82ffeff0b2e202", 1); // Erlina and Brugraves intro
             ret.Add("d5e47da78cf42e84c95bffcd01b66dae", 0); // testing, argument with Moraine
-            ret.Add("0143bd6816480ba4982009e7b52f9099", 1); // cooking tutorial
+            ret.Add("c19e91f4f68f0064e992433ae3b804fc", 1); // Bvar_MountainTrail_IntroPartySplit_Done
             ret.Add("7ea13775cb23fba49a758c2a48ec4038", 1);
             ret.Add("8bf2351d237202145a8f7698d9ee3658", 1);
             ret.Add("487b80dac3d19314793684db783ca1aa", 1);
             ret.Add("f46a1e28208110e48bbef2f5fc45fd1f", 0); // testing, may trigger garl getting his eye poked cutscene
             ret.Add("b8c81760117db0943a181633b4916152", 1);
-            ret.Add("9c0f3d33b592d2044baf92d95d4c0c00", 1);
-            ret.Add("5304cd26dacc0a246914672d7e002d47", 1);
-            ret.Add("e7f74919505683e42b2cbeef63929c31", 1);
-            ret.Add("f97f879ff22c77340b3480753368d0e1", 1);
-            ret.Add("980f0ab283c33474d8ff1192d7b5bb3b", 1);
-            ret.Add("9a2a19e6b68ba3744b1c2693213f18e4", 1);
-            ret.Add("94aeba6688db8934fa971de45cf16314", 1);
-            ret.Add("213250fa0e0f107468afbfe17d4d02f3", 1);
+            ret.Add("9c0f3d33b592d2044baf92d95d4c0c00", 1); // Bvar_MooncradlePast_FlashbackKid_Done
+            ret.Add("5304cd26dacc0a246914672d7e002d47", 1); // Bvar_MooncradlePast_IntroZenithAcademy_Done
+            ret.Add("e7f74919505683e42b2cbeef63929c31", 1); // Bvar_MooncradlePast_Morning_Done
+            ret.Add("f97f879ff22c77340b3480753368d0e1", 1); // Bvar_MooncradlePast_TrainingBrugaves_Done
+            ret.Add("980f0ab283c33474d8ff1192d7b5bb3b", 1); // Bvar_MooncradlePast_TrainingErlina_Done
+            ret.Add("9a2a19e6b68ba3744b1c2693213f18e4", 1); // Bvar_MooncradlePast_TrainingSewing_Done
+            ret.Add("94aeba6688db8934fa971de45cf16314", 1); // Bvar_Mooncradle_SoundInTheNight_Done
+            ret.Add("213250fa0e0f107468afbfe17d4d02f3", 1); // Bvar_Mooncradle_FinishSewing_Done
             ret.Add("58eaa8afa08ba5b4ca5d27fbdafb993a", 1); // Post forbidden cavern number guys scene
+            ret.Add("878d616211febff49b25d78db8a02f75", 1); // Bvar_MooncradlePast_CookiesFound_Done
+            ret.Add("3e435bdd6992ba044903a36741ebacc2", 1); // Bvar_Mooncradle_Moraine_CallWeapon_Done ?
+            ret.Add("59d5788af50f16249b374de929b4e50a", 1); // Bvar_Mooncradle_RefuseErlinaTuto_Done (immediately talk to Moraine)
+            ret.Add("a4193016f21d618428b5ac8622128c06", 1); // Bvar_Mooncradle_RefuseBrugavesTuto_Done (immediately talk to Moraine)
+            ret.Add("ebb3bbf4405b7b4459ee45d1bf1eb812", 1); // campfire cooking tutorial
+            ret.Add("03cc26d5b9ba29a4688f814767a8be58", 1); // CharacterLightColorUnlocked ?? happens during Elder Mist introduction, testing
+            ret.Add("a162c5e3299382b41a2affd9dd7bf2e4", 1); // Elder Mist introduction
+            
+            // Sleeper Island
+            // Moorlands
+            ret.Add("ae21436453a98f74f9b2839e9c8b9aab", 1); // meet Teaks
 
             return ret;
         }

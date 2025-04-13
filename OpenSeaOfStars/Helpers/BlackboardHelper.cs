@@ -46,6 +46,18 @@ namespace OpenSeaOfStars.Helpers
             }
         }
 
+        internal void AddBlackboardValue(string key, int value)
+        {
+            if (!blackboardManager.blackboardValues.ContainsKey(key))
+            {
+                blackboardManager.blackboardValues.Add(key, value);
+            }
+            else
+            {
+                blackboardManager.blackboardValues[key] = value;
+            }
+        }
+
         [HarmonyPatch(typeof(BlackboardManager), "GetBlackboardValue", new Type[] { typeof(BlackboardVariable) })]
         private static class GetBlackboardPatch
         {

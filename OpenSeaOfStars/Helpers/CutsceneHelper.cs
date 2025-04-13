@@ -225,6 +225,7 @@ namespace OpenSeaOfStars.Helpers
             {
                 if (__instance != null && __instance.gameObject != null)
                 {
+                    Msg($"CUTSCENE: {__instance.gameObject.name}");
                     PlayerPartyManager ppm = PlayerPartyManager.Instance;
                     if (__instance.gameObject.name.Equals("CUT_IntroBossSlug")
                         || __instance.gameObject.name.Equals("CUT_GiantSlugDefeated")
@@ -265,6 +266,25 @@ namespace OpenSeaOfStars.Helpers
                             currentCutsceneGraph = __instance;
                             currentCutsceneType = CutsceneType.World;
                         }
+                    }
+                    else if (__instance.gameObject.name.Equals("CUT_ElderMistBoss") ||
+                             __instance.gameObject.name.Equals("CUT_ElderMistDefeated"))
+                    {
+                        if (!ppm.currentParty.Contains(CharacterDefinitionId.Valere))
+                        {
+                            loadCharacterForCutscene(CharacterDefinitionId.Valere);
+                        }
+                        if (!ppm.currentParty.Contains(CharacterDefinitionId.Zale))
+                        {
+                            loadCharacterForCutscene(CharacterDefinitionId.Zale);
+                        }
+                        if (!ppm.currentParty.Contains(CharacterDefinitionId.Garl))
+                        {
+                            loadCharacterForCutscene(CharacterDefinitionId.Garl);
+                        }
+                        
+                        currentCutsceneGraph = __instance;
+                        currentCutsceneType = CutsceneType.Story;
                     }
                 }
             }

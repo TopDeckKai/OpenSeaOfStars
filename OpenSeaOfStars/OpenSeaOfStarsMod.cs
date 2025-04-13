@@ -61,6 +61,21 @@ namespace OpenSeaOfStars
                 }
             }
 
+            if (!string.IsNullOrEmpty(sceneName) && sceneName.ToLower().Equals("eldermisttrials_gameplay"))
+            {
+                LoggerInstance.Msg($"Scene {sceneName} with build index {buildIndex} has been loaded!");
+                
+                // spawn live mana. required to battle enemies
+                // maybe don't allow entering trial without this?
+                BlackboardHelper.AddBlackboardValue("9aee0be400eb37943991e9e95407b84b", 1);
+                GameObject tutEnemy = GameObject.Find("ENC_01 (TutoMana)");
+                if (tutEnemy != null)
+                {
+                    GameObject.Destroy(tutEnemy);
+                    LoggerInstance.Msg("Unloaded blocking tutorial enemy");
+                }
+            }
+
             if (sceneName != null && sceneName.ToLower().Equals("kilnmountain_cutscene"))
             {
                 LoggerInstance.Msg($"Scene {sceneName} with build index {buildIndex} has been loaded!");
@@ -126,6 +141,24 @@ namespace OpenSeaOfStars
                 
                 GameObject.FindObjectOfType<PauseMenu>(true).ReturnToTitle();
             }
+
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                var list = GameObject.FindObjectsOfType<Transform>(true);
+                try
+                {
+                    Transform t = list.First(obj => obj.name == "ENCOUNTER_STUFF");
+                    if (t != null)
+                    {
+                        GameObject enc = t.gameObject;
+                        enc.SetActive(!enc.active);
+                    }
+                }
+                catch (Exception e)
+                {
+                    return;
+                }
+            }
             
             
             if (UnityEngine.Input.GetKeyDown(KeyCode.Z))
@@ -152,6 +185,15 @@ namespace OpenSeaOfStars
             {
                 AddPartyMember(CharacterDefinitionId.Bst);
             }
+            else if (Input.GetKeyDown(KeyCode.T))
+            {
+                PlayerPartyManager ppm = PlayerPartyManager.Instance;
+                if (!ppm.cargoCharacters.Contains(CharacterDefinitionId.Teaks))
+                {
+                    LoggerInstance.Msg($"Adding {CharacterDefinitionId.Teaks.ToString()} to cargo for debug");
+                    ppm.AddCargoCharacter(CharacterDefinitionId.Teaks);
+                }
+            }
         }
         
         private void AddPartyMember(CharacterDefinitionId character)
@@ -164,6 +206,8 @@ namespace OpenSeaOfStars
             LoggerInstance.Msg($"Adding {character.ToString()} for debug");
             ppm.AddPartyMember(character, ppm.currentParty.Count < 3, true, true);
             ppm.SetupParty(true);
+            
+            randomizerParty.Add(character);
         }
 
         #if HAS_UNITY_EXPLORER

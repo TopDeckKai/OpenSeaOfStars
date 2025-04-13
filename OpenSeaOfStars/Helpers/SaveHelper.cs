@@ -43,8 +43,6 @@ namespace OpenSeaOfStars.Helpers
             {
                 SaveGameSlot sgs = null;
 
-                CharacterDefinitionId initialCharacter = randomizerParty[0];
-
                 try
                 {
                     SaveGameSlot defaultSave = saveManager.GetSaveSlot(99);
@@ -75,11 +73,12 @@ namespace OpenSeaOfStars.Helpers
 
                     sgs.checkpointData = checkpointData;
 
-                    InventoryItemReference weaponVal = new InventoryItemReference();
-                    weaponVal.itemGuid = "40b7062ac812c5d47bb1ff0df4987e8e";
+                    // Commenting out starting weapons for now
+                    // InventoryItemReference weaponVal = new InventoryItemReference();
+                    // weaponVal.itemGuid = "40b7062ac812c5d47bb1ff0df4987e8e";
 
-                    InventoryItemReference weaponZale = new InventoryItemReference();
-                    weaponZale.itemGuid = "e3098c0169021924a97713b57a009928";
+                    // InventoryItemReference weaponZale = new InventoryItemReference();
+                    // weaponZale.itemGuid = "e3098c0169021924a97713b57a009928";
 
                     sgs.characterData[CharacterDefinitionId.Valere].gaveCharacterStartInventory = true;
                     sgs.characterData[CharacterDefinitionId.Valere].currentHP = 46;
@@ -111,18 +110,26 @@ namespace OpenSeaOfStars.Helpers
                     sgs.activitySaveData = activitySaveData;
 
                     sgs.currentParty.Clear();
-                    sgs.currentParty.Add(initialCharacter);
                     sgs.combatParty.Clear();
-                    sgs.combatParty.Add(initialCharacter);
-                    sgs.mainCharacter = initialCharacter;
-                    sgs.leader = initialCharacter;
-
-                    if (debug)
+                    for (int i = 0; i < randomizerParty.Count; i++)
                     {
-                        sgs.characterData[initialCharacter].currentHP = 999;
-                        sgs.characterData[initialCharacter].currentSP = 999;
+                        sgs.currentParty.Add(randomizerParty[i]);
+                        if (i == 0)
+                        {
+                            sgs.mainCharacter = randomizerParty[i];
+                            sgs.leader = randomizerParty[i];
+                        }
+                        if (i < 3)
+                        {
+                            sgs.combatParty.Add(randomizerParty[i]);
+                        }
+                        if (debug)
+                        {
+                            sgs.characterData[randomizerParty[i]].currentHP = 999;
+                            sgs.characterData[randomizerParty[i]].currentSP = 999;
 
-                        sgs.characterData[initialCharacter].levelUpStatUpgrades = createDebugLevelUpList();
+                            sgs.characterData[randomizerParty[i]].levelUpStatUpgrades = createDebugLevelUpList();
+                        }
                     }
 
                     saveManager.SetSaveSlotAtIndex(modInitSaveSlot, sgs);

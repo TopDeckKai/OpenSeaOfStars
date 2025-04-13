@@ -22,10 +22,12 @@ namespace OpenSeaOfStars.Helpers
         private static List<CharacterDefinitionId> gameplayParty = new List<CharacterDefinitionId>();
         private static List<string> characterObjectNames = new List<string>();
         private static List<string> worldMapObjectNames = new List<string>();
+        private static List<string> characterIdleString = new List<string>();
         public static GraphControllerBase currentCutsceneGraph = null;
-        public static CutsceneType currentCutsceneType = CutsceneType.None;        
+        public static CutsceneType currentCutsceneType = CutsceneType.None;
 
-        // TODO: Refactor to use game object.find potentially instead of this, using the dictonary for the gameobject's name
+        private static bool keepActiveFix = false;
+        private static List<CharacterDefinitionId> keepActive = new List<CharacterDefinitionId>();
 
         public CutsceneHelper(OpenSeaOfStarsMod mainMod)
         {
@@ -66,10 +68,13 @@ namespace OpenSeaOfStars.Helpers
         }
 
         // removed forceload variable as you always want to load a character with this method.
-        private static void loadCharacterForCutscene(CharacterDefinitionId id)
+        private static void loadCharacterForCutscene(CharacterDefinitionId id, bool forceStandingAnimation = false)
         {
             PlayerPartyManager ppm = PlayerPartyManager.Instance;
-            ppm.currentParty.Add(id);
+            if (!ppm.currentParty.Contains(id))
+            {
+                ppm.currentParty.Add(id);
+            }
 
             GameObject partyHandler = GameObject.Find("CapsuleParty(Clone)");
             if (partyHandler != null)
@@ -115,34 +120,63 @@ namespace OpenSeaOfStars.Helpers
         {
             if (currentCutsceneGraph != null && !currentCutsceneGraph.IsPlaying)
             {
+                keepActiveFix = false;
+                keepActive = new List<CharacterDefinitionId>();
                 PlayerPartyManager ppm = PlayerPartyManager.Instance;
 
                 foreach (CharacterDefinitionId id in gameplayParty)
                 {
                     GameObject partyHandler = GameObject.Find("CapsuleParty(Clone)");
-
-                    if (ppm.currentParty.Contains(id) && !OpenSeaOfStarsMod.randomizerParty.Contains(id))
+                    if (ppm.currentParty.Contains(id))
                     {
-                        //I really don't understand why comparisons don't properly work. Contains returned false when it should've returned true. TODO refactor
-                        bool inParty = false;
-                        foreach (CharacterDefinitionId thechar in OpenSeaOfStarsMod.randomizerParty)
+                        if (iteratePartyCheck(OpenSeaOfStarsMod.randomizerParty, id) && ppm.combatParty.Contains(id))
                         {
-                            if (getCharacterObjectString(thechar).Equals(getCharacterObjectString(id)))
-                            {
-                                inParty = true; break;
-                            }
+                            GameObject partychar = partyHandler.transform.FindChild(getCharacterObjectString(id)).gameObject;
+                            partychar.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").gameObject.active = true;
                         }
-                        if (!inParty)
+                        else
                         {
-                            GameObject follower = partyHandler.transform.FindChild(getCharacterObjectString(id)).gameObject;
-                            if (follower.active)
+                            //I really don't understand why comparisons don't properly work. Contains returned false when it should've returned true. TODO refactor
+                            bool inParty = false;
+                            bool inCombat = false;
+                            foreach (CharacterDefinitionId thechar in ppm.combatParty)
                             {
-                                Msg("REMOVAL for " + id.ToString());
+                                if (getCharacterObjectString(thechar).Equals(getCharacterObjectString(id)))
+                                {
+                                    inCombat = true; break;
+                                }
+                            }
+                            foreach (CharacterDefinitionId thechar in OpenSeaOfStarsMod.randomizerParty)
+                            {
+                                if (getCharacterObjectString(thechar).Equals(getCharacterObjectString(id)))
+                                {
+                                    inParty = true; break;
+                                }
+                            }
+                            if (!inParty)
+                            {
+                                GameObject follower = partyHandler.transform.FindChild(getCharacterObjectString(id)).gameObject;
                                 ppm.currentParty.Remove(id);
                                 ppm.combatParty.Remove(id);
-                                if (partyHandler != null)
+                                if (follower.active)
                                 {
-                                    follower.active = false;
+                                    if (partyHandler != null)
+                                    {
+                                        follower.active = false;
+                                    }
+                                }
+                            }
+                            else
+                            if (!inCombat)
+                            {
+                                GameObject follower = partyHandler.transform.FindChild(getCharacterObjectString(id)).gameObject;
+                                ppm.combatParty.Remove(id);
+                                if (follower.active)
+                                {
+                                    if (partyHandler != null)
+                                    {
+                                        follower.active = false;
+                                    }
                                 }
                             }
                         }
@@ -152,6 +186,63 @@ namespace OpenSeaOfStars.Helpers
                 currentCutsceneGraph = null;
                 currentCutsceneType = CutsceneType.None;
             }
+            else if (keepActiveFix)
+            {
+                GameObject partyHandler = GameObject.Find("CapsuleParty(Clone)");
+                bool didFix = false;
+                foreach (CharacterDefinitionId id in keepActive)
+                { 
+                    GameObject partychar = partyHandler.transform.FindChild(getCharacterObjectString(id)).gameObject;
+                    if (!partychar.active) { 
+                        partychar.active = true; 
+                        didFix = true;
+                    }
+                }
+
+                if (didFix)
+                {
+                    keepActiveFix = false;
+                }
+            }
+        }
+
+        // This method is the starting point for handling the game's objects in such a way that only the intended characters show for a cutscene 
+        private static void resetCharactersForCutscenes(PlayerPartyManager ppm, GameObject partyHandler, List<CharacterDefinitionId> enabledList, bool forceAnimations)
+        {
+            foreach (CharacterDefinitionId cutsceneChar in enabledList)
+            {
+                if (!ppm.combatParty.Contains(cutsceneChar))
+                {
+                    loadCharacterForCutscene(cutsceneChar);
+                }
+            }
+
+            foreach (CharacterDefinitionId partyChar in OpenSeaOfStarsMod.randomizerParty)
+            {
+                if (!iteratePartyCheck(enabledList, partyChar))
+                {
+                    GameObject partyCharObj = partyHandler.transform.FindChild(getCharacterObjectString(partyChar)).gameObject;
+                    if (partyCharObj != null && partyCharObj.active && ppm.combatParty.Contains(partyChar))
+                    {
+                        partyCharObj.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").gameObject.active = false;
+                    }
+                }
+            }
+
+            if (forceAnimations)
+            {
+                keepActiveFix = true;
+                keepActive = enabledList;
+            }
+        }
+
+        private static bool iteratePartyCheck(List<CharacterDefinitionId> list, CharacterDefinitionId id)
+        {
+            foreach (CharacterDefinitionId listId in list)
+            {
+                if (listId == id) { return true; }
+            }
+            return false;
         }
 
         // I am getting errors when using a dictionary for the CharacterDefinitionId??? back to basics i guess
@@ -217,6 +308,7 @@ namespace OpenSeaOfStars.Helpers
             return ret;
         }
 
+
         [HarmonyPatch(typeof(GraphControllerBase), "StartTree")]
         private static class StartCutscenePatch
         {
@@ -227,18 +319,17 @@ namespace OpenSeaOfStars.Helpers
                 {
                     Msg($"CUTSCENE: {__instance.gameObject.name}");
                     PlayerPartyManager ppm = PlayerPartyManager.Instance;
-                    if (__instance.gameObject.name.Equals("CUT_IntroBossSlug")
-                        || __instance.gameObject.name.Equals("CUT_GiantSlugDefeated")
-                    )
+                    GameObject partyHandler = GameObject.Find("CapsuleParty(Clone)");
+                    if (__instance.gameObject.name.Equals("CUT_IntroBossSlug"))
                     {
-                        if (!ppm.currentParty.Contains(CharacterDefinitionId.Valere))
-                        {
-                            loadCharacterForCutscene(CharacterDefinitionId.Valere);
-                        }
-                        if (!ppm.currentParty.Contains(CharacterDefinitionId.Zale))
-                        {
-                            loadCharacterForCutscene(CharacterDefinitionId.Zale);
-                        }
+                        resetCharactersForCutscenes(ppm, partyHandler, new List<CharacterDefinitionId>() { CharacterDefinitionId.Zale, CharacterDefinitionId.Valere }, false);
+
+                        currentCutsceneGraph = __instance;
+                        currentCutsceneType = CutsceneType.Story;
+                    }
+                    else if (__instance.gameObject.name.Equals("CUT_GiantSlugDefeated"))
+                    {
+                        resetCharactersForCutscenes(ppm, partyHandler, new List<CharacterDefinitionId>() { CharacterDefinitionId.Zale, CharacterDefinitionId.Valere }, true);
 
                         currentCutsceneGraph = __instance;
                         currentCutsceneType = CutsceneType.Story;
@@ -248,7 +339,7 @@ namespace OpenSeaOfStars.Helpers
                         Msg("Dock event: " + __instance.gameObject.name);
                         if (__instance.gameObject.scene.name.Equals("EvermistIsland_WorldMap_Gameplay"))
                         {
-                            GameObject partyHandler = GameObject.Find("WorldMapParty(Clone)");
+                            partyHandler = GameObject.Find("WorldMapParty(Clone)");
                             GameObject leader = partyHandler.transform.FindChild(getWorldMapObjectString(ppm.Leader.CharacterDefinitionId)).gameObject;
                             leader.transform.position = new Vector3(116.5f, 1.01f, 74.5f);
                             currentCutsceneGraph = __instance;
@@ -260,29 +351,24 @@ namespace OpenSeaOfStars.Helpers
                         Msg("Dock event: " + __instance.gameObject.name);
                         if (__instance.gameObject.scene.name.Equals("EvermistIsland_WorldMap_Gameplay"))
                         {
-                            GameObject partyHandler = GameObject.Find("WorldMapParty(Clone)");
+                            partyHandler = GameObject.Find("WorldMapParty(Clone)");
                             GameObject leader = partyHandler.transform.FindChild(getWorldMapObjectString(ppm.Leader.CharacterDefinitionId)).gameObject;
                             leader.transform.position = new Vector3(114.5f, 3.01f, 74.5f);
                             currentCutsceneGraph = __instance;
                             currentCutsceneType = CutsceneType.World;
                         }
                     }
-                    else if (__instance.gameObject.name.Equals("CUT_ElderMistBoss") ||
-                             __instance.gameObject.name.Equals("CUT_ElderMistDefeated"))
+                    else if (__instance.gameObject.name.Equals("CUT_ElderMistBoss")) 
                     {
-                        if (!ppm.currentParty.Contains(CharacterDefinitionId.Valere))
-                        {
-                            loadCharacterForCutscene(CharacterDefinitionId.Valere);
-                        }
-                        if (!ppm.currentParty.Contains(CharacterDefinitionId.Zale))
-                        {
-                            loadCharacterForCutscene(CharacterDefinitionId.Zale);
-                        }
-                        if (!ppm.currentParty.Contains(CharacterDefinitionId.Garl))
-                        {
-                            loadCharacterForCutscene(CharacterDefinitionId.Garl);
-                        }
-                        
+                        resetCharactersForCutscenes(ppm, partyHandler, new List<CharacterDefinitionId>() { CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl }, false);
+
+                        currentCutsceneGraph = __instance;
+                        currentCutsceneType = CutsceneType.Story;
+                    }
+                    else if (__instance.gameObject.name.Equals("CUT_ElderMistDefeated"))
+                    {
+                        resetCharactersForCutscenes(ppm, partyHandler, new List<CharacterDefinitionId>() { CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl }, true);
+
                         currentCutsceneGraph = __instance;
                         currentCutsceneType = CutsceneType.Story;
                     }

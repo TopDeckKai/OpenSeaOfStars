@@ -13,6 +13,8 @@ namespace OpenSeaOfStars
 {
     public class OpenSeaOfStarsMod : MelonMod
     {
+        public static OpenSeaOfStarsMod OpenInstance { get; private set; }
+        
         ActivityHelper ActivityHelper;
         SaveHelper SaveHelper;
         BlackboardHelper BlackboardHelper;
@@ -35,6 +37,8 @@ namespace OpenSeaOfStars
 
         public OpenSeaOfStarsMod()
         {
+            OpenInstance = this;
+            
             ActivityHelper = new ActivityHelper(this);
             BlackboardHelper = new BlackboardHelper(this);
             CutsceneHelper = new CutsceneHelper(this);
@@ -63,6 +67,11 @@ namespace OpenSeaOfStars
                 }
             }
 
+            if (initLoaded)
+            {
+                BlackboardHelper.FindNewBlackboardVars();
+            }
+
             if (sceneName.ToLower().Equals("eldermisttrials_gameplay"))
             {
                 LoggerInstance.Msg($"Scene {sceneName} with build index {buildIndex} has been loaded!");
@@ -73,8 +82,8 @@ namespace OpenSeaOfStars
                 GameObject tutEnemy = GameObject.Find("ENC_01 (TutoMana)");
                 if (tutEnemy != null)
                 {
-                    GameObject.Destroy(tutEnemy);
-                    LoggerInstance.Msg("Unloaded blocking tutorial enemy");
+                    tutEnemy.SetActive(false);
+                    LoggerInstance.Msg("Turned off blocking tutorial enemy");
                 }
             }
 
@@ -154,12 +163,8 @@ namespace OpenSeaOfStars
             {
                 SaveHelper.save();
             }
-            if (UnityEngine.Input.GetKeyDown(KeyCode.L))
-            {
-                BlackboardHelper.tryReadBlackboardManager();
-            }
 
-            if (Input.GetKeyDown(KeyCode.P))
+            else if (Input.GetKeyDown(KeyCode.P))
             {
                 #if HAS_UNITY_EXPLORER
                 HideUnityExplorer();
@@ -168,26 +173,30 @@ namespace OpenSeaOfStars
                 GameObject.FindObjectOfType<PauseMenu>(true).ReturnToTitle();
             }
 
-            if (Input.GetKeyDown(KeyCode.E))
+            else if (Input.GetKeyDown(KeyCode.E))
             {
                 var list = GameObject.FindObjectsOfType<Transform>(true);
                 try
                 {
-                    Transform t = list.First(obj => obj.name == "ENCOUNTER_STUFF");
+                    Transform t = list.First(obj => obj.name is "ENCOUNTER_STUFF" or "ENC_YeetGolem_01");
                     if (t != null)
                     {
                         GameObject enc = t.gameObject;
                         enc.SetActive(!enc.active);
                     }
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return;
                 }
             }
             
+            else if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                BlackboardHelper.AddBlackboardValue("e531806b7c2ae3840b743077f1167609", 0);
+            }
             
-            if (UnityEngine.Input.GetKeyDown(KeyCode.Z))
+            else if (UnityEngine.Input.GetKeyDown(KeyCode.Z))
             {
                 AddPartyMember(CharacterDefinitionId.Zale);
             }

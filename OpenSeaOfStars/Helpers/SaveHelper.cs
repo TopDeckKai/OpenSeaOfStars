@@ -225,32 +225,38 @@ namespace OpenSeaOfStars.Helpers
             ret.Add("5cbf24a710e8156409bffb38edec491d", 1); // Light Bridge
 
             // Prologue & Mooncradle
-            ret.Add("54c150f4b5ad60540a82ffeff0b2e202", 1); // Erlina and Brugraves intro
-            ret.Add("d5e47da78cf42e84c95bffcd01b66dae", 0); // testing, argument with Moraine
+            // past
+            ret.Add("54c150f4b5ad60540a82ffeff0b2e202", 1); // Bvar_MooncradlePast_IntroBrugavesErlina_Done
+            ret.Add("d5e47da78cf42e84c95bffcd01b66dae", 1); // Bvar_MooncradlePast_ArgumentWithMoraine_Done
             ret.Add("c19e91f4f68f0064e992433ae3b804fc", 1); // Bvar_MountainTrail_IntroPartySplit_Done
-            ret.Add("7ea13775cb23fba49a758c2a48ec4038", 1);
-            ret.Add("8bf2351d237202145a8f7698d9ee3658", 1);
-            ret.Add("487b80dac3d19314793684db783ca1aa", 1);
-            ret.Add("f46a1e28208110e48bbef2f5fc45fd1f", 0); // testing, may trigger garl getting his eye poked cutscene
-            ret.Add("b8c81760117db0943a181633b4916152", 1);
+            ret.Add("7ea13775cb23fba49a758c2a48ec4038", 1); // Bvar_FogUnlocked_SeaOfStars1
+            ret.Add("8bf2351d237202145a8f7698d9ee3658", 1); // Bvar_FogUnlocked_SleeperIsland
+            ret.Add("487b80dac3d19314793684db783ca1aa", 1); // Bvar_FogUnlocked_IslandShrine03
+            ret.Add("f46a1e28208110e48bbef2f5fc45fd1f", 0); // Bbvar_ForbiddenCavern_ZoneEntry_Done // testing, may trigger garl getting his eye poked cutscene
+            ret.Add("b8c81760117db0943a181633b4916152", 1); // Bvar_MooncradlePast_ReturnFromForbidden_Done
             ret.Add("9c0f3d33b592d2044baf92d95d4c0c00", 1); // Bvar_MooncradlePast_FlashbackKid_Done
             ret.Add("5304cd26dacc0a246914672d7e002d47", 1); // Bvar_MooncradlePast_IntroZenithAcademy_Done
             ret.Add("e7f74919505683e42b2cbeef63929c31", 1); // Bvar_MooncradlePast_Morning_Done
+            ret.Add("3e435bdd6992ba044903a36741ebacc2", 1); // Bvar_Mooncradle_Moraine_CallWeapon_Done
             ret.Add("f97f879ff22c77340b3480753368d0e1", 1); // Bvar_MooncradlePast_TrainingBrugaves_Done
             ret.Add("980f0ab283c33474d8ff1192d7b5bb3b", 1); // Bvar_MooncradlePast_TrainingErlina_Done
             ret.Add("9a2a19e6b68ba3744b1c2693213f18e4", 1); // Bvar_MooncradlePast_TrainingSewing_Done
             ret.Add("94aeba6688db8934fa971de45cf16314", 1); // Bvar_Mooncradle_SoundInTheNight_Done
-            ret.Add("213250fa0e0f107468afbfe17d4d02f3", 1); // Bvar_Mooncradle_FinishSewing_Done
-            ret.Add("58eaa8afa08ba5b4ca5d27fbdafb993a", 1); // Post forbidden cavern number guys scene
             ret.Add("878d616211febff49b25d78db8a02f75", 1); // Bvar_MooncradlePast_CookiesFound_Done
-            ret.Add("3e435bdd6992ba044903a36741ebacc2", 1); // Bvar_Mooncradle_Moraine_CallWeapon_Done ?
-            ret.Add("59d5788af50f16249b374de929b4e50a", 1); // Bvar_Mooncradle_RefuseErlinaTuto_Done (immediately talk to Moraine)
-            ret.Add("a4193016f21d618428b5ac8622128c06", 1); // Bvar_Mooncradle_RefuseBrugavesTuto_Done (immediately talk to Moraine)
-            ret.Add("ebb3bbf4405b7b4459ee45d1bf1eb812", 1); // campfire cooking tutorial
+            ret.Add("213250fa0e0f107468afbfe17d4d02f3", 1); // Bvar_Mooncradle_FinishSewing_Done
+            // final test
+            ret.Add("2720546160f12594799f63a99280c6b8", 1); // Bvar_Mooncradle_BattleTuto_Done
+            ret.Add("14c3e4f34da06e646a90fb8605e6fe99", 1); // Bvar_Mooncradle_IntroTuto_Done
+            // Forbidden Cavern/Mountain Trail
+            ret.Add("58eaa8afa08ba5b4ca5d27fbdafb993a", 1); // Post forbidden cavern number guys scene
+            ret.Add("ebb3bbf4405b7b4459ee45d1bf1eb812", 1); // Bvar_MountainTrail_ReplayIntro_Done // campfire cooking tutorial
+            ret.Add("a162c5e3299382b41a2affd9dd7bf2e4", 1); // Bvar_MountainTrail_ElderMistIntro_Done
             ret.Add("03cc26d5b9ba29a4688f814767a8be58", 1); // CharacterLightColorUnlocked ?? happens during Elder Mist introduction, testing
-            ret.Add("a162c5e3299382b41a2affd9dd7bf2e4", 1); // Elder Mist introduction
+            ret.Add("e531806b7c2ae3840b743077f1167609", 1); // Bvar_MountainTrail_ToDIntro_Done - learn Time of Day 1
             
             // Sleeper Island
+            ret.Add("80a0eb7a932f46d4b8f2ab17ca957731", 1); // Bvar_YeetGolem_Bridges_Done - Xtol area bridges
+            ret.Add("2f831b26713f4434e9c29474767cd29c", 1); // Serai spying after leaving Xtol area
             // Moorlands
             ret.Add("ae21436453a98f74f9b2839e9c8b9aab", 1); // meet Teaks
 

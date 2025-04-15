@@ -317,7 +317,7 @@ namespace OpenSeaOfStars.Helpers
             {
                 if (__instance != null && __instance.gameObject != null)
                 {
-                    Msg($"CUTSCENE: {__instance.gameObject.name}");
+                    OpenSeaOfStarsMod.OpenInstance.LoggerInstance.Msg($"CUTSCENE: {__instance.gameObject.name}");
                     PlayerPartyManager ppm = PlayerPartyManager.Instance;
                     GameObject partyHandler = GameObject.Find("CapsuleParty(Clone)");
                     if (__instance.gameObject.name.Equals("CUT_IntroBossSlug"))
@@ -336,7 +336,7 @@ namespace OpenSeaOfStars.Helpers
                     }
                     else if (__instance.gameObject.name.Equals("BEH_Dock_Fast_Travel_To_Docks"))
                     {
-                        Msg("Dock event: " + __instance.gameObject.name);
+                        OpenSeaOfStarsMod.OpenInstance.LoggerInstance.Msg("Dock event: " + __instance.gameObject.name);
                         if (__instance.gameObject.scene.name.Equals("EvermistIsland_WorldMap_Gameplay"))
                         {
                             partyHandler = GameObject.Find("WorldMapParty(Clone)");
@@ -348,7 +348,7 @@ namespace OpenSeaOfStars.Helpers
                     }
                     else if (__instance.gameObject.name.Equals("BEH_Dock_Fast_Travel_From_Docks"))
                     {
-                        Msg("Dock event: " + __instance.gameObject.name);
+                        OpenSeaOfStarsMod.OpenInstance.LoggerInstance.Msg("Dock event: " + __instance.gameObject.name);
                         if (__instance.gameObject.scene.name.Equals("EvermistIsland_WorldMap_Gameplay"))
                         {
                             partyHandler = GameObject.Find("WorldMapParty(Clone)");

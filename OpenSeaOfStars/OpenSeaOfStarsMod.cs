@@ -1,4 +1,4 @@
-﻿// #define HAS_UNITY_EXPLORER
+﻿#define HAS_UNITY_EXPLORER
 using MelonLoader;
 using Il2Cpp;
 using Unity;
@@ -178,7 +178,8 @@ namespace OpenSeaOfStars
                 var list = GameObject.FindObjectsOfType<Transform>(true);
                 try
                 {
-                    Transform t = list.First(obj => obj.name is "ENCOUNTER_STUFF" or "ENC_YeetGolem_01");
+                    List<string> encounterNames = new() {"ENCOUNTER_STUFF", "ENCOUNTERS_STUFF", "ENC_YeetGolem_01"};
+                    Transform t = list.First(obj => encounterNames.Contains(obj.name));
                     if (t != null)
                     {
                         GameObject enc = t.gameObject;
@@ -196,11 +197,11 @@ namespace OpenSeaOfStars
                 BlackboardHelper.AddBlackboardValue("e531806b7c2ae3840b743077f1167609", 0);
             }
             
-            else if (UnityEngine.Input.GetKeyDown(KeyCode.Z))
+            else if (Input.GetKeyDown(KeyCode.Z))
             {
                 AddPartyMember(CharacterDefinitionId.Zale);
             }
-            else if (UnityEngine.Input.GetKeyDown(KeyCode.V))
+            else if (Input.GetKeyDown(KeyCode.V))
             {
                 AddPartyMember(CharacterDefinitionId.Valere);
             }

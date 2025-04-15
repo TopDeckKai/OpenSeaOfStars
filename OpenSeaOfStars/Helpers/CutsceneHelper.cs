@@ -19,6 +19,30 @@ namespace OpenSeaOfStars.Helpers
 
         private OpenSeaOfStarsMod mod;
         private CutsceneManager cutManager;
+        
+        private class CutscenePatchData
+        {
+            public List<CharacterDefinitionId> requiredCharacters;
+            public bool forceAnimations;
+            public Vector3 newPosition;
+        }
+
+        private static Dictionary<string, CutscenePatchData> storyCutsceneData = new()
+        {
+            { "CUT_IntroBossSlug", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere}} },
+            { "CUT_GiantSlugDefeated", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere}, forceAnimations = true} },
+            { "CUT_ElderMistBoss", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
+            { "CUT_ElderMistDefeated", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, forceAnimations = true} },
+        };
+        private static Dictionary<string, CutscenePatchData> toDockCutsceneData = new()
+        {
+            { "EvermistIsland_WorldMap_Gameplay", new CutscenePatchData {newPosition = new Vector3(116.5f, 1.01f, 74.5f)} },
+        };
+        private static Dictionary<string, CutscenePatchData> fromDockCutsceneData = new()
+        {
+            { "EvermistIsland_WorldMap_Gameplay", new CutscenePatchData {newPosition = new Vector3(114.5f, 3.01f, 74.5f)} }
+        };
+        
         private static List<CharacterDefinitionId> gameplayParty = new()
         {
             CharacterDefinitionId.Zale,
@@ -218,29 +242,6 @@ namespace OpenSeaOfStars.Helpers
                 keepActive = enabledList;
             }
         }
-        
-        private class CutscenePatchData
-        {
-            public List<CharacterDefinitionId> requiredCharacters;
-            public bool forceAnimations;
-            public Vector3 newPosition;
-        }
-
-        private static Dictionary<string, CutscenePatchData> storyCutsceneData = new()
-        {
-            { "CUT_IntroBossSlug", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere}} },
-            { "CUT_GiantSlugDefeated", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere}, forceAnimations = true} },
-            { "CUT_ElderMistBoss", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
-            { "CUT_ElderMistDefeated", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, forceAnimations = true} },
-        };
-        private static Dictionary<string, CutscenePatchData> toDockCutsceneData = new()
-        {
-            { "EvermistIsland_WorldMap_Gameplay", new CutscenePatchData {newPosition = new Vector3(116.5f, 1.01f, 74.5f)} },
-        };
-        private static Dictionary<string, CutscenePatchData> fromDockCutsceneData = new()
-        {
-            { "EvermistIsland_WorldMap_Gameplay", new CutscenePatchData {newPosition = new Vector3(114.5f, 3.01f, 74.5f)} }
-        };
 
         [HarmonyPatch(typeof(GraphControllerBase), "StartTree")]
         private static class StartCutscenePatch

@@ -8,6 +8,8 @@ using OpenSeaOfStars.Helpers;
 using Il2CppSabotage.Blackboard;
 using HarmonyLib;
 using Il2CppSabotage.Imposter;
+using Il2CppSabotage.Graph.Core;
+using Il2CppSabotage.Localization;
 
 namespace OpenSeaOfStars
 {
@@ -23,7 +25,7 @@ namespace OpenSeaOfStars
         bool initLoaded = false;
         public static bool debug = true;
         public static List<CharacterDefinitionId> randomizerParty = new List<CharacterDefinitionId> { CharacterDefinitionId.Zale };
-        
+        private bool loadDialogue = false;
         
         private readonly Dictionary<string, int> charMap = new()
         {
@@ -141,6 +143,12 @@ namespace OpenSeaOfStars
                     LoggerInstance.Msg($"BOSS SLOTS NOT FOUND");
                 }
             }
+
+            if (sceneName.ToLower().Equals("vespertine_cutscene_worldmap"))
+            {
+                // This does not work on first frame of load. TODO refactor.
+                loadDialogue = true;
+            }
         }
         public override void OnUpdate()
         {
@@ -152,6 +160,41 @@ namespace OpenSeaOfStars
             else if (CutsceneHelper.currentCutsceneType == CutsceneHelper.CutsceneType.World)
             {
                 CutsceneHelper.skipWorldCutscene();
+            }
+
+            if (loadDialogue)
+            {
+                GameObject vespertineDialogue = GameObject.Find("DIALOGUES/DIA_Hortence_TakeHelm");
+                if (vespertineDialogue != null)
+                {
+                    CutsceneTreeController ctc = vespertineDialogue.GetComponent<CutsceneTreeController>();
+                    if (ctc != null)
+                    {
+                        CutsceneTree ct = ctc.currentGraph;
+                        if (ct != null && ct.nodes.Count > 0)
+                        {
+                            // Surrounding with try catch because comparing the type with "is" isn't working, chalking that up to modding library jank?
+                            try
+                            {
+                                GraphNode node = ct.nodes[1];
+                                PlayDialogNode dialogueNode = node.Cast<PlayDialogNode>();
+                                DialogBoxData dbd = dialogueNode.dialogBoxData.value;
+                                DialogBoxData.DialogChoice dc = new DialogBoxData.DialogChoice();
+                                dc.characterDefinitionId = CharacterDefinitionId.LeaderCharacter;
+                                LocalizationId sonLocId = new LocalizationId();
+                                sonLocId.categoryName = "Camping";
+                                sonLocId.locId = DialogueHelper.LocalizationIdConstants[0];
+                                dc.localizationId = sonLocId;
+                                dbd.dialogChoices.Insert(1, dc);
+                                dialogueNode.dialogBoxData.value = dbd;
+
+                                LoggerInstance.Msg("Loaded " + DialogueHelper.LocalizationIdConstants[0]);
+                                loadDialogue = false;
+                            }
+                            catch (Exception ex) { }
+                        }
+                    }
+                }
             }
 
             if (!debug)
@@ -256,7 +299,7 @@ namespace OpenSeaOfStars
             MelonBase ue = FindMelon("UnityExplorer", "Sinai");
             if (ue != null)
             {
-                UnityExplorer.UI.UIManager.ShowMenu = false;
+                // UnityExplorer.UI.UIManager.ShowMenu = false;
             }
         }
         #endif

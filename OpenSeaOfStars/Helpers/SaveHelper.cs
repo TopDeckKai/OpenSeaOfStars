@@ -3,6 +3,7 @@ using Il2CppSystem;
 using UnityEngine;
 using Il2CppSabotage.Blackboard;
 using Il2CppInterop.Runtime;
+using Il2CppKVP = Il2CppSystem.Collections.Generic;
 
 namespace OpenSeaOfStars.Helpers
 {
@@ -72,6 +73,11 @@ namespace OpenSeaOfStars.Helpers
                     checkpointData.isBoat = true;
 
                     sgs.checkpointData = checkpointData;
+
+                    foreach (KeyValuePair<string, int> kvp in mod.InventoryHelper.startingItems)
+                    {
+                        sgs.inventorySaveData.ownedInventoryItems.Add(new Il2CppKVP.KeyValuePair<InventoryItemReference, int>(mod.InventoryHelper.inventoryItems[kvp.Key].Reference, kvp.Value));
+                    }
 
                     // Commenting out starting weapons for now
                     // InventoryItemReference weaponVal = new InventoryItemReference();
@@ -176,7 +182,7 @@ namespace OpenSeaOfStars.Helpers
 
             // Gameplay flags
             ret.Add("3d7bce7fa2d8dd047a99e54e6526423a", 1); // UnlockedBoat
-            ret.Add("9aee0be400eb37943991e9e95407b84b", 0); // CanSpawnLiveMana
+            ret.Add("9aee0be400eb37943991e9e95407b84b", 1); // CanSpawnLiveMana
             ret.Add("1b9a8febc97662c4abefc3990a8f3b13", 0); // NecromancerLair_GetGraplou_Done
             ret.Add("dd9e2a3bb5f9bb64b9474557c1bf132c", 0); // Bvar_Mines_GetPushBracelet_Done
             ret.Add("767078e1d423a5040b2c9cb4317da3b5", 1); // Evermist Docs
@@ -206,6 +212,8 @@ namespace OpenSeaOfStars.Helpers
             ret.Add("c65b65e48fc393a448d58ff1aac9644d", 1);
             ret.Add("8921232ab8bbbd648bcf0bf43c3eee8d", 1);
             ret.Add("d45db53dd7c1f3a4ea6143b0ebe5408d", 1);
+            ret.Add("50862854cc21e3745842a3845273ed41", 1);
+            ret.Add("97889ae144bd21b4bbf4316a28f2b1d3", 1);
 
             // Abandoned Wizard Flags
             ret.Add("cd680b2ad619ca14c869c23e8cfcc55b", 1);
@@ -259,6 +267,18 @@ namespace OpenSeaOfStars.Helpers
             ret.Add("2f831b26713f4434e9c29474767cd29c", 1); // Serai spying after leaving Xtol area
             // Moorlands
             ret.Add("ae21436453a98f74f9b2839e9c8b9aab", 1); // meet Teaks
+            // Stonemasons Outpost
+            ret.Add("21609a20eefbf394c9c7fc145b87c385", 1); // Bvar_Outpost_EnterFirstTime_Done
+            ret.Add("def4ac542c3fc3a4496877c00921947f", 1); // Bvar_Mines_MeetingElder_Done
+            ret.Add("f692607b1dfb5d745be23a63fa47009c", 0); // Bvar_Mines_FirstWindTunnel_Done
+            ret.Add("f243ba246f56bb7419932f918853184e", 0); // Bvar_Mines_ElderExitMine_Done
+            ret.Add("d69c8e3fa6966ab45812523c26235776", 1); // Bvar_Mines_Salamander_Done
+            ret.Add("d0fa044c434e5fc468abaf62f3547b88", 0); // Bvar_Mines_EastWindTunnel_Done
+            ret.Add("daa715cbd0e1e5b4bae8c163230b6bf3", 1); // Bvar_Mines_ExitStair_Done
+            ret.Add("d1f66ca7b32a4c4459c8f4e8dde77075", 0); // Bvar_Mines_WestWindTunnel_Done
+            ret.Add("8dc814be1b11bee4fa2bbe5cd94479fd", 1); // Bvar_Mines_BossFight_Done // powers elevator as well
+            ret.Add("67c2e14989179794caa05fcba09c99f3", 0); // Bvar_ClockworkCastle_InterludeTwo_Done
+            ret.Add("775d6e50cf2ef0f4d9d8a98a89bf4a02", 1); // Bvar_Outpost_ExitMine_Done // needs to be 0 when you beat Malkomud
 
             return ret;
         }

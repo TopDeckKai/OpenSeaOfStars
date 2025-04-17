@@ -15,6 +15,17 @@ namespace OpenSeaOfStars.Helpers
         private OpenSeaOfStarsMod mod;
         private BlackboardManager blackboardManager;
 
+        private static Dictionary<string, int> skipSetGuids = new()
+        {
+            {"7d2f0bce0c57c4b4cbb6c525e5b6bc2b", 0} // Teaks camping, sometimes turns off after cutscenes
+        };
+
+        private static Dictionary<(string guid, int value), Dictionary<string, int>> triggers = new()
+        {
+
+            { ("67c2e14989179794caa05fcba09c99f3", 1), new Dictionary<string, int> {{"775d6e50cf2ef0f4d9d8a98a89bf4a02", 0}} } // beating Malkomud (watching the acolyte cutscene)
+        };
+
         private static Dictionary<string, string> blackboardVariables = new();
         private static string bVarFileLocation = "bVars.txt";
 
@@ -88,6 +99,17 @@ namespace OpenSeaOfStars.Helpers
             }
         }
 
+        public bool GetBlackboardValue(string key, out int value)
+        {
+            if (blackboardManager.blackboardValues.ContainsKey(key))
+            {
+                value = blackboardManager.blackboardValues[key];
+                return true;
+            }
+
+            value = int.MinValue;
+            return false;
+        }
         public void AddBlackboardValue(string key, int value)
         {
             blackboardManager.SetBlackboardValue(key, value);
@@ -131,11 +153,28 @@ namespace OpenSeaOfStars.Helpers
         [HarmonyPatch(typeof(BlackboardManager), "SetBlackboardValue", typeof(string), typeof(int))]
         private static class SetBlackboardPatchGuid
         {
+            private static bool Prefix(string guid, int value)
+            {
+                return string.IsNullOrEmpty(guid) || !skipSetGuids.ContainsKey(guid) || skipSetGuids[guid] != value;
+            }
             private static void Postfix(string guid, int value)
             {
-                if (OpenSeaOfStarsMod.debug && !string.IsNullOrEmpty(guid))
+                if (string.IsNullOrEmpty(guid))
+                {
+                    return;
+                }
+                
+                if (OpenSeaOfStarsMod.debug)
                 {
                     OpenSeaOfStarsMod.OpenInstance.LoggerInstance.Msg($"SET: {guid} {blackboardVariables[guid]}: {value}");
+                }
+                
+                if (triggers.TryGetValue((guid, value), out Dictionary<string, int> bVars))
+                {
+                    foreach (KeyValuePair<string, int> bVar in bVars)
+                    {
+                        BlackboardManager.instance.SetBlackboardValue(bVar.Key, bVar.Value);
+                    }
                 }
             }
         }

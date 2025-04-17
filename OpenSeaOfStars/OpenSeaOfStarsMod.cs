@@ -7,6 +7,7 @@ using UnityEditor;
 using OpenSeaOfStars.Helpers;
 using Il2CppSabotage.Blackboard;
 using HarmonyLib;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppSabotage.Imposter;
 
 namespace OpenSeaOfStars
@@ -19,6 +20,7 @@ namespace OpenSeaOfStars
         SaveHelper SaveHelper;
         BlackboardHelper BlackboardHelper;
         CutsceneHelper CutsceneHelper;
+        public InventoryHelper InventoryHelper { get; }
         
         bool initLoaded = false;
         public static bool debug = true;
@@ -43,6 +45,7 @@ namespace OpenSeaOfStars
             BlackboardHelper = new BlackboardHelper(this);
             CutsceneHelper = new CutsceneHelper(this);
             SaveHelper = new SaveHelper(this);
+            InventoryHelper = new InventoryHelper(this);
         }
 
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
@@ -58,6 +61,7 @@ namespace OpenSeaOfStars
                     ActivityHelper.initActivityManager(debug);
                     BlackboardHelper.initBlackboardManager(debug);
                     CutsceneHelper.initCutsceneManager(debug);
+                    InventoryHelper.GetInventoryItems();
                     SaveHelper.createOpenSaveSlot(randomizerParty, debug);
                     initLoaded = true;
                 }
@@ -139,6 +143,31 @@ namespace OpenSeaOfStars
                 else
                 {
                     LoggerInstance.Msg($"BOSS SLOTS NOT FOUND");
+                }
+            }
+            
+            if (sceneName.ToLower().Equals("outpost_gameplay"))
+            {
+                // open outpost
+                BlackboardHelper.AddBlackboardValue("8dc814be1b11bee4fa2bbe5cd94479fd", 1);
+            }
+            
+            if (sceneName.ToLower().Equals("mines_gameplay"))
+            {
+                // if acolyte cutscene is not watched, make Malkomud fightable
+                if (BlackboardHelper.GetBlackboardValue("67c2e14989179794caa05fcba09c99f3", out int value) && value == 0)
+                {
+                    BlackboardHelper.AddBlackboardValue("8dc814be1b11bee4fa2bbe5cd94479fd", 0);
+                    Il2CppArrayBase<Transform>? encounters = GameObject.Find("ENCOUNTER_STUFF").GetComponentsInChildren<Transform>(true);
+                    if (encounters == null || encounters.Count <= 0)
+                    {
+                        return;
+                    }
+                    Transform enc = encounters.First(enc => enc.gameObject.name == "ENC_Mines_Boss_Malkumud");
+                    if (enc)
+                    {
+                        enc.gameObject.SetActive(true);
+                    }
                 }
             }
         }
@@ -229,6 +258,10 @@ namespace OpenSeaOfStars
                     LoggerInstance.Msg($"Adding {CharacterDefinitionId.Teaks.ToString()} to cargo for debug");
                     ppm.AddCargoCharacter(CharacterDefinitionId.Teaks);
                 }
+            }
+            else if (Input.GetKeyDown(KeyCode.I))
+            {
+                InventoryHelper.PrintInventoryItems();
             }
         }
         

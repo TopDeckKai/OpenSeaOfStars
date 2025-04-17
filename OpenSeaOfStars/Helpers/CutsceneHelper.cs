@@ -33,6 +33,14 @@ namespace OpenSeaOfStars.Helpers
             { "CUT_GiantSlugDefeated", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere}, forceAnimations = true} },
             { "CUT_ElderMistBoss", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
             { "CUT_ElderMistDefeated", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, forceAnimations = true} },
+            // { "BEH_FloorA_PingPongWindTunnel", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, forceAnimations = true} },
+            // { "BEH_OutWindTunnel_FloorA", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, forceAnimations = true} },
+            { "CUT_SalamanderAppears", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
+            { "CUT_FightSalamanderDone", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, forceAnimations = true} },
+            { "CUT_Mines_MeetingMalkomud", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
+            { "CUT_Mines_MalkomudAfterBossFight", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
+            { "CUT_Outpost_AfterSavingVillage", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
+            { "CUT_Elevator_TheSleepingSerpent", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
         };
         private static Dictionary<string, CutscenePatchData> toDockCutsceneData = new()
         {
@@ -41,6 +49,16 @@ namespace OpenSeaOfStars.Helpers
         private static Dictionary<string, CutscenePatchData> fromDockCutsceneData = new()
         {
             { "EvermistIsland_WorldMap_Gameplay", new CutscenePatchData {newPosition = new Vector3(114.5f, 3.01f, 74.5f)} }
+        };
+
+        private static List<string> cutscenesToSkip = new()
+        {
+            // "BEH_ZenithElevator_GoingUp",
+            // "BEH_OutWindTunnel_FloorA",
+            // "BEH_OutTunnel_Right",
+            // "BEH_OutTunnel_Left",
+            // "CUT_ActTwoInterlude",
+            // "CUT_Outpost_AfterSavingVillage"
         };
         
         private static List<CharacterDefinitionId> gameplayParty = new()
@@ -278,6 +296,11 @@ namespace OpenSeaOfStars.Helpers
                     leader.transform.position = fromDock.newPosition;
                     currentCutsceneGraph = __instance;
                     currentCutsceneType = CutsceneType.World;
+                }
+                else if (cutscenesToSkip.Contains(__instance.gameObject.name))
+                {
+                    OpenSeaOfStarsMod.OpenInstance.LoggerInstance.Msg($"Skipping {__instance.gameObject.name}");
+                    __instance.SkipTree();
                 }
             }
         }

@@ -170,6 +170,21 @@ namespace OpenSeaOfStars
                     }
                 }
             }
+
+            if (sceneName.ToLower().Equals("wizardlab_gameplay"))
+            {
+                GameObject blueTrigger = GameObject.Find("ROOMS_STUFF/BLUE_ROOM_STUFF/BluePortal_Stuff/TRIG_DisableBluePortal").gameObject;
+                GameObject cyanTrigger = GameObject.Find("ROOMS_STUFF/CYAN_ROOM_STUFF/TRIG_Disable_CyanPortal").gameObject;
+                if (blueTrigger)
+                {
+                    GameObject.Destroy(blueTrigger);
+                }
+
+                if (cyanTrigger)
+                {
+                    GameObject.Destroy(cyanTrigger);
+                }
+            }
         }
         public override void OnUpdate()
         {

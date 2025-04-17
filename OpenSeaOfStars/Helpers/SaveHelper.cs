@@ -215,10 +215,6 @@ namespace OpenSeaOfStars.Helpers
             ret.Add("50862854cc21e3745842a3845273ed41", 1);
             ret.Add("97889ae144bd21b4bbf4316a28f2b1d3", 1);
 
-            // Abandoned Wizard Flags
-            ret.Add("cd680b2ad619ca14c869c23e8cfcc55b", 1);
-            ret.Add("f911c403f7589884b84287dee465fe72", 1);
-
             // Kiln Mountain flags
             ret.Add("23872d00c0fccc44b90faed2b33d7d4f", 1);
             ret.Add("7bd4347bdbff8af4a9e90918ab45ab07", 1);
@@ -279,6 +275,13 @@ namespace OpenSeaOfStars.Helpers
             ret.Add("8dc814be1b11bee4fa2bbe5cd94479fd", 1); // Bvar_Mines_BossFight_Done // powers elevator as well
             ret.Add("67c2e14989179794caa05fcba09c99f3", 0); // Bvar_ClockworkCastle_InterludeTwo_Done
             ret.Add("775d6e50cf2ef0f4d9d8a98a89bf4a02", 1); // Bvar_Outpost_ExitMine_Done // needs to be 0 when you beat Malkomud
+            // Brisk
+            ret.Add("7deb5119d7009224295879f991aeb433", 1); // Bvar_InfiniteAbyss_DwellerOfDreadDefeated_Done // opens Brisk arena
+            // Abandoned Wizard Flags
+            ret.Add("cd680b2ad619ca14c869c23e8cfcc55b", 1); // Bvar_WizardLab_Entrance_Done
+            ret.Add("f911c403f7589884b84287dee465fe72", 1); // Bvar_WizardLab_LabIntro_Done
+            // CHEATS, remove after testing
+            ret.Add("72c972132d13ff943818a3295efe8c77", 1); // white portal open
 
             return ret;
         }

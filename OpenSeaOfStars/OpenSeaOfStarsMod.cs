@@ -1,14 +1,10 @@
 ﻿#define HAS_UNITY_EXPLORER
 using MelonLoader;
 using Il2Cpp;
-using Unity;
 using UnityEngine;
-using UnityEditor;
 using OpenSeaOfStars.Helpers;
-using Il2CppSabotage.Blackboard;
-using HarmonyLib;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
-using Il2CppSabotage.Imposter;
+using static OpenSeaOfStars.Helpers.CutsceneHelper;
 
 namespace OpenSeaOfStars
 {
@@ -68,6 +64,13 @@ namespace OpenSeaOfStars
                 else
                 {
                     SaveHelper.setLastSave(); // Temp to load the init save with "Continue"
+                    CutsceneHelper.currentCutsceneGraph = null;
+                    CutsceneHelper.endingCutsceneGraph = null;
+                    CutsceneHelper.didEndingPlay = false;
+                    CutsceneHelper.isCustom = true;
+                    CutsceneHelper.doSwapLeader = false;
+                    CutsceneHelper.doHide = false;
+                    CutsceneHelper.currentCutsceneType = CutsceneType.None;
                 }
             }
 
@@ -119,6 +122,30 @@ namespace OpenSeaOfStars
                 {
                     GameObject.Destroy(bossBlocker);
                     LoggerInstance.Msg($"Unloaded blocking cutscene");
+                }
+            }
+
+            if (sceneName.ToLower().Equals("mines_gameplay"))
+            {
+                LoggerInstance.Msg($"Scene {sceneName} with build index {buildIndex} has been loaded!");
+
+                GameObject blocker = GameObject.Find("GPI_AutosaveTrigger_BoucheTrou (C)");
+                if (blocker != null)
+                {
+                    blocker.SetActive(false);
+                    LoggerInstance.Msg($"Unloaded buggy autosave");
+                }
+                blocker = GameObject.Find("GPI_AutosaveTrigger_BoucheTrou (E)");
+                if (blocker != null)
+                {
+                    blocker.SetActive(false);
+                    LoggerInstance.Msg($"Unloaded buggy autosave");
+                }
+                blocker = GameObject.Find("GPI_AutosaveTrigger_BoucheTrou (G)");
+                if (blocker != null)
+                {
+                    blocker.SetActive(false);
+                    LoggerInstance.Msg($"Unloaded buggy autosave");
                 }
             }
 
@@ -189,7 +216,7 @@ namespace OpenSeaOfStars
         public override void OnUpdate()
         {
             base.OnUpdate();
-            if (CutsceneHelper.currentCutsceneType == CutsceneHelper.CutsceneType.Story)
+            if (CutsceneHelper.currentCutsceneType == CutsceneHelper.CutsceneType.Story || CutsceneHelper.currentCutsceneType == CutsceneHelper.CutsceneType.StoryExt)
             {
                 CutsceneHelper.checkCutsceneFinished();
             }

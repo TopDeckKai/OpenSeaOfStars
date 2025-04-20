@@ -170,6 +170,9 @@
     <Reference Include="UnityEngine.VFXModule">
       <HintPath>D:\SteamLibrary\steamapps\common\Sea of Stars\MelonLoader\Il2CppAssemblies\UnityEngine.VFXModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityExplorer.ML.IL2CPP.net6preview.interop">
+      <HintPath>D:\SteamLibrary\steamapps\common\Sea of Stars\Mods\UnityExplorer.ML.IL2CPP.net6preview.interop.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

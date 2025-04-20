@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using System;
+using HarmonyLib;
 using Il2Cpp;
 using Il2CppRewired;
 using Il2CppSabotage.Graph.Core;
@@ -8,14 +9,10 @@ using UnityEngine;
 
 namespace OpenSeaOfStars.Helpers
 {
-    internal class DialogueHelper : MelonLogger
+    public class DialogueHelper : MelonLogger
     {
         public static List<string> LocalizationIdConstants = new List<string>() {
             "OPEN_SEA_OF_STARS_VESPERTINE_SEA_OF_NIGHTMARE"
-        };
-
-        private static Dictionary<string, string> newDialogue = new Dictionary<string, string>() {
-            { LocalizationIdConstants[0], "Sea of Nightmare" }
         };
 
         private class DialoguePatchData
@@ -26,6 +23,17 @@ namespace OpenSeaOfStars.Helpers
             public int nodePos = 0;
             public int slot = 0;
         }
+
+        private class DialogueOptionPatchData
+        {
+            public string dialogueText = "";
+            public string loadLevel = "";
+        }
+
+        private static Dictionary<string, DialogueOptionPatchData> newDialogueOption = new Dictionary<string, DialogueOptionPatchData>() {
+            { LocalizationIdConstants[0], new DialogueOptionPatchData() {dialogueText = "Sea of Nightmare", loadLevel = "SeaOfNightmare_WorldMap" } }
+        };
+
 
         private static Dictionary<string, DialoguePatchData[]> dialoguePatch = new Dictionary<string, DialoguePatchData[]>()
         {
@@ -55,7 +63,6 @@ namespace OpenSeaOfStars.Helpers
                             CutsceneTree ct = ctc.currentGraph;
                             if (ct != null && ct.nodes.Count > 0)
                             {
-                                // Surrounding with try catch because comparing the type with "is" isn't working, chalking that up to modding library jank?
                                 try
                                 {
                                     GraphNode node = ct.nodes[dpd.nodePos];
@@ -88,6 +95,27 @@ namespace OpenSeaOfStars.Helpers
             return false;
         }
 
+        [HarmonyPatch(typeof(PlayDialogNode), "OnDialogCompleted")]
+        private static class DialogueChoicePatch
+        {
+            [HarmonyPostfix]
+            private static void Postfix(PlayDialogNode __instance)
+            {
+                if (__instance.dialogBoxData.value.ContainsChoice()) {
+                    LocalizationId choiceLocId = __instance.dialogBoxData.value.dialogChoices[__instance.dialogChoiceIndex].localizationId;
+
+                    if (LocalizationIdConstants.Any(s => s.Equals(choiceLocId.locId)))
+                    {
+                        Msg("THIS WORKS 2");
+                        if (!newDialogueOption[choiceLocId.locId].loadLevel.Equals(""))
+                        {
+                            OpenSeaOfStarsMod.OpenInstance.LevelHelper.loadLevel(newDialogueOption[choiceLocId.locId].loadLevel);
+                        }
+                    }
+                }
+            }
+        }
+
         [HarmonyPatch(typeof(LocalizationId), "GetText")]
         private static class AdditionalDialoguePatch
         {
@@ -96,7 +124,7 @@ namespace OpenSeaOfStars.Helpers
             {
                 if (LocalizationIdConstants.Any(s => s.Equals(__instance.locId)))
                 {
-                    __result = newDialogue[__instance.locId];
+                    __result = newDialogueOption[__instance.locId].dialogueText;
                     return false;
                 }
 
@@ -112,7 +140,7 @@ namespace OpenSeaOfStars.Helpers
             {
                 if (LocalizationIdConstants.Any(s => s.Equals(__instance.locId)))
                 {
-                    __result = newDialogue[__instance.locId];
+                    __result = newDialogueOption[__instance.locId].dialogueText;
                     return false;
                 }
 
@@ -128,7 +156,7 @@ namespace OpenSeaOfStars.Helpers
             {
                 if (LocalizationIdConstants.Any(s => s.Equals(localizationId.locId)))
                 {
-                    __result = newDialogue[localizationId.locId];
+                    __result = newDialogueOption[localizationId.locId].dialogueText;
                     return false;
                 }
 
@@ -144,7 +172,7 @@ namespace OpenSeaOfStars.Helpers
             {
                 if (LocalizationIdConstants.Any(s => s.Equals(locId)))
                 {
-                    __result = newDialogue[locId];
+                    __result = newDialogueOption[locId].dialogueText;
                     return false;
                 }
 
@@ -160,7 +188,7 @@ namespace OpenSeaOfStars.Helpers
             {
                 if (LocalizationIdConstants.Any(s => s.Equals(locId)))
                 {
-                    __result = newDialogue[locId];
+                    __result = newDialogueOption[locId].dialogueText;
                     return false;
                 }
 

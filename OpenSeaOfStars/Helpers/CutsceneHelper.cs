@@ -5,6 +5,7 @@ using Il2CppSabotage.Graph.Core;
 using MelonLoader;
 using Il2CppSabotage.Imposter;
 using static MelonLoader.MelonLogger;
+using static OpenSeaOfStars.OpenSeaOfStarsMod;
 
 namespace OpenSeaOfStars.Helpers
 {
@@ -24,11 +25,13 @@ namespace OpenSeaOfStars.Helpers
         private class CutscenePatchData
         {
             public List<CharacterDefinitionId> requiredCharacters;
-            public bool forceAnimations = false;
+            public bool forceAnimations;
             public Vector3 newPosition;
             public bool isCustom = true;
-            public bool hideSprite = false;
-            public bool swapLeader = false;
+            public bool hideSprite;
+            public bool swapLeader;
+            public Action onCutsceneStart;
+            public Action onCutsceneEnd;
         }
 
         private static Dictionary<string, CutscenePatchData> storyCutsceneData = new()
@@ -49,7 +52,8 @@ namespace OpenSeaOfStars.Helpers
             { "CUT_Outpost_AfterSavingVillage", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
             { "CUT_Elevator_TheSleepingSerpent", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
             // brisk
-            { "CUT_StartArena", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Bst, CharacterDefinitionId.Serai, CharacterDefinitionId.Reshan}} },
+            // { "CUT_StartArena", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Bst, CharacterDefinitionId.Serai, CharacterDefinitionId.Reshan}} },
+            // { "CUT_BronzeIntro", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Bst, CharacterDefinitionId.Valere, CharacterDefinitionId.Reshan}} },
             // wizard lab
             { "CUT_WizardLab_BossFight", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
             { "CUT_BackToHub", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
@@ -100,15 +104,27 @@ namespace OpenSeaOfStars.Helpers
             CharacterDefinitionId.Reshan,
             CharacterDefinitionId.Bst
         };
-        private static Dictionary<string, (string main, string world)> characterObjectDict = new()
+        private static Dictionary<string, CutscenePatchData> callbackOnlyCutsceneData = new()
         {
-            {CharacterDefinitionId.Zale.ToString(), ("PlayableCharacter_SunBoy(Clone)", "PlayableCharacter_WorldMapSunboy(Clone)")},
-            {CharacterDefinitionId.Valere.ToString(), ("PlayableCharacter_Moongirl(Clone)", "PlayableCharacter_WorldMapMoongirl(Clone)")},
-            {CharacterDefinitionId.Garl.ToString(), ("PlayableCharacter_Garl(Clone)", "PlayableCharacter_WorldMapGarl(Clone)")},
-            {CharacterDefinitionId.Serai.ToString(), ("PlayableCharacter_Serai(Clone)", "PlayableCharacter_WorldMapSerai(Clone)")},
-            {CharacterDefinitionId.Reshan.ToString(), ("PlayableCharacter_Reshan(Clone)", "PlayableCharacter_WorldMapReshan(Clone)")},
-            {CharacterDefinitionId.Bst.ToString(), ("PlayableCharacter_Bst(Clone)", "PlayableCharacter_WorldMapBst(Clone)")}
+            // { "CUT_BronzePrize", new CutscenePatchData {onCutsceneStart = () => {
+            //     foreach (CharacterDefinitionId character in gameplayParty)
+            //     {
+            //         PlayerPartyManager ppm = PlayerPartyManager.Instance;
+            //         Il2CppArrayBase<CharacterDefinitionId> chars = ppm.currentParty.ToArray();
+            //         // remove characters that should not be there
+            //         if (OpenSeaOfStarsMod.randomizerParty.All(c => c.ToString() != character.ToString()) && chars.Any(c => c.ToString() == character.ToString()))
+            //         {
+            //             ppm.RemovePartyMember(character, true, true, true);
+            //         }
+            //         // add characters that should be there
+            //         if (OpenSeaOfStarsMod.randomizerParty.Any(c => c.ToString() == character.ToString()) && chars.All(c => c.ToString() != character.ToString()))
+            //         {
+            //             ppm.AddPartyMember(character, ppm.currentParty.Count < 3, true, true);
+            //         }
+            //     }
+            // }} }
         };
+        
         public static GraphControllerBase currentCutsceneGraph = null;
         public static GraphControllerBase endingCutsceneGraph = null;
         public static bool didEndingPlay = false;
@@ -117,6 +133,7 @@ namespace OpenSeaOfStars.Helpers
         public static bool doHide = false;
 
         public static CutsceneType currentCutsceneType = CutsceneType.None;
+        public static Action currentCutsceneCallback;
 
         private static bool keepActiveFix = false;
         private static List<CharacterDefinitionId> keepActive = new List<CharacterDefinitionId>();
@@ -126,7 +143,7 @@ namespace OpenSeaOfStars.Helpers
             mod = mainMod;
         }
 
-        internal void initCutsceneManager(bool debug)
+        internal void initCutsceneManager()
         {
             try
             {
@@ -141,7 +158,7 @@ namespace OpenSeaOfStars.Helpers
 
         private static void hidePartyMember(CharacterDefinitionId id, GameObject partyHandler, bool hideSprite)
         {
-            GameObject follower = partyHandler.transform.FindChild(characterObjectDict[id.ToString()].main).gameObject;
+            GameObject follower = partyHandler.transform.FindChild(CharacterObjectDict[id.ToString()].main).gameObject;
             if (hideSprite)
             {
                 follower.transform.FindChild("CharacterOffset").FindChild("Character").GetComponent<Animator>().enabled = false;
@@ -168,14 +185,13 @@ namespace OpenSeaOfStars.Helpers
                 if (ppm.currentParty.Count < 3)
                 {
                     ppm.AddPartyMember(id, true, true, false);
-                    if (OpenSeaOfStarsMod.debug)
-                    {
-                        Msg("DEBUG NON CUSTOM CHARACTER SPAWNED: " + id.ToString);
-                    }
+                    #if DEBUG
+                    Msg("DEBUG NON CUSTOM CHARACTER SPAWNED: " + id.ToString);
+                    #endif
 
                     foreach (CharacterDefinitionId charId in gameplayParty)
                     {
-                        if (!OpenSeaOfStarsMod.randomizerParty.Any(c => c.Equals(charId)))
+                        if (!RandomizerParty.Any(c => c.Equals(charId)))
                         {
                             ppm.combatParty.Remove(charId);
                         }
@@ -193,13 +209,12 @@ namespace OpenSeaOfStars.Helpers
 
                 if (partyHandler != null)
                 {
-                    GameObject leader = partyHandler.transform.FindChild(characterObjectDict[ppm.Leader.CharacterDefinitionId.ToString()].main).gameObject;
-                    GameObject follower = partyHandler.transform.FindChild(characterObjectDict[id.ToString()].main).gameObject;
+                    GameObject leader = partyHandler.transform.FindChild(CharacterObjectDict[ppm.Leader.CharacterDefinitionId.ToString()].main).gameObject;
+                    GameObject follower = partyHandler.transform.FindChild(CharacterObjectDict[id.ToString()].main).gameObject;
 
-                    if (OpenSeaOfStarsMod.debug)
-                    {
-                        Msg("DEBUG CHARACTER SPAWNED: " + id.ToString);
-                    }
+                    #if DEBUG
+                    Msg("DEBUG CHARACTER SPAWNED: " + id.ToString);
+                    #endif
 
                     follower.SetActive(true);
                     follower.GetComponent<PartyCharacterFollower>().enabled = true;
@@ -224,6 +239,8 @@ namespace OpenSeaOfStars.Helpers
                 if (toDockCutsceneData.ContainsKey(currentCutsceneGraph.gameObject.scene.name))
                 {
                     currentCutsceneGraph.StopTree();
+                    currentCutsceneCallback?.Invoke();
+                    currentCutsceneCallback = null;
                     currentCutsceneGraph = null;
                     currentCutsceneType = CutsceneType.None;
                     
@@ -234,6 +251,8 @@ namespace OpenSeaOfStars.Helpers
                 if (fromDockCutsceneData.ContainsKey(currentCutsceneGraph.gameObject.scene.name))
                 {
                     currentCutsceneGraph.StopTree();
+                    currentCutsceneCallback?.Invoke();
+                    currentCutsceneCallback = null;
                     currentCutsceneGraph = null;
                     currentCutsceneType = CutsceneType.None;
                 }
@@ -259,7 +278,7 @@ namespace OpenSeaOfStars.Helpers
                 bool didFix = false;
                 foreach (CharacterDefinitionId id in keepActive)
                 {
-                    GameObject partychar = partyHandler.transform.FindChild(characterObjectDict[id.ToString()].main).gameObject;
+                    GameObject partychar = partyHandler.transform.FindChild(CharacterObjectDict[id.ToString()].main).gameObject;
                     if (!partychar.active)
                     {
                         partychar.active = true;
@@ -279,7 +298,7 @@ namespace OpenSeaOfStars.Helpers
                 GameObject partyHandler = GameObject.Find("CapsuleParty(Clone)");
                 foreach (CharacterDefinitionId charId in gameplayParty)
                 {
-                    if (!OpenSeaOfStarsMod.randomizerParty.Any(c => c.Equals(charId)) && ppm.currentParty.Contains(charId))
+                    if (!RandomizerParty.Any(c => c.Equals(charId)) && ppm.currentParty.Contains(charId))
                     {
                         ppm.combatParty.Remove(charId);
                         hidePartyMember(charId, partyHandler, true);
@@ -294,7 +313,7 @@ namespace OpenSeaOfStars.Helpers
             keepActive = new List<CharacterDefinitionId>();
             PlayerPartyManager ppm = PlayerPartyManager.Instance;
             GameObject partyHandler = GameObject.Find("CapsuleParty(Clone)");
-            Vector3 pos = partyHandler.transform.FindChild(characterObjectDict[ppm.currentParty[0].ToString()].main).transform.position;
+            Vector3 pos = partyHandler.transform.FindChild(CharacterObjectDict[ppm.currentParty.ToArray()[0].ToString()].main).transform.position;
 
             foreach (CharacterDefinitionId id in gameplayParty)
             {
@@ -302,18 +321,18 @@ namespace OpenSeaOfStars.Helpers
                 {
                     if (ppm.currentParty.Contains(id))
                     {
-                        if (OpenSeaOfStarsMod.randomizerParty.Any(c => c.Equals(id)) && ppm.combatParty.Contains(id))
+                        if (RandomizerParty.Any(c => c.Equals(id)) && ppm.combatParty.Contains(id))
                         {
-                            GameObject partychar = partyHandler.transform.FindChild(characterObjectDict[id.ToString()].main).gameObject;
+                            GameObject partychar = partyHandler.transform.FindChild(CharacterObjectDict[id.ToString()].main).gameObject;
                             partychar.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").gameObject.active = true;
                         }
                         else
                         {
                             bool inCombat = ppm.combatParty.ToArray().Any(c => c.Equals(id));
-                            bool inParty = OpenSeaOfStarsMod.randomizerParty.Any(c => c.Equals(id));
+                            bool inParty = RandomizerParty.Any(c => c.Equals(id));
                             if (!inParty)
                             {
-                                GameObject follower = partyHandler.transform.FindChild(characterObjectDict[id.ToString()].main).gameObject;
+                                GameObject follower = partyHandler.transform.FindChild(CharacterObjectDict[id.ToString()].main).gameObject;
                                 ppm.currentParty.Remove(id);
                                 ppm.combatParty.Remove(id);
                                 if (follower.active)
@@ -326,7 +345,7 @@ namespace OpenSeaOfStars.Helpers
                             }
                             else if (!inCombat)
                             {
-                                GameObject follower = partyHandler.transform.FindChild(characterObjectDict[id.ToString()].main).gameObject;
+                                GameObject follower = partyHandler.transform.FindChild(CharacterObjectDict[id.ToString()].main).gameObject;
                                 ppm.combatParty.Remove(id);
                                 if (follower.active)
                                 {
@@ -341,14 +360,14 @@ namespace OpenSeaOfStars.Helpers
                 } 
                 else
                 {
-                    if (OpenSeaOfStarsMod.randomizerParty.Any(c => c.Equals(id)))
+                    if (RandomizerParty.Any(c => c.Equals(id)))
                     {
                         if (ppm.currentParty.Contains(id))
                         {
                             ppm.RemovePartyMember(id, true, false, false);
                         }
                         ppm.AddPartyMember(id, ppm.combatParty.Count < 3, ppm.combatParty.Count < 3, ppm.combatParty.Count < 3);
-                        partyHandler.transform.FindChild(characterObjectDict[id.ToString()].main).transform.position = pos;
+                        partyHandler.transform.FindChild(CharacterObjectDict[id.ToString()].main).transform.position = pos;
                     }
                     else
                     {
@@ -361,32 +380,33 @@ namespace OpenSeaOfStars.Helpers
             }
             if (doSwapLeader)
             {
-                ppm.SetLeader(OpenSeaOfStarsMod.randomizerParty[0]);
+                ppm.SetLeader(RandomizerParty[0]);
                 ppm.SetupParty(true);
                 doSwapLeader = false;
 
-                GameObject leader = partyHandler.transform.FindChild(characterObjectDict[ppm.Leader.CharacterDefinitionId.ToString()].main).gameObject;
+                GameObject leader = partyHandler.transform.FindChild(CharacterObjectDict[ppm.Leader.CharacterDefinitionId.ToString()].main).gameObject;
 
                 if (ppm.combatParty.Count > 1)
                 {
-                    GameObject follower = partyHandler.transform.FindChild(characterObjectDict[ppm.combatParty[1].characterId].main).gameObject;
+                    GameObject follower = partyHandler.transform.FindChild(CharacterObjectDict[ppm.combatParty.ToArray()[1].characterId].main).gameObject;
                     follower.GetComponent<PartyCharacterFollower>().FollowTarget(leader.GetComponent<FollowerLeader>(), true, true);  
                 }
                 if (ppm.combatParty.Count > 2)
                 {
-                    GameObject follower = partyHandler.transform.FindChild(characterObjectDict[ppm.combatParty[2].characterId].main).gameObject;
+                    GameObject follower = partyHandler.transform.FindChild(CharacterObjectDict[ppm.combatParty.ToArray()[2].characterId].main).gameObject;
                     follower.GetComponent<PartyCharacterFollower>().FollowTarget(leader.GetComponent<FollowerLeader>(), true, true);
                 }
 
                 //set rpg camera
-                setRPGCameraToLeader(ppm, partyHandler, OpenSeaOfStarsMod.randomizerParty[0]);
+                setRPGCameraToLeader(ppm, partyHandler, RandomizerParty[0]);
 
-                if (OpenSeaOfStarsMod.debug)
-                {
-                    Msg("LEADER SWAPPED BACK: " + characterObjectDict[OpenSeaOfStarsMod.randomizerParty[0].ToString()].main);
-                }
+                #if DEBUG
+                Msg("LEADER SWAPPED BACK: " + CharacterObjectDict[RandomizerParty[0].ToString()].main);
+                #endif
             }
 
+            currentCutsceneCallback?.Invoke();
+            currentCutsceneCallback = null;
             currentCutsceneGraph = null;
             currentCutsceneType = CutsceneType.None;
             endingCutsceneGraph = null;
@@ -403,7 +423,7 @@ namespace OpenSeaOfStars.Helpers
                 CharacterViewCameraContext context = cameraObject.GetComponent<CameraBehaviour>().currentContext.TryCast<CharacterViewCameraContext>();
                 if (context != null)
                 {
-                    GameObject leader = partyHandler.transform.FindChild(characterObjectDict[leadId.ToString()].main).gameObject;
+                    GameObject leader = partyHandler.transform.FindChild(CharacterObjectDict[leadId.ToString()].main).gameObject;
                     context.player = leader.transform;
                     context.cameraLookAtPosition = leader.GetComponent<PlayerCameraLookAtPosition>();
                 }
@@ -416,22 +436,24 @@ namespace OpenSeaOfStars.Helpers
 
             if (isCustomCode)
             {
-                foreach (CharacterDefinitionId partyChar in OpenSeaOfStarsMod.randomizerParty)
+                foreach (CharacterDefinitionId partyChar in RandomizerParty)
                 {
                     if (!enabledList.Any(c => c.Equals(partyChar)))
                     {
-                        GameObject partyCharObj = partyHandler.transform.FindChild(characterObjectDict[partyChar.ToString()].main).gameObject;
+                        GameObject partyCharObj = partyHandler.transform.FindChild(CharacterObjectDict[partyChar.ToString()].main).gameObject;
                         if (partyCharObj != null && partyCharObj.active && ppm.combatParty.Contains(partyChar))
                         {
                             partyCharObj.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").gameObject.active = false;
-                            if (OpenSeaOfStarsMod.debug) { OpenSeaOfStarsMod.OpenInstance.LoggerInstance.Msg($"HIDE SPRITE IN CUSTOM CODE: {characterObjectDict[partyChar.ToString()].main}"); }
+                            #if DEBUG 
+                            OpenInstance.LoggerInstance.Msg($"HIDE SPRITE IN CUSTOM CODE: {CharacterObjectDict[partyChar.ToString()].main}");
+                            #endif
                         }
                     }
                 }
             }
             else
             {
-                foreach (CharacterDefinitionId partyChar in OpenSeaOfStarsMod.randomizerParty)
+                foreach (CharacterDefinitionId partyChar in RandomizerParty)
                 {
                     if (!enabledList.Any(c => c.Equals(partyChar)))
                     {
@@ -467,21 +489,23 @@ namespace OpenSeaOfStars.Helpers
                     return;
                 }
 
-                if (__instance != null && OpenSeaOfStarsMod.debug)
+                #if DEBUG
+                if (__instance != null)
                 {
                     if (__instance.transform.parent != null && __instance.transform.parent.parent != null && __instance.transform.parent.parent.gameObject != null)
                     {
-                        OpenSeaOfStarsMod.OpenInstance.LoggerInstance.Msg($"TELE PLAYER: {__instance.transform.parent.parent.gameObject.name}/{__instance.transform.parent.gameObject.name}/{__instance.gameObject.name}");
+                        OpenInstance.LoggerInstance.Msg($"TELE PLAYER: {__instance.transform.parent.parent.gameObject.name}/{__instance.transform.parent.gameObject.name}/{__instance.gameObject.name}");
                     }
                     else if (__instance.transform.parent != null && __instance.transform.parent.gameObject != null)
                     {
-                        OpenSeaOfStarsMod.OpenInstance.LoggerInstance.Msg($"TELE PLAYER: {__instance.transform.parent.gameObject.name}/{__instance.gameObject.name}");
+                        OpenInstance.LoggerInstance.Msg($"TELE PLAYER: {__instance.transform.parent.gameObject.name}/{__instance.gameObject.name}");
                     }
                     else
                     {
-                        OpenSeaOfStarsMod.OpenInstance.LoggerInstance.Msg($"TELE PLAYER: {__instance.gameObject.name}");
+                        OpenInstance.LoggerInstance.Msg($"TELE PLAYER: {__instance.gameObject.name}");
                     }
                 }
+                #endif
 
                 if (currentCutsceneType == CutsceneType.None)
                 {
@@ -501,17 +525,16 @@ namespace OpenSeaOfStars.Helpers
 
                             foreach (CharacterDefinitionId charId in gameplayParty)
                             {
-                                if (!OpenSeaOfStarsMod.randomizerParty.Any(c => c.Equals(charId)) && ppm.currentParty.Contains(charId))
+                                if (!RandomizerParty.Any(c => c.Equals(charId)) && ppm.currentParty.Contains(charId))
                                 {
                                     ppm.combatParty.Remove(charId);
                                     hidePartyMember(charId, partyHandler, tele.hideSprite);
                                 }
                             }
 
-                            if (OpenSeaOfStarsMod.debug)
-                            {
-                                Msg("LEADER SWAPPED: " + characterObjectDict[tele.requiredCharacters[0].ToString()].main);
-                            }
+                            #if DEBUG
+                            Msg("LEADER SWAPPED: " + CharacterObjectDict[tele.requiredCharacters[0].ToString()].main);
+                            #endif
                         }
                     }
                 }
@@ -529,34 +552,44 @@ namespace OpenSeaOfStars.Helpers
                     return;
                 }
                 
-                OpenSeaOfStarsMod.OpenInstance.LoggerInstance.Msg($"CUTSCENE: {__instance.gameObject.name}");
+                OpenInstance.LoggerInstance.Msg($"CUTSCENE: {__instance.gameObject.name}");
                 PlayerPartyManager ppm = PlayerPartyManager.Instance;
-                if (storyCutsceneData.TryGetValue(__instance.gameObject.name, out CutscenePatchData story))
+                if (storyCutsceneData.TryGetValue(__instance.gameObject.name, out CutscenePatchData data))
                 {
                     GameObject partyHandler = GameObject.Find("CapsuleParty(Clone)");
-                    resetCharactersForCutscenes(ppm, partyHandler, story.requiredCharacters, story.forceAnimations, story.isCustom, story.hideSprite);
+                    resetCharactersForCutscenes(ppm, partyHandler, data.requiredCharacters, data.forceAnimations, data.isCustom, data.hideSprite);
+                    currentCutsceneCallback = data.onCutsceneEnd;
                     currentCutsceneGraph = __instance;
                     currentCutsceneType = CutsceneType.Story;
+                    data.onCutsceneStart?.Invoke();
                 }
-                else if (__instance.gameObject.name.Equals("BEH_Dock_Fast_Travel_To_Docks") && toDockCutsceneData.TryGetValue(__instance.gameObject.scene.name, out CutscenePatchData toDock))
+                else if (__instance.gameObject.name.Equals("BEH_Dock_Fast_Travel_To_Docks") && toDockCutsceneData.TryGetValue(__instance.gameObject.scene.name, out data))
                 {
                     GameObject partyHandler = GameObject.Find("WorldMapParty(Clone)");
-                    GameObject leader = partyHandler.transform.FindChild(characterObjectDict[ppm.Leader.CharacterDefinitionId.ToString()].world).gameObject;
-                    leader.transform.position = toDock.newPosition;
+                    GameObject leader = partyHandler.transform.FindChild(CharacterObjectDict[ppm.Leader.CharacterDefinitionId.ToString()].world).gameObject;
+                    leader.transform.position = data.newPosition;
+                    currentCutsceneCallback = data.onCutsceneEnd;
+                    currentCutsceneGraph = __instance;
+                    currentCutsceneType = CutsceneType.World;
+                    data.onCutsceneStart?.Invoke();
+                }
+                else if (__instance.gameObject.name.Equals("BEH_Dock_Fast_Travel_From_Docks") && fromDockCutsceneData.TryGetValue(__instance.gameObject.scene.name, out data))
+                {
+                    GameObject partyHandler = GameObject.Find("WorldMapParty(Clone)");
+                    GameObject leader = partyHandler.transform.FindChild(CharacterObjectDict[ppm.Leader.CharacterDefinitionId.ToString()].world).gameObject;
+                    leader.transform.position = data.newPosition;
+                    data.onCutsceneStart?.Invoke();
+                    currentCutsceneCallback = data.onCutsceneEnd;
                     currentCutsceneGraph = __instance;
                     currentCutsceneType = CutsceneType.World;
                 }
-                else if (__instance.gameObject.name.Equals("BEH_Dock_Fast_Travel_From_Docks") && fromDockCutsceneData.TryGetValue(__instance.gameObject.scene.name, out CutscenePatchData fromDock))
+                else if (callbackOnlyCutsceneData.TryGetValue(__instance.gameObject.name, out data))
                 {
-                    GameObject partyHandler = GameObject.Find("WorldMapParty(Clone)");
-                    GameObject leader = partyHandler.transform.FindChild(characterObjectDict[ppm.Leader.CharacterDefinitionId.ToString()].world).gameObject;
-                    leader.transform.position = fromDock.newPosition;
-                    currentCutsceneGraph = __instance;
-                    currentCutsceneType = CutsceneType.World;
+                    data.onCutsceneStart?.Invoke();
                 }
                 else if (cutscenesToSkip.Contains(__instance.gameObject.name))
                 {
-                    OpenSeaOfStarsMod.OpenInstance.LoggerInstance.Msg($"Skipping {__instance.gameObject.name}");
+                    OpenInstance.LoggerInstance.Msg($"Skipping {__instance.gameObject.name}");
                     __instance.SkipTree();
                 }
             }

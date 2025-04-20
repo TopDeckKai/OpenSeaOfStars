@@ -34,7 +34,7 @@ namespace OpenSeaOfStars.Helpers
             mod = mainMod;
         }
 
-        internal void initBlackboardManager(bool debug)
+        internal void initBlackboardManager()
         {
             try
             {
@@ -67,36 +67,32 @@ namespace OpenSeaOfStars.Helpers
 
         internal void tryReadBlackboardManager()
         {
-            if (OpenSeaOfStarsMod.debug)
-            {
-                
-            }
+            
         }
         
         internal void FindNewBlackboardVars()
         {
-            if (OpenSeaOfStarsMod.debug)
+            #if DEBUG
+            Il2CppReferenceArray<Object> objs = ResourcesAPIInternal.FindObjectsOfTypeAll(Il2CppType.From(typeof(BlackboardVariable)));
+            int added = 0;
+            foreach (Object obj in objs)
             {
-                Il2CppReferenceArray<Object> objs = ResourcesAPIInternal.FindObjectsOfTypeAll(Il2CppType.From(typeof(BlackboardVariable)));
-                int added = 0;
-                foreach (Object obj in objs)
+                BlackboardVariable bVar = obj.Cast<BlackboardVariable>();
+                if (!blackboardVariables.ContainsKey(bVar.guid))
                 {
-                    BlackboardVariable bVar = obj.Cast<BlackboardVariable>();
-                    if (!blackboardVariables.ContainsKey(bVar.guid))
-                    {
-                        blackboardVariables.Add(bVar.guid, bVar.name);
-                        using StreamWriter writer = new(bVarFileLocation, true);
-                        writer.WriteLine($"{bVar.guid},{bVar.name}");
-                        mod.LoggerInstance.Msg($"{bVar.guid}, {bVar.name}");
-                        added++;
-                    }
-                }
-
-                if (added > 0)
-                {
-                    mod.LoggerInstance.Msg($"Found {added} new bVars");
+                    blackboardVariables.Add(bVar.guid, bVar.name);
+                    using StreamWriter writer = new(bVarFileLocation, true);
+                    writer.WriteLine($"{bVar.guid},{bVar.name}");
+                    mod.LoggerInstance.Msg($"{bVar.guid}, {bVar.name}");
+                    added++;
                 }
             }
+
+            if (added > 0)
+            {
+                mod.LoggerInstance.Msg($"Found {added} new bVars");
+            }
+            #endif
         }
 
         public bool GetBlackboardValue(string key, out int value)
@@ -144,10 +140,12 @@ namespace OpenSeaOfStars.Helpers
         {
             private static void Postfix(BlackboardVariable variable, int value)
             {
-                if (OpenSeaOfStarsMod.debug && variable != null)
+                #if DEBUG
+                if (variable != null)
                 {
                     OpenSeaOfStarsMod.OpenInstance.LoggerInstance.Msg($"SET: {variable.guid} {variable.name}: {value}");
                 }
+                #endif
             }
         }
         [HarmonyPatch(typeof(BlackboardManager), "SetBlackboardValue", typeof(string), typeof(int))]
@@ -164,10 +162,9 @@ namespace OpenSeaOfStars.Helpers
                     return;
                 }
                 
-                if (OpenSeaOfStarsMod.debug)
-                {
-                    OpenSeaOfStarsMod.OpenInstance.LoggerInstance.Msg($"SET: {guid} {blackboardVariables[guid]}: {value}");
-                }
+                #if DEBUG
+                OpenSeaOfStarsMod.OpenInstance.LoggerInstance.Msg($"SET: {guid} {blackboardVariables[guid]}: {value}");
+                #endif
                 
                 if (triggers.TryGetValue((guid, value), out Dictionary<string, int> bVars))
                 {

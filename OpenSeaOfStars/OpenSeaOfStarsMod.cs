@@ -1,10 +1,11 @@
 ﻿#define HAS_UNITY_EXPLORER
 using MelonLoader;
 using Il2Cpp;
+using Il2CppInterop.Runtime;
 using UnityEngine;
 using OpenSeaOfStars.Helpers;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
-using static OpenSeaOfStars.Helpers.CutsceneHelper;
+using UnityEngine.SceneManagement;
 
 namespace OpenSeaOfStars
 {
@@ -12,25 +13,23 @@ namespace OpenSeaOfStars
     {
         public static OpenSeaOfStarsMod OpenInstance { get; private set; }
         
-        ActivityHelper ActivityHelper;
-        SaveHelper SaveHelper;
-        BlackboardHelper BlackboardHelper;
-        CutsceneHelper CutsceneHelper;
+        private ActivityHelper ActivityHelper;
+        private SaveHelper SaveHelper;
+        private BlackboardHelper BlackboardHelper;
+        private CutsceneHelper CutsceneHelper;
         public InventoryHelper InventoryHelper { get; }
         
-        bool initLoaded = false;
-        public static bool debug = true;
-        public static List<CharacterDefinitionId> randomizerParty = new List<CharacterDefinitionId> { CharacterDefinitionId.Zale };
+        private bool initLoaded;
+        public static List<CharacterDefinitionId> RandomizerParty = new() { CharacterDefinitionId.Zale };
         
-        
-        private readonly Dictionary<string, int> charMap = new()
+        public static Dictionary<string, (string main, string world)> CharacterObjectDict { get; } = new()
         {
-            { CharacterDefinitionId.Zale.ToString(), 0 },
-            { CharacterDefinitionId.Valere.ToString(), 1 },
-            { CharacterDefinitionId.Garl.ToString(), 2 },
-            { CharacterDefinitionId.Serai.ToString(), 3 },
-            { CharacterDefinitionId.Reshan.ToString(), 4 },
-            { CharacterDefinitionId.Bst.ToString(), 5 }
+            {CharacterDefinitionId.Zale.ToString(), ("PlayableCharacter_SunBoy(Clone)", "PlayableCharacter_WorldMapSunboy(Clone)")},
+            {CharacterDefinitionId.Valere.ToString(), ("PlayableCharacter_Moongirl(Clone)", "PlayableCharacter_WorldMapMoongirl(Clone)")},
+            {CharacterDefinitionId.Garl.ToString(), ("PlayableCharacter_Garl(Clone)", "PlayableCharacter_WorldMapGarl(Clone)")},
+            {CharacterDefinitionId.Serai.ToString(), ("PlayableCharacter_Serai(Clone)", "PlayableCharacter_WorldMapSerai(Clone)")},
+            {CharacterDefinitionId.Reshan.ToString(), ("PlayableCharacter_Reshan(Clone)", "PlayableCharacter_WorldMapReshan(Clone)")},
+            {CharacterDefinitionId.Bst.ToString(), ("PlayableCharacter_Bst(Clone)", "PlayableCharacter_WorldMapBst(Clone)")}
         };
 
         public OpenSeaOfStarsMod()
@@ -54,11 +53,11 @@ namespace OpenSeaOfStars
                 if (!initLoaded)
                 {
                     LoggerInstance.Msg($"Scene {sceneName} with build index {buildIndex} has been loaded!");
-                    ActivityHelper.initActivityManager(debug);
-                    BlackboardHelper.initBlackboardManager(debug);
-                    CutsceneHelper.initCutsceneManager(debug);
+                    ActivityHelper.initActivityManager();
+                    BlackboardHelper.initBlackboardManager();
+                    CutsceneHelper.initCutsceneManager();
                     InventoryHelper.GetInventoryItems();
-                    SaveHelper.createOpenSaveSlot(randomizerParty, debug);
+                    SaveHelper.createOpenSaveSlot(RandomizerParty);
                     initLoaded = true;
                 }
                 else
@@ -70,7 +69,7 @@ namespace OpenSeaOfStars
                     CutsceneHelper.isCustom = true;
                     CutsceneHelper.doSwapLeader = false;
                     CutsceneHelper.doHide = false;
-                    CutsceneHelper.currentCutsceneType = CutsceneType.None;
+                    CutsceneHelper.currentCutsceneType = CutsceneHelper.CutsceneType.None;
                 }
             }
 
@@ -211,6 +210,13 @@ namespace OpenSeaOfStars
                 {
                     GameObject.Destroy(cyanTrigger);
                 }
+                
+                // disabling the dummy WizCroube because it hardlocks the game if you Graplou it
+                GameObject croube = GameObject.Find("ROOMS_STUFF/BLUE_ROOM_STUFF/MovingFloor_Stuff/Floors_Stuff/WizCroube04_Dummy");
+                if (croube)
+                {
+                    croube.SetActive(false);
+                }
             }
         }
         public override void OnUpdate()
@@ -225,11 +231,7 @@ namespace OpenSeaOfStars
                 CutsceneHelper.skipWorldCutscene();
             }
 
-            if (!debug)
-            {
-                return;
-            }
-            
+            #if DEBUG
             if (Input.GetKeyDown(KeyCode.K))
             {
                 SaveHelper.save();
@@ -305,6 +307,7 @@ namespace OpenSeaOfStars
             {
                 InventoryHelper.PrintInventoryItems();
             }
+            #endif
         }
         
         private void AddPartyMember(CharacterDefinitionId character)
@@ -316,9 +319,37 @@ namespace OpenSeaOfStars
             }
             LoggerInstance.Msg($"Adding {character.ToString()} for debug");
             ppm.AddPartyMember(character, ppm.currentParty.Count < 3, true, true);
-            ppm.SetupParty(true);
+            if (character == CharacterDefinitionId.Zale && ppm.leader.CharacterDefinitionId != CharacterDefinitionId.Valere || character == CharacterDefinitionId.Valere && ppm.leader.CharacterDefinitionId != CharacterDefinitionId.Zale)
+            {
+                PlayerPartyCharacter old = ppm.leader;
+                ppm.SetMainCharacter(character);
+                ppm.RemovePartyMember(old.CharacterDefinitionId, true, true, false);
+                ppm.SetLeader(character);
+                ppm.SetLeaderFirstInParty();
+                ppm.leader.transform.position = old.transform.position;
+                CameraBehaviour cam = Camera.main.GetComponentInParent<CameraBehaviour>();
+                if (cam.currentContext.GetIl2CppType() == Il2CppType.Of<CharacterViewCameraContext>())
+                {
+                    string charObjName = SceneManager.GetActiveScene().name.ToLower() == "worldmap_gameplay" ? CharacterObjectDict[character.ToString()].world : CharacterObjectDict[character.ToString()].main;
+                    cam.currentContext.Cast<CharacterViewCameraContext>().cameraLookAtPosition = GameObject.FindObjectsOfType<PlayerCameraLookAtPosition>(true).First(c => c.name.Equals(charObjName));
+                }
+                BlackboardHelper.AddBlackboardValue("eade193956f385243bbd0ab47aee2ee9", 1); // can fly with a Solstice Warrior
+
+                System.Collections.IEnumerator reAddCharAfterFrame()
+                {
+                    yield return null;
+                    ppm.AddPartyMember(old.CharacterDefinitionId, ppm.currentParty.Count < 3, true, true);
+                    ppm.SetupParty(!BoatManager.Instance.IsInBoatMode);
+                }
+                MelonCoroutines.Start(reAddCharAfterFrame());
+            }
+            else if (ppm.currentParty.Count <= 3)
+            {
+                ppm.followers.ToArray().First(c => c.characterDefinitionId.ToString() == character.ToString()).transform.position = ppm.leader.transform.position;
+            }
+            ppm.SetupParty(!BoatManager.Instance.IsInBoatMode);
             
-            randomizerParty.Add(character);
+            RandomizerParty.Add(character);
         }
 
         #if HAS_UNITY_EXPLORER

@@ -89,17 +89,17 @@ namespace OpenSeaOfStars.Helpers
                     sgs.characterData[CharacterDefinitionId.Valere].gaveCharacterStartInventory = true;
                     sgs.characterData[CharacterDefinitionId.Valere].currentHP = 46;
                     sgs.characterData[CharacterDefinitionId.Valere].currentSP = 10;
-                    sgs.characterData[CharacterDefinitionId.Valere].currentVariant = 0;
+                    sgs.characterData[CharacterDefinitionId.Valere].currentVariant = EPartyCharacterVariant.DEFAULT;
                     /*sgs.characterData[CharacterDefinitionId.Valere].equippedWeapon = weaponVal; */
 
                     sgs.characterData[CharacterDefinitionId.Zale].gaveCharacterStartInventory = true;
                     sgs.characterData[CharacterDefinitionId.Zale].currentHP = 45;
                     sgs.characterData[CharacterDefinitionId.Zale].currentSP = 8;
-                    sgs.characterData[CharacterDefinitionId.Zale].currentVariant = 0;
+                    sgs.characterData[CharacterDefinitionId.Zale].currentVariant = EPartyCharacterVariant.DEFAULT;
                     /*sgs.characterData[CharacterDefinitionId.Zale].equippedWeapon = weaponZale;*/
 
                     sgs.characterData[CharacterDefinitionId.Serai].gaveCharacterStartInventory = true;
-                    sgs.characterData[CharacterDefinitionId.Serai].currentVariant = 0;
+                    sgs.characterData[CharacterDefinitionId.Serai].currentVariant = EPartyCharacterVariant.DEFAULT;
                     sgs.characterData[CharacterDefinitionId.Reshan].gaveCharacterStartInventory = true;
                     sgs.characterData[CharacterDefinitionId.Garl].gaveCharacterStartInventory = true;
                     sgs.characterData[CharacterDefinitionId.MasterMoraine].gaveCharacterStartInventory = true;
@@ -170,15 +170,12 @@ namespace OpenSeaOfStars.Helpers
         {
             BlackboardDictionary ret = new BlackboardDictionary();
 
-            //Debug can fly
-            if (OpenSeaOfStarsMod.debug && party.Any(character => character == CharacterDefinitionId.Zale || character == CharacterDefinitionId.Valere))
+            #if DEBUG
+            if (party.Any(character => character == CharacterDefinitionId.Zale || character == CharacterDefinitionId.Valere))
             {
                 ret.Add("eade193956f385243bbd0ab47aee2ee9", 1);
             }
-            else
-            {
-                ret.Add("eade193956f385243bbd0ab47aee2ee9", 0);
-            }
+            #endif
 
             // Gameplay flags
             ret.Add("3d7bce7fa2d8dd047a99e54e6526423a", 1); // UnlockedBoat
@@ -266,17 +263,12 @@ namespace OpenSeaOfStars.Helpers
             // Stonemasons Outpost
             ret.Add("21609a20eefbf394c9c7fc145b87c385", 1); // Bvar_Outpost_EnterFirstTime_Done
             ret.Add("def4ac542c3fc3a4496877c00921947f", 1); // Bvar_Mines_MeetingElder_Done
-            ret.Add("f692607b1dfb5d745be23a63fa47009c", 0); // Bvar_Mines_FirstWindTunnel_Done
             ret.Add("f243ba246f56bb7419932f918853184e", 0); // Bvar_Mines_ElderExitMine_Done
             ret.Add("d69c8e3fa6966ab45812523c26235776", 1); // Bvar_Mines_Salamander_Done
-            ret.Add("d0fa044c434e5fc468abaf62f3547b88", 0); // Bvar_Mines_EastWindTunnel_Done
             ret.Add("daa715cbd0e1e5b4bae8c163230b6bf3", 1); // Bvar_Mines_ExitStair_Done
-            ret.Add("d1f66ca7b32a4c4459c8f4e8dde77075", 0); // Bvar_Mines_WestWindTunnel_Done
             ret.Add("8dc814be1b11bee4fa2bbe5cd94479fd", 1); // Bvar_Mines_BossFight_Done // powers elevator as well
-            ret.Add("67c2e14989179794caa05fcba09c99f3", 0); // Bvar_ClockworkCastle_InterludeTwo_Done
+            ret.Add("67c2e14989179794caa05fcba09c99f3", 0); // Bvar_ClockworkCastle_InterludeTwo_Done // use as key for Mine state
             ret.Add("775d6e50cf2ef0f4d9d8a98a89bf4a02", 1); // Bvar_Outpost_ExitMine_Done // needs to be 0 when you beat Malkomud
-            // Brisk
-            ret.Add("7deb5119d7009224295879f991aeb433", 1); // Bvar_InfiniteAbyss_DwellerOfDreadDefeated_Done // opens Brisk arena
             // Abandoned Wizard Flags
             ret.Add("cd680b2ad619ca14c869c23e8cfcc55b", 1); // Bvar_WizardLab_Entrance_Done
             ret.Add("f911c403f7589884b84287dee465fe72", 1); // Bvar_WizardLab_LabIntro_Done

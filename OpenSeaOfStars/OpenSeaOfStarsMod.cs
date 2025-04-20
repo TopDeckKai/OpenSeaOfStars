@@ -17,11 +17,12 @@ namespace OpenSeaOfStars
     {
         public static OpenSeaOfStarsMod OpenInstance { get; private set; }
         
-        ActivityHelper ActivityHelper;
-        SaveHelper SaveHelper;
-        BlackboardHelper BlackboardHelper;
-        CutsceneHelper CutsceneHelper;
-        DialogueHelper DialogueHelper;
+        public ActivityHelper ActivityHelper;
+        public SaveHelper SaveHelper;
+        public BlackboardHelper BlackboardHelper;
+        public CutsceneHelper CutsceneHelper;
+        public DialogueHelper DialogueHelper;
+        public LevelHelper LevelHelper;
         
         bool initLoaded = false;
         public static bool debug = true;
@@ -47,6 +48,7 @@ namespace OpenSeaOfStars
             CutsceneHelper = new CutsceneHelper(this);
             SaveHelper = new SaveHelper(this);
             DialogueHelper = new DialogueHelper();
+            LevelHelper = new LevelHelper();
         }
 
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)

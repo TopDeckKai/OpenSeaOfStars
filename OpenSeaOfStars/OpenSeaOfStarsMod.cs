@@ -8,6 +8,8 @@ using OpenSeaOfStars.Helpers;
 using Il2CppSabotage.Blackboard;
 using HarmonyLib;
 using Il2CppSabotage.Imposter;
+using Il2CppSabotage.Graph.Core;
+using Il2CppSabotage.Localization;
 
 namespace OpenSeaOfStars
 {
@@ -19,11 +21,12 @@ namespace OpenSeaOfStars
         SaveHelper SaveHelper;
         BlackboardHelper BlackboardHelper;
         CutsceneHelper CutsceneHelper;
+        DialogueHelper DialogueHelper;
         
         bool initLoaded = false;
         public static bool debug = true;
         public static List<CharacterDefinitionId> randomizerParty = new List<CharacterDefinitionId> { CharacterDefinitionId.Zale };
-        
+        private string loadDialogue = "";
         
         private readonly Dictionary<string, int> charMap = new()
         {
@@ -43,6 +46,7 @@ namespace OpenSeaOfStars
             BlackboardHelper = new BlackboardHelper(this);
             CutsceneHelper = new CutsceneHelper(this);
             SaveHelper = new SaveHelper(this);
+            DialogueHelper = new DialogueHelper();
         }
 
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
@@ -141,6 +145,12 @@ namespace OpenSeaOfStars
                     LoggerInstance.Msg($"BOSS SLOTS NOT FOUND");
                 }
             }
+
+            if (sceneName.ToLower().Equals("vespertine_cutscene_worldmap"))
+            {
+                // This does not work on first frame of load. TODO refactor.
+                loadDialogue = sceneName.ToLower();
+            }
         }
         public override void OnUpdate()
         {
@@ -152,6 +162,14 @@ namespace OpenSeaOfStars
             else if (CutsceneHelper.currentCutsceneType == CutsceneHelper.CutsceneType.World)
             {
                 CutsceneHelper.skipWorldCutscene();
+            }
+
+            if (loadDialogue.Length > 0)
+            {
+                if (DialogueHelper.changeDialoguePerScene(loadDialogue))
+                {
+                    loadDialogue = "";
+                }
             }
 
             if (!debug)

@@ -274,7 +274,7 @@ namespace OpenSeaOfStars
             MelonBase ue = FindMelon("UnityExplorer", "Sinai");
             if (ue != null)
             {
-                // UnityExplorer.UI.UIManager.ShowMenu = false;
+                UnityExplorer.UI.UIManager.ShowMenu = false;
             }
         }
         #endif

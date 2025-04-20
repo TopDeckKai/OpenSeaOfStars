@@ -21,11 +21,12 @@ namespace OpenSeaOfStars
         SaveHelper SaveHelper;
         BlackboardHelper BlackboardHelper;
         CutsceneHelper CutsceneHelper;
+        DialogueHelper DialogueHelper;
         
         bool initLoaded = false;
         public static bool debug = true;
         public static List<CharacterDefinitionId> randomizerParty = new List<CharacterDefinitionId> { CharacterDefinitionId.Zale };
-        private bool loadDialogue = false;
+        private string loadDialogue = "";
         
         private readonly Dictionary<string, int> charMap = new()
         {
@@ -45,6 +46,7 @@ namespace OpenSeaOfStars
             BlackboardHelper = new BlackboardHelper(this);
             CutsceneHelper = new CutsceneHelper(this);
             SaveHelper = new SaveHelper(this);
+            DialogueHelper = new DialogueHelper();
         }
 
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
@@ -147,7 +149,7 @@ namespace OpenSeaOfStars
             if (sceneName.ToLower().Equals("vespertine_cutscene_worldmap"))
             {
                 // This does not work on first frame of load. TODO refactor.
-                loadDialogue = true;
+                loadDialogue = sceneName.ToLower();
             }
         }
         public override void OnUpdate()
@@ -162,38 +164,11 @@ namespace OpenSeaOfStars
                 CutsceneHelper.skipWorldCutscene();
             }
 
-            if (loadDialogue)
+            if (loadDialogue.Length > 0)
             {
-                GameObject vespertineDialogue = GameObject.Find("DIALOGUES/DIA_Hortence_TakeHelm");
-                if (vespertineDialogue != null)
+                if (DialogueHelper.changeDialoguePerScene(loadDialogue))
                 {
-                    CutsceneTreeController ctc = vespertineDialogue.GetComponent<CutsceneTreeController>();
-                    if (ctc != null)
-                    {
-                        CutsceneTree ct = ctc.currentGraph;
-                        if (ct != null && ct.nodes.Count > 0)
-                        {
-                            // Surrounding with try catch because comparing the type with "is" isn't working, chalking that up to modding library jank?
-                            try
-                            {
-                                GraphNode node = ct.nodes[1];
-                                PlayDialogNode dialogueNode = node.Cast<PlayDialogNode>();
-                                DialogBoxData dbd = dialogueNode.dialogBoxData.value;
-                                DialogBoxData.DialogChoice dc = new DialogBoxData.DialogChoice();
-                                dc.characterDefinitionId = CharacterDefinitionId.LeaderCharacter;
-                                LocalizationId sonLocId = new LocalizationId();
-                                sonLocId.categoryName = "Camping";
-                                sonLocId.locId = DialogueHelper.LocalizationIdConstants[0];
-                                dc.localizationId = sonLocId;
-                                dbd.dialogChoices.Insert(1, dc);
-                                dialogueNode.dialogBoxData.value = dbd;
-
-                                LoggerInstance.Msg("Loaded " + DialogueHelper.LocalizationIdConstants[0]);
-                                loadDialogue = false;
-                            }
-                            catch (Exception ex) { }
-                        }
-                    }
+                    loadDialogue = "";
                 }
             }
 

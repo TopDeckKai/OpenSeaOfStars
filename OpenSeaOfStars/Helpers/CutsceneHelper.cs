@@ -366,7 +366,7 @@ namespace OpenSeaOfStars.Helpers
                         {
                             ppm.RemovePartyMember(id, true, false, false);
                         }
-                        ppm.AddPartyMember(id, ppm.combatParty.Count < 3, ppm.combatParty.Count < 3, ppm.combatParty.Count < 3);
+                        ppm.AddPartyMember(id, ppm.currentParty.Count < 3, ppm.currentParty.Count < 3, ppm.currentParty.Count < 3);
                         partyHandler.transform.FindChild(CharacterObjectDict[id.ToString()].main).transform.position = pos;
                     }
                     else

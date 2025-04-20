@@ -1,8 +1,6 @@
 ﻿using Il2Cpp;
-using Il2CppSystem;
 using UnityEngine;
 using Il2CppSabotage.Blackboard;
-using Il2CppInterop.Runtime;
 using Il2CppKVP = Il2CppSystem.Collections.Generic;
 
 namespace OpenSeaOfStars.Helpers
@@ -28,7 +26,7 @@ namespace OpenSeaOfStars.Helpers
             saveManager.lastSelectedSlotIndex = index;
         }
 
-        internal void createOpenSaveSlot(List<CharacterDefinitionId> randomizerParty, bool debug = false)
+        internal void createOpenSaveSlot(List<CharacterDefinitionId> randomizerParty)
         {
             try
             {
@@ -129,13 +127,14 @@ namespace OpenSeaOfStars.Helpers
                         {
                             sgs.combatParty.Add(randomizerParty[i]);
                         }
-                        if (debug)
+                        #if DEBUG
                         {
                             sgs.characterData[randomizerParty[i]].currentHP = 999;
                             sgs.characterData[randomizerParty[i]].currentSP = 999;
 
                             sgs.characterData[randomizerParty[i]].levelUpStatUpgrades = createDebugLevelUpList();
                         }
+                        #endif
                     }
 
                     saveManager.SetSaveSlotAtIndex(modInitSaveSlot, sgs);

@@ -352,7 +352,8 @@ namespace OpenSeaOfStars
             RandomizerParty.Add(character);
         }
 
-        #if HAS_UNITY_EXPLORER
+        
+        #if HAS_UNITY_EXPLORER && DEBUG
         /// <summary>
         /// Same as pressing F7 (or whatever keybind you've changed UE to)<br/>
         /// This exists because there's a bug with UE that prevents all inputs when opening game menus

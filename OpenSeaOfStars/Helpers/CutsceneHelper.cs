@@ -55,8 +55,8 @@ namespace OpenSeaOfStars.Helpers
             // { "CUT_StartArena", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Bst, CharacterDefinitionId.Serai, CharacterDefinitionId.Reshan}} },
             // { "CUT_BronzeIntro", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Bst, CharacterDefinitionId.Valere, CharacterDefinitionId.Reshan}} },
             // wizard lab
-            { "CUT_WizardLab_BossFight", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
-            { "CUT_BackToHub", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
+            { "CUT_WizardLab_BossFight", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, isCustom = false} },
+            { "CUT_BackToHub", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, forceAnimations = true} },
         };
         private static Dictionary<string, CutscenePatchData> teleCutsceneData = new()
         {
@@ -275,20 +275,13 @@ namespace OpenSeaOfStars.Helpers
             else if (keepActiveFix)
             {
                 GameObject partyHandler = GameObject.Find("CapsuleParty(Clone)");
-                bool didFix = false;
                 foreach (CharacterDefinitionId id in keepActive)
                 {
                     GameObject partychar = partyHandler.transform.FindChild(CharacterObjectDict[id.ToString()].main).gameObject;
                     if (!partychar.active)
                     {
                         partychar.active = true;
-                        didFix = true;
                     }
-                }
-
-                if (didFix)
-                {
-                    keepActiveFix = false;
                 }
             }
             //TODO: Find harmony patch for this call instead of calling it on update thread

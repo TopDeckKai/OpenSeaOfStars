@@ -63,13 +63,7 @@ namespace OpenSeaOfStars
                 else
                 {
                     SaveHelper.setLastSave(); // Temp to load the init save with "Continue"
-                    CutsceneHelper.currentCutsceneGraph = null;
-                    CutsceneHelper.endingCutsceneGraph = null;
-                    CutsceneHelper.didEndingPlay = false;
-                    CutsceneHelper.isCustom = true;
-                    CutsceneHelper.doSwapLeader = false;
-                    CutsceneHelper.doHide = false;
-                    CutsceneHelper.currentCutsceneType = CutsceneHelper.CutsceneType.None;
+                    CutsceneHelper.ClearAllCutsceneData();
                 }
             }
 
@@ -256,7 +250,7 @@ namespace OpenSeaOfStars
                     if (t != null)
                     {
                         GameObject enc = t.gameObject;
-                        enc.SetActive(!enc.active);
+                        enc.SetActive(!enc.activeSelf);
                     }
                 }
                 catch (Exception)
@@ -330,7 +324,7 @@ namespace OpenSeaOfStars
                 CameraBehaviour cam = Camera.main.GetComponentInParent<CameraBehaviour>();
                 if (cam.currentContext.GetIl2CppType() == Il2CppType.Of<CharacterViewCameraContext>())
                 {
-                    string charObjName = SceneManager.GetActiveScene().name.ToLower() == "worldmap_gameplay" ? CharacterObjectDict[character.ToString()].world : CharacterObjectDict[character.ToString()].main;
+                    string charObjName = SceneManager.GetActiveScene().name.ToLower().Contains("worldmap") ? CharacterObjectDict[character.ToString()].world : CharacterObjectDict[character.ToString()].main;
                     cam.currentContext.Cast<CharacterViewCameraContext>().cameraLookAtPosition = GameObject.FindObjectsOfType<PlayerCameraLookAtPosition>(true).First(c => c.name.Equals(charObjName));
                 }
                 BlackboardHelper.AddBlackboardValue("eade193956f385243bbd0ab47aee2ee9", 1); // can fly with a Solstice Warrior

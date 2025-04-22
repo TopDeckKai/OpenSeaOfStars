@@ -128,12 +128,10 @@ namespace OpenSeaOfStars.Helpers
                             sgs.combatParty.Add(randomizerParty[i]);
                         }
                         #if DEBUG
-                        {
-                            sgs.characterData[randomizerParty[i]].currentHP = 999;
-                            sgs.characterData[randomizerParty[i]].currentSP = 999;
+                        sgs.characterData[randomizerParty[i]].currentHP = 999;
+                        sgs.characterData[randomizerParty[i]].currentSP = 999;
 
-                            sgs.characterData[randomizerParty[i]].levelUpStatUpgrades = createDebugLevelUpList();
-                        }
+                        sgs.characterData[randomizerParty[i]].levelUpStatUpgrades = createDebugLevelUpList();
                         #endif
                     }
 
@@ -268,11 +266,10 @@ namespace OpenSeaOfStars.Helpers
             ret.Add("8dc814be1b11bee4fa2bbe5cd94479fd", 1); // Bvar_Mines_BossFight_Done // powers elevator as well
             ret.Add("67c2e14989179794caa05fcba09c99f3", 0); // Bvar_ClockworkCastle_InterludeTwo_Done // use as key for Mine state
             ret.Add("775d6e50cf2ef0f4d9d8a98a89bf4a02", 1); // Bvar_Outpost_ExitMine_Done // needs to be 0 when you beat Malkomud
+            ret.Add("d44f0265bc66e4145919ba811cc784aa", 1); // Bvar_SleeperElevator_SleepingSerpent_Done
             // Abandoned Wizard Flags
             ret.Add("cd680b2ad619ca14c869c23e8cfcc55b", 1); // Bvar_WizardLab_Entrance_Done
             ret.Add("f911c403f7589884b84287dee465fe72", 1); // Bvar_WizardLab_LabIntro_Done
-            // CHEATS, remove after testing
-            ret.Add("72c972132d13ff943818a3295efe8c77", 1); // white portal open
 
             return ret;
         }

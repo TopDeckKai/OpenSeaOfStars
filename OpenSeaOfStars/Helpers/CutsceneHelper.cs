@@ -24,33 +24,62 @@ namespace OpenSeaOfStars.Helpers
         
         private class CutscenePatchData
         {
-            public List<CharacterDefinitionId> requiredCharacters;
+            public enum RequiredCharacterType
+            {
+                ANY,
+                ALL
+            }
+            public List<CharacterDefinitionId>? cutsceneCharacters;
+            public List<CharacterDefinitionId>? requiredCharacters;
+            public List<CharacterDefinitionId>? backupCharacters;
+            public RequiredCharacterType requiredCharacterType;
             public bool forceAnimations;
             public Vector3 newPosition;
             public bool isCustom = true;
             public bool hideSprite;
             public bool swapLeader;
-            public Action onCutsceneStart;
-            public Action onCutsceneEnd;
+            public Action? onCutsceneStart;
+            public Action? onCutsceneEnd;
         }
 
         private static Dictionary<string, CutscenePatchData> storyCutsceneData = new()
         {
+            // Evermist Island
+            { "BEH_ZenithElevator_GoingUp", new CutscenePatchData
+                {
+                    cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere},
+                    requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere},
+                    backupCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Garl, CharacterDefinitionId.Serai},
+                    requiredCharacterType = CutscenePatchData.RequiredCharacterType.ANY,
+                    isCustom = false,
+                    forceAnimations = true
+                }
+            },
+            { "BEH_ZenithElevator_GoingDown", new CutscenePatchData
+                {
+                    cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere},
+                    requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere},
+                    backupCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Garl, CharacterDefinitionId.Serai},
+                    requiredCharacterType = CutscenePatchData.RequiredCharacterType.ANY,
+                    isCustom = false
+                }
+            },
             // forbidden cavern
-            { "CUT_IntroBossSlug", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere}} },
-            { "CUT_GiantSlugDefeated", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere}, forceAnimations = true} },
+            { "CUT_IntroBossSlug", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere}} },
+            { "CUT_GiantSlugDefeated", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere}, forceAnimations = true} },
             // mountain trail
-            { "CUT_ElderMistBoss", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
-            { "CUT_ElderMistDefeated", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, forceAnimations = true} },
+            { "CUT_ElderMistBoss", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
+            { "CUT_ElderMistDefeated", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, forceAnimations = true} },
+            { "CUT_YeetThrow", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere}, isCustom = false} },
+            // Sleeper Island
+            { "CUT_XtolThrow", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere}, isCustom = false} },
             // outpost/mines
-            // { "BEH_FloorA_PingPongWindTunnel", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, forceAnimations = false, extendedCutscene = true } },
-            // { "BEH_OutWindTunnel_FloorA", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, forceAnimations = false} },
-            { "CUT_SalamanderAppears", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl }, isCustom = false } },
-            { "CUT_FightSalamanderDone", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, forceAnimations = true} },
-            { "CUT_Mines_MeetingMalkomud", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
-            { "CUT_Mines_MalkomudAfterBossFight", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
-            { "CUT_Outpost_AfterSavingVillage", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
-            { "CUT_Elevator_TheSleepingSerpent", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
+            { "CUT_SalamanderAppears", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl }, isCustom = false } },
+            { "CUT_FightSalamanderDone", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, forceAnimations = true} },
+            { "CUT_Mines_MeetingMalkomud", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
+            { "CUT_Mines_MalkomudAfterBossFight", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
+            { "CUT_Outpost_AfterSavingVillage", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
+            { "CUT_Elevator_TheSleepingSerpent", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
             // brisk
             // { "CUT_StartArena", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Bst, CharacterDefinitionId.Serai, CharacterDefinitionId.Reshan}} },
             // { "CUT_BronzeIntro", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Bst, CharacterDefinitionId.Valere, CharacterDefinitionId.Reshan}} },
@@ -61,9 +90,9 @@ namespace OpenSeaOfStars.Helpers
         private static Dictionary<string, CutscenePatchData> teleCutsceneData = new()
         {
             // mines
-            { "TEL_OUT_Room01_02", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, isCustom = false, hideSprite = false, swapLeader = true } },
-            { "TEL_OUT_Room2", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, isCustom = false, hideSprite = false, swapLeader = true  } },
-            { "TEL_OUT_Room3", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, isCustom = false, hideSprite = false, swapLeader = true  } },
+            { "TEL_OUT_Room01_02", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, isCustom = false, hideSprite = false, swapLeader = true} },
+            { "TEL_OUT_Room2", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, isCustom = false, hideSprite = false, swapLeader = true} },
+            { "TEL_OUT_Room3", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, isCustom = false, hideSprite = false, swapLeader = true} },
         };
         private static Dictionary<string, CutscenePatchData> toDockCutsceneData = new()
         {
@@ -85,14 +114,18 @@ namespace OpenSeaOfStars.Helpers
             "BEH_OutTunnel_Right",
             "BEH_OutTunnel_Left"
         };
-        private static List<string> cutscenesToSkip = new()
+        private static Dictionary<string, CutscenePatchData> cutscenesToSkip = new()
         {
-            // "BEH_ZenithElevator_GoingUp",
-            // "BEH_OutWindTunnel_FloorA",
-            // "BEH_OutTunnel_Right",
-            // "BEH_OutTunnel_Left",
-            // "CUT_ActTwoInterlude",
-            // "CUT_Outpost_AfterSavingVillage"
+            { "CUT_KeenathanRejoin", new CutscenePatchData {onCutsceneEnd = () => {
+                MelonCoroutines.Start(removeKeenathan());
+                return;
+
+                System.Collections.IEnumerator removeKeenathan()
+                {
+                    yield return null;
+                    PlayerPartyManager.Instance.RemoveCargoCharacter(CharacterDefinitionId.Keenathan);
+                }
+            }} },
         };
         
         private static List<CharacterDefinitionId> gameplayParty = new()
@@ -104,39 +137,19 @@ namespace OpenSeaOfStars.Helpers
             CharacterDefinitionId.Reshan,
             CharacterDefinitionId.Bst
         };
-        private static Dictionary<string, CutscenePatchData> callbackOnlyCutsceneData = new()
-        {
-            // { "CUT_BronzePrize", new CutscenePatchData {onCutsceneStart = () => {
-            //     foreach (CharacterDefinitionId character in gameplayParty)
-            //     {
-            //         PlayerPartyManager ppm = PlayerPartyManager.Instance;
-            //         Il2CppArrayBase<CharacterDefinitionId> chars = ppm.currentParty.ToArray();
-            //         // remove characters that should not be there
-            //         if (OpenSeaOfStarsMod.randomizerParty.All(c => c.ToString() != character.ToString()) && chars.Any(c => c.ToString() == character.ToString()))
-            //         {
-            //             ppm.RemovePartyMember(character, true, true, true);
-            //         }
-            //         // add characters that should be there
-            //         if (OpenSeaOfStarsMod.randomizerParty.Any(c => c.ToString() == character.ToString()) && chars.All(c => c.ToString() != character.ToString()))
-            //         {
-            //             ppm.AddPartyMember(character, ppm.currentParty.Count < 3, true, true);
-            //         }
-            //     }
-            // }} }
-        };
-        
-        public static GraphControllerBase currentCutsceneGraph = null;
-        public static GraphControllerBase endingCutsceneGraph = null;
-        public static bool didEndingPlay = false;
-        public static bool isCustom = true;
-        public static bool doSwapLeader = false;
-        public static bool doHide = false;
+
+        private static GraphControllerBase? currentCutsceneGraph;
+        private static GraphControllerBase? endingCutsceneGraph;
+        private static bool didEndingPlay;
+        private static bool isCustom = true;
+        private static bool doSwapLeader;
+        private static bool doHide;
 
         public static CutsceneType currentCutsceneType = CutsceneType.None;
-        public static Action currentCutsceneCallback;
+        private static Action? currentCutsceneCallback;
 
-        private static bool keepActiveFix = false;
-        private static List<CharacterDefinitionId> keepActive = new List<CharacterDefinitionId>();
+        private static bool keepActiveFix;
+        private static List<CharacterDefinitionId> keepActive;
 
         public CutsceneHelper(OpenSeaOfStarsMod mainMod)
         {
@@ -156,20 +169,37 @@ namespace OpenSeaOfStars.Helpers
             }
         }
 
+        /// <summary>
+        /// Helper function to prevent stale cutscene data when returning to menu
+        /// </summary>
+        public void ClearAllCutsceneData()
+        {
+            currentCutsceneGraph = null;
+            endingCutsceneGraph = null;
+            didEndingPlay = false;
+            isCustom = true;
+            doSwapLeader = false;
+            doHide = false;
+            currentCutsceneType = CutsceneType.None;
+            currentCutsceneCallback = null;
+            keepActiveFix = false;
+            keepActive = null;
+        }
+
         private static void hidePartyMember(CharacterDefinitionId id, GameObject partyHandler, bool hideSprite)
         {
             GameObject follower = partyHandler.transform.FindChild(CharacterObjectDict[id.ToString()].main).gameObject;
             if (hideSprite)
             {
                 follower.transform.FindChild("CharacterOffset").FindChild("Character").GetComponent<Animator>().enabled = false;
-                follower.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").gameObject.active = false;
+                follower.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").gameObject.SetActive(false);
                 follower.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").GetComponent<CharacterVisual>().enabled = false;
                 // if (OpenSeaOfStarsMod.debug) { OpenSeaOfStarsMod.OpenInstance.LoggerInstance.Msg($"HIDE SPRITE IN HIDE CODE: {characterObjectDict[id.ToString()].main}"); }
             }
             else
             {
                 follower.transform.FindChild("CharacterOffset").FindChild("Character").GetComponent<Animator>().enabled = true;
-                follower.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").gameObject.active = true;
+                follower.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").gameObject.SetActive(true);
                 follower.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").GetComponent<CharacterVisual>().enabled = true;
             }
         }
@@ -185,8 +215,9 @@ namespace OpenSeaOfStars.Helpers
                 if (ppm.currentParty.Count < 3)
                 {
                     ppm.AddPartyMember(id, true, true, false);
+                    partyHandler.transform.FindChild(CharacterObjectDict[id.ToString()].main).position = ppm.leader.gameObject.transform.position;
                     #if DEBUG
-                    Msg("DEBUG NON CUSTOM CHARACTER SPAWNED: " + id.ToString);
+                    OpenInstance.LoggerInstance.Msg("DEBUG NON CUSTOM CHARACTER SPAWNED: " + id.ToString());
                     #endif
 
                     foreach (CharacterDefinitionId charId in gameplayParty)
@@ -213,14 +244,14 @@ namespace OpenSeaOfStars.Helpers
                     GameObject follower = partyHandler.transform.FindChild(CharacterObjectDict[id.ToString()].main).gameObject;
 
                     #if DEBUG
-                    Msg("DEBUG CHARACTER SPAWNED: " + id.ToString);
+                    OpenInstance.LoggerInstance.Msg("DEBUG CHARACTER SPAWNED: " + id.ToString());
                     #endif
 
                     follower.SetActive(true);
                     follower.GetComponent<PartyCharacterFollower>().enabled = true;
                     follower.GetComponent<PlayerController>().enabled = true;
                     follower.transform.FindChild("CharacterOffset").FindChild("Character").GetComponent<Animator>().enabled = true;
-                    follower.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").gameObject.active = true;
+                    follower.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").gameObject.SetActive(true);
                     follower.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").GetComponent<CharacterVisual>().enabled = true;
                     follower.transform.localPosition = leader.transform.localPosition;
                 }
@@ -278,9 +309,9 @@ namespace OpenSeaOfStars.Helpers
                 foreach (CharacterDefinitionId id in keepActive)
                 {
                     GameObject partychar = partyHandler.transform.FindChild(CharacterObjectDict[id.ToString()].main).gameObject;
-                    if (!partychar.active)
+                    if (!partychar.activeSelf)
                     {
-                        partychar.active = true;
+                        partychar.SetActive(true);
                     }
                 }
             }
@@ -317,7 +348,7 @@ namespace OpenSeaOfStars.Helpers
                         if (RandomizerParty.Any(c => c.Equals(id)) && ppm.combatParty.Contains(id))
                         {
                             GameObject partychar = partyHandler.transform.FindChild(CharacterObjectDict[id.ToString()].main).gameObject;
-                            partychar.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").gameObject.active = true;
+                            partychar.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").gameObject.SetActive(true);
                         }
                         else
                         {
@@ -328,24 +359,18 @@ namespace OpenSeaOfStars.Helpers
                                 GameObject follower = partyHandler.transform.FindChild(CharacterObjectDict[id.ToString()].main).gameObject;
                                 ppm.currentParty.Remove(id);
                                 ppm.combatParty.Remove(id);
-                                if (follower.active)
+                                if (follower.activeSelf && partyHandler != null)
                                 {
-                                    if (partyHandler != null)
-                                    {
-                                        follower.active = false;
-                                    }
+                                    follower.SetActive(false);
                                 }
                             }
                             else if (!inCombat)
                             {
                                 GameObject follower = partyHandler.transform.FindChild(CharacterObjectDict[id.ToString()].main).gameObject;
                                 ppm.combatParty.Remove(id);
-                                if (follower.active)
+                                if (follower.activeSelf && partyHandler != null)
                                 {
-                                    if (partyHandler != null)
-                                    {
-                                        follower.active = false;
-                                    }
+                                    follower.SetActive(false);
                                 }
                             }
                         }
@@ -434,9 +459,9 @@ namespace OpenSeaOfStars.Helpers
                     if (!enabledList.Any(c => c.Equals(partyChar)))
                     {
                         GameObject partyCharObj = partyHandler.transform.FindChild(CharacterObjectDict[partyChar.ToString()].main).gameObject;
-                        if (partyCharObj != null && partyCharObj.active && ppm.combatParty.Contains(partyChar))
+                        if (partyCharObj != null && partyCharObj.activeSelf && ppm.combatParty.Contains(partyChar))
                         {
-                            partyCharObj.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").gameObject.active = false;
+                            partyCharObj.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").gameObject.SetActive(false);
                             #if DEBUG 
                             OpenInstance.LoggerInstance.Msg($"HIDE SPRITE IN CUSTOM CODE: {CharacterObjectDict[partyChar.ToString()].main}");
                             #endif
@@ -506,12 +531,12 @@ namespace OpenSeaOfStars.Helpers
                     if (teleCutsceneData.TryGetValue(__instance.gameObject.name, out CutscenePatchData tele))
                     {
                         GameObject partyHandler = GameObject.Find("CapsuleParty(Clone)");
-                        resetCharactersForCutscenes(ppm, partyHandler, tele.requiredCharacters, tele.forceAnimations, tele.isCustom, tele.hideSprite);
+                        resetCharactersForCutscenes(ppm, partyHandler, tele.cutsceneCharacters, tele.forceAnimations, tele.isCustom, tele.hideSprite);
                         currentCutsceneType = CutsceneType.StoryExt;
 
                         if (tele.swapLeader)
                         {
-                            ppm.SetLeader(tele.requiredCharacters[0]);
+                            ppm.SetLeader(tele.cutsceneCharacters[0]);
                             ppm.SetupParty(true);
                             doSwapLeader = true;
                             doHide = tele.hideSprite;
@@ -526,7 +551,7 @@ namespace OpenSeaOfStars.Helpers
                             }
 
                             #if DEBUG
-                            Msg("LEADER SWAPPED: " + CharacterObjectDict[tele.requiredCharacters[0].ToString()].main);
+                            OpenInstance.LoggerInstance.Msg("LEADER SWAPPED: " + CharacterObjectDict[tele.cutsceneCharacters[0].ToString()].main);
                             #endif
                         }
                     }
@@ -549,8 +574,17 @@ namespace OpenSeaOfStars.Helpers
                 PlayerPartyManager ppm = PlayerPartyManager.Instance;
                 if (storyCutsceneData.TryGetValue(__instance.gameObject.name, out CutscenePatchData data))
                 {
+                    List<CharacterDefinitionId> chars = data.cutsceneCharacters;
+                    if (data.requiredCharacters?.Count > 0)
+                    {
+                        IEnumerable<CharacterDefinitionId> intersect = data.requiredCharacters.IntersectBy(ppm.currentParty.ToArray().Select(c1 => c1.ToString()), c2 => c2.ToString());
+                        if (intersect.ToList().Count == 0 && ppm.currentParty.Count < 2)
+                        {
+                            chars = data.backupCharacters;
+                        }
+                    }
                     GameObject partyHandler = GameObject.Find("CapsuleParty(Clone)");
-                    resetCharactersForCutscenes(ppm, partyHandler, data.requiredCharacters, data.forceAnimations, data.isCustom, data.hideSprite);
+                    resetCharactersForCutscenes(ppm, partyHandler, chars, data.forceAnimations, data.isCustom, data.hideSprite);
                     currentCutsceneCallback = data.onCutsceneEnd;
                     currentCutsceneGraph = __instance;
                     currentCutsceneType = CutsceneType.Story;
@@ -576,14 +610,12 @@ namespace OpenSeaOfStars.Helpers
                     currentCutsceneGraph = __instance;
                     currentCutsceneType = CutsceneType.World;
                 }
-                else if (callbackOnlyCutsceneData.TryGetValue(__instance.gameObject.name, out data))
-                {
-                    data.onCutsceneStart?.Invoke();
-                }
-                else if (cutscenesToSkip.Contains(__instance.gameObject.name))
+                else if (cutscenesToSkip.TryGetValue(__instance.gameObject.name, out data))
                 {
                     OpenInstance.LoggerInstance.Msg($"Skipping {__instance.gameObject.name}");
+                    data.onCutsceneStart?.Invoke();
                     __instance.SkipTree();
+                    data.onCutsceneEnd?.Invoke();
                 }
             }
 

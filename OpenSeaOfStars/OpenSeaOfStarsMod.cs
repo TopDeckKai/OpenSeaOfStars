@@ -6,6 +6,11 @@ using UnityEngine;
 using OpenSeaOfStars.Helpers;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using UnityEngine.SceneManagement;
+using Il2CppSabotage.Blackboard;
+using HarmonyLib;
+using Il2CppSabotage.Imposter;
+using Il2CppSabotage.Graph.Core;
+using Il2CppSabotage.Localization;
 
 namespace OpenSeaOfStars
 {
@@ -18,9 +23,12 @@ namespace OpenSeaOfStars
         private BlackboardHelper BlackboardHelper;
         private CutsceneHelper CutsceneHelper;
         public InventoryHelper InventoryHelper { get; }
+        private DialogueHelper DialogueHelper;
+        public LevelHelper LevelHelper { get; }
         
         private bool initLoaded;
         public static List<CharacterDefinitionId> RandomizerParty = new() { CharacterDefinitionId.Zale };
+        private string loadDialogue = "";
         
         public static Dictionary<string, (string main, string world)> CharacterObjectDict { get; } = new()
         {
@@ -41,6 +49,8 @@ namespace OpenSeaOfStars
             CutsceneHelper = new CutsceneHelper(this);
             SaveHelper = new SaveHelper(this);
             InventoryHelper = new InventoryHelper(this);
+            DialogueHelper = new DialogueHelper();
+            LevelHelper = new LevelHelper();
         }
 
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
@@ -212,6 +222,12 @@ namespace OpenSeaOfStars
                     croube.SetActive(false);
                 }
             }
+
+            if (sceneName.ToLower().Equals("vespertine_cutscene_worldmap"))
+            {
+                // This does not work on first frame of load. TODO refactor.
+                loadDialogue = sceneName.ToLower();
+            }
         }
         public override void OnUpdate()
         {
@@ -223,6 +239,14 @@ namespace OpenSeaOfStars
             else if (CutsceneHelper.currentCutsceneType == CutsceneHelper.CutsceneType.World)
             {
                 CutsceneHelper.skipWorldCutscene();
+            }
+            
+            if (loadDialogue.Length > 0)
+            {
+                if (DialogueHelper.changeDialoguePerScene(loadDialogue))
+                {
+                    loadDialogue = "";
+                }
             }
 
             #if DEBUG

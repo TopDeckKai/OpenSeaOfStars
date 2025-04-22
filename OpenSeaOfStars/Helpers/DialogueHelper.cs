@@ -1,5 +1,4 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Il2Cpp;
 using Il2CppRewired;
 using Il2CppSabotage.Graph.Core;
@@ -7,193 +6,193 @@ using Il2CppSabotage.Localization;
 using MelonLoader;
 using UnityEngine;
 
-namespace OpenSeaOfStars.Helpers
+namespace OpenSeaOfStars.Helpers;
+
+public class DialogueHelper : MelonLogger
 {
-    public class DialogueHelper : MelonLogger
+    public static List<string> LocalizationIdConstants = new() {
+        "OPEN_SEA_OF_STARS_VESPERTINE_SEA_OF_NIGHTMARE"
+    };
+
+    private class DialoguePatchData
     {
-        public static List<string> LocalizationIdConstants = new List<string>() {
-            "OPEN_SEA_OF_STARS_VESPERTINE_SEA_OF_NIGHTMARE"
-        };
+        public string localizationId = "";
+        public string gameObject = "";
+        public string category = "";
+        public int nodePos;
+        public int slot;
+    }
 
-        private class DialoguePatchData
-        {
-            public string localizationId = "";
-            public string gameObject = "";
-            public string category = "";
-            public int nodePos = 0;
-            public int slot = 0;
+    private class DialogueOptionPatchData
+    {
+        public string dialogueText = "";
+        public string loadLevel = "";
+    }
+
+    private static Dictionary<string, DialogueOptionPatchData> newDialogueOption = new() {
+        { LocalizationIdConstants[0], new DialogueOptionPatchData() {dialogueText = "Sea of Nightmare", loadLevel = "SeaOfNightmare_WorldMap" } }
+    };
+
+
+    private static Dictionary<string, DialoguePatchData[]> dialoguePatch = new()
+    {
+        { 
+            "vespertine_cutscene_worldmap", new[] { 
+                new DialoguePatchData { localizationId = LocalizationIdConstants[0], gameObject = "DIALOGUES/DIA_Hortence_TakeHelm", category = "Camping", nodePos = 1, slot = 1 } 
+            } 
         }
+    };
 
-        private class DialogueOptionPatchData
+    public bool changeDialoguePerScene(string scene)
+    {
+        DialoguePatchData[] dialoguePatches = dialoguePatch[scene];
+
+        if (dialoguePatches != null)
         {
-            public string dialogueText = "";
-            public string loadLevel = "";
-        }
+            int success = 0;
 
-        private static Dictionary<string, DialogueOptionPatchData> newDialogueOption = new Dictionary<string, DialogueOptionPatchData>() {
-            { LocalizationIdConstants[0], new DialogueOptionPatchData() {dialogueText = "Sea of Nightmare", loadLevel = "SeaOfNightmare_WorldMap" } }
-        };
-
-
-        private static Dictionary<string, DialoguePatchData[]> dialoguePatch = new Dictionary<string, DialoguePatchData[]>()
-        {
-            { 
-                "vespertine_cutscene_worldmap", new DialoguePatchData[] { 
-                    new DialoguePatchData { localizationId = LocalizationIdConstants[0], gameObject = "DIALOGUES/DIA_Hortence_TakeHelm", category = "Camping", nodePos = 1, slot = 1 } 
-                } 
-            }
-        };
-
-        public bool changeDialoguePerScene(string scene)
-        {
-            DialoguePatchData[] dialoguePatches = dialoguePatch[scene];
-
-            if (dialoguePatches != null)
+            foreach (DialoguePatchData dpd in dialoguePatches)
             {
-                int success = 0;
-
-                foreach (DialoguePatchData dpd in dialoguePatches)
+                GameObject gameDialogue = GameObject.Find(dpd.gameObject);
+                if (gameDialogue != null)
                 {
-                    GameObject gameDialogue = GameObject.Find(dpd.gameObject);
-                    if (gameDialogue != null)
+                    CutsceneTreeController ctc = gameDialogue.GetComponent<CutsceneTreeController>();
+                    if (ctc != null)
                     {
-                        CutsceneTreeController ctc = gameDialogue.GetComponent<CutsceneTreeController>();
-                        if (ctc != null)
+                        CutsceneTree ct = ctc.currentGraph;
+                        if (ct != null && ct.nodes.Count > 0)
                         {
-                            CutsceneTree ct = ctc.currentGraph;
-                            if (ct != null && ct.nodes.Count > 0)
+                            try
                             {
-                                try
+                                GraphNode node = ct.nodes.ToArray()[dpd.nodePos];
+                                PlayDialogNode dialogueNode = node.Cast<PlayDialogNode>();
+                                DialogBoxData dbd = dialogueNode.dialogBoxData.value;
+                                DialogBoxData.DialogChoice dc = new() { characterDefinitionId = CharacterDefinitionId.LeaderCharacter };
+                                LocalizationId sonLocId = new()
                                 {
-                                    GraphNode node = ct.nodes[dpd.nodePos];
-                                    PlayDialogNode dialogueNode = node.Cast<PlayDialogNode>();
-                                    DialogBoxData dbd = dialogueNode.dialogBoxData.value;
-                                    DialogBoxData.DialogChoice dc = new DialogBoxData.DialogChoice();
-                                    dc.characterDefinitionId = CharacterDefinitionId.LeaderCharacter;
-                                    LocalizationId sonLocId = new LocalizationId();
-                                    sonLocId.categoryName = dpd.category;
-                                    sonLocId.locId = DialogueHelper.LocalizationIdConstants[0];
-                                    dc.localizationId = sonLocId;
-                                    dbd.dialogChoices.Insert(dpd.slot, dc);
-                                    dialogueNode.dialogBoxData.value = dbd;
+                                    categoryName = dpd.category,
+                                    locId = LocalizationIdConstants[0]
+                                };
+                                dc.localizationId = sonLocId;
+                                dbd.dialogChoices.Insert(dpd.slot, dc);
+                                dialogueNode.dialogBoxData.value = dbd;
 
-                                    Msg("Loaded " + DialogueHelper.LocalizationIdConstants[0]);
-                                    success = success + 1;
-                                }
-                                catch (Exception ex) { }
+                                Msg("Loaded " + LocalizationIdConstants[0]);
+                                success++;
                             }
+                            catch (Exception ex) { }
                         }
                     }
                 }
-
-                if (success == dialoguePatches.Length)
-                {
-                    return true;
-                }
             }
 
-            return false;
+            if (success == dialoguePatches.Length)
+            {
+                return true;
+            }
         }
 
-        [HarmonyPatch(typeof(PlayDialogNode), "OnDialogCompleted")]
-        private static class DialogueChoicePatch
-        {
-            [HarmonyPostfix]
-            private static void Postfix(PlayDialogNode __instance)
-            {
-                if (__instance.dialogBoxData.value.ContainsChoice()) {
-                    LocalizationId choiceLocId = __instance.dialogBoxData.value.dialogChoices[__instance.dialogChoiceIndex].localizationId;
+        return false;
+    }
 
-                    if (LocalizationIdConstants.Any(s => s.Equals(choiceLocId.locId)))
+    [HarmonyPatch(typeof(PlayDialogNode), "OnDialogCompleted")]
+    private static class DialogueChoicePatch
+    {
+        [HarmonyPostfix]
+        private static void Postfix(PlayDialogNode __instance)
+        {
+            if (__instance.dialogBoxData.value.ContainsChoice()) {
+                LocalizationId choiceLocId = __instance.dialogBoxData.value.dialogChoices.ToArray()[__instance.dialogChoiceIndex].localizationId;
+
+                if (LocalizationIdConstants.Any(s => s.Equals(choiceLocId.locId)))
+                {
+                    Msg("THIS WORKS 2");
+                    if (!newDialogueOption[choiceLocId.locId].loadLevel.Equals(""))
                     {
-                        Msg("THIS WORKS 2");
-                        if (!newDialogueOption[choiceLocId.locId].loadLevel.Equals(""))
-                        {
-                            OpenSeaOfStarsMod.OpenInstance.LevelHelper.loadLevel(newDialogueOption[choiceLocId.locId].loadLevel);
-                        }
+                        OpenSeaOfStarsMod.OpenInstance.LevelHelper.loadLevel(newDialogueOption[choiceLocId.locId].loadLevel);
                     }
                 }
             }
         }
+    }
 
-        [HarmonyPatch(typeof(LocalizationId), "GetText")]
-        private static class AdditionalDialoguePatch
+    [HarmonyPatch(typeof(LocalizationId), "GetText")]
+    private static class AdditionalDialoguePatch
+    {
+        [HarmonyPrefix]
+        private static bool Prefix(LocalizationId __instance, ref string __result)
         {
-            [HarmonyPrefix]
-            private static bool Prefix(LocalizationId __instance, ref string __result)
+            if (LocalizationIdConstants.Any(s => s.Equals(__instance.locId)))
             {
-                if (LocalizationIdConstants.Any(s => s.Equals(__instance.locId)))
-                {
-                    __result = newDialogueOption[__instance.locId].dialogueText;
-                    return false;
-                }
-
-                return true;
+                __result = newDialogueOption[__instance.locId].dialogueText;
+                return false;
             }
+
+            return true;
         }
+    }
 
-        [HarmonyPatch(typeof(LocalizationId), "GetText", new Type[] {typeof(Controller), typeof(Player)})]
-        private static class AdditionalDialogueParamsPatch
+    [HarmonyPatch(typeof(LocalizationId), "GetText", new Type[] {typeof(Controller), typeof(Player)})]
+    private static class AdditionalDialogueParamsPatch
+    {
+        [HarmonyPrefix]
+        private static bool Prefix(LocalizationId __instance, ref string __result, Controller controller, Player player)
         {
-            [HarmonyPrefix]
-            private static bool Prefix(LocalizationId __instance, ref string __result, Controller controller, Player player)
+            if (LocalizationIdConstants.Any(s => s.Equals(__instance.locId)))
             {
-                if (LocalizationIdConstants.Any(s => s.Equals(__instance.locId)))
-                {
-                    __result = newDialogueOption[__instance.locId].dialogueText;
-                    return false;
-                }
-
-                return true;
+                __result = newDialogueOption[__instance.locId].dialogueText;
+                return false;
             }
+
+            return true;
         }
+    }
 
-        [HarmonyPatch(typeof(LocalizationManager), "GetText", new Type[] { typeof(LocalizationId), typeof(Controller), typeof(Player) })]
-        private static class AdditionalDialogueInManagerPatch
+    [HarmonyPatch(typeof(LocalizationManager), "GetText", new Type[] { typeof(LocalizationId), typeof(Controller), typeof(Player) })]
+    private static class AdditionalDialogueInManagerPatch
+    {
+        [HarmonyPrefix]
+        private static bool Prefix(ref string __result, LocalizationId localizationId, Controller controller, Player player)
         {
-            [HarmonyPrefix]
-            private static bool Prefix(ref string __result, LocalizationId localizationId, Controller controller, Player player)
+            if (LocalizationIdConstants.Any(s => s.Equals(localizationId.locId)))
             {
-                if (LocalizationIdConstants.Any(s => s.Equals(localizationId.locId)))
-                {
-                    __result = newDialogueOption[localizationId.locId].dialogueText;
-                    return false;
-                }
-
-                return true;
+                __result = newDialogueOption[localizationId.locId].dialogueText;
+                return false;
             }
+
+            return true;
         }
+    }
 
-        [HarmonyPatch(typeof(LocalizationManager), "GetText", new Type[] { typeof(string), typeof(string), typeof(Controller), typeof(Player) })]
-        private static class AdditionalDialogueInManagerLongPatch
+    [HarmonyPatch(typeof(LocalizationManager), "GetText", new Type[] { typeof(string), typeof(string), typeof(Controller), typeof(Player) })]
+    private static class AdditionalDialogueInManagerLongPatch
+    {
+        [HarmonyPrefix]
+        private static bool Prefix(ref string __result, string locId, Controller controller, Player player)
         {
-            [HarmonyPrefix]
-            private static bool Prefix(ref string __result, string locId, Controller controller, Player player)
+            if (LocalizationIdConstants.Any(s => s.Equals(locId)))
             {
-                if (LocalizationIdConstants.Any(s => s.Equals(locId)))
-                {
-                    __result = newDialogueOption[locId].dialogueText;
-                    return false;
-                }
-
-                return true;
+                __result = newDialogueOption[locId].dialogueText;
+                return false;
             }
+
+            return true;
         }
+    }
 
-        [HarmonyPatch(typeof(LocalizationManager), "GetText", new Type[] { typeof(string) })]
-        private static class AdditionalDialogueInManagerLocPatch
+    [HarmonyPatch(typeof(LocalizationManager), "GetText", new Type[] { typeof(string) })]
+    private static class AdditionalDialogueInManagerLocPatch
+    {
+        [HarmonyPrefix]
+        private static bool Prefix(ref string __result, string locId)
         {
-            [HarmonyPrefix]
-            private static bool Prefix(ref string __result, string locId)
+            if (LocalizationIdConstants.Any(s => s.Equals(locId)))
             {
-                if (LocalizationIdConstants.Any(s => s.Equals(locId)))
-                {
-                    __result = newDialogueOption[locId].dialogueText;
-                    return false;
-                }
-
-                return true;
+                __result = newDialogueOption[locId].dialogueText;
+                return false;
             }
+
+            return true;
         }
     }
 }

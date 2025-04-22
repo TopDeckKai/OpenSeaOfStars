@@ -1,10 +1,11 @@
 ﻿#define HAS_UNITY_EXPLORER
 using MelonLoader;
 using Il2Cpp;
-using Unity;
+using Il2CppInterop.Runtime;
 using UnityEngine;
-using UnityEditor;
 using OpenSeaOfStars.Helpers;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
+using UnityEngine.SceneManagement;
 using Il2CppSabotage.Blackboard;
 using HarmonyLib;
 using Il2CppSabotage.Imposter;
@@ -17,26 +18,26 @@ namespace OpenSeaOfStars
     {
         public static OpenSeaOfStarsMod OpenInstance { get; private set; }
         
-        public ActivityHelper ActivityHelper;
-        public SaveHelper SaveHelper;
-        public BlackboardHelper BlackboardHelper;
-        public CutsceneHelper CutsceneHelper;
-        public DialogueHelper DialogueHelper;
-        public LevelHelper LevelHelper;
+        private ActivityHelper ActivityHelper;
+        private SaveHelper SaveHelper;
+        private BlackboardHelper BlackboardHelper;
+        private CutsceneHelper CutsceneHelper;
+        public InventoryHelper InventoryHelper { get; }
+        private DialogueHelper DialogueHelper;
+        public LevelHelper LevelHelper { get; }
         
-        bool initLoaded = false;
-        public static bool debug = true;
-        public static List<CharacterDefinitionId> randomizerParty = new List<CharacterDefinitionId> { CharacterDefinitionId.Zale };
+        private bool initLoaded;
+        public static List<CharacterDefinitionId> RandomizerParty = new() { CharacterDefinitionId.Zale };
         private string loadDialogue = "";
         
-        private readonly Dictionary<string, int> charMap = new()
+        public static Dictionary<string, (string main, string world)> CharacterObjectDict { get; } = new()
         {
-            { CharacterDefinitionId.Zale.ToString(), 0 },
-            { CharacterDefinitionId.Valere.ToString(), 1 },
-            { CharacterDefinitionId.Garl.ToString(), 2 },
-            { CharacterDefinitionId.Serai.ToString(), 3 },
-            { CharacterDefinitionId.Reshan.ToString(), 4 },
-            { CharacterDefinitionId.Bst.ToString(), 5 }
+            {CharacterDefinitionId.Zale.ToString(), ("PlayableCharacter_SunBoy(Clone)", "PlayableCharacter_WorldMapSunboy(Clone)")},
+            {CharacterDefinitionId.Valere.ToString(), ("PlayableCharacter_Moongirl(Clone)", "PlayableCharacter_WorldMapMoongirl(Clone)")},
+            {CharacterDefinitionId.Garl.ToString(), ("PlayableCharacter_Garl(Clone)", "PlayableCharacter_WorldMapGarl(Clone)")},
+            {CharacterDefinitionId.Serai.ToString(), ("PlayableCharacter_Serai(Clone)", "PlayableCharacter_WorldMapSerai(Clone)")},
+            {CharacterDefinitionId.Reshan.ToString(), ("PlayableCharacter_Reshan(Clone)", "PlayableCharacter_WorldMapReshan(Clone)")},
+            {CharacterDefinitionId.Bst.ToString(), ("PlayableCharacter_Bst(Clone)", "PlayableCharacter_WorldMapBst(Clone)")}
         };
 
         public OpenSeaOfStarsMod()
@@ -47,6 +48,7 @@ namespace OpenSeaOfStars
             BlackboardHelper = new BlackboardHelper(this);
             CutsceneHelper = new CutsceneHelper(this);
             SaveHelper = new SaveHelper(this);
+            InventoryHelper = new InventoryHelper(this);
             DialogueHelper = new DialogueHelper();
             LevelHelper = new LevelHelper();
         }
@@ -61,15 +63,17 @@ namespace OpenSeaOfStars
                 if (!initLoaded)
                 {
                     LoggerInstance.Msg($"Scene {sceneName} with build index {buildIndex} has been loaded!");
-                    ActivityHelper.initActivityManager(debug);
-                    BlackboardHelper.initBlackboardManager(debug);
-                    CutsceneHelper.initCutsceneManager(debug);
-                    SaveHelper.createOpenSaveSlot(randomizerParty, debug);
+                    ActivityHelper.initActivityManager();
+                    BlackboardHelper.initBlackboardManager();
+                    CutsceneHelper.initCutsceneManager();
+                    InventoryHelper.GetInventoryItems();
+                    SaveHelper.createOpenSaveSlot(RandomizerParty);
                     initLoaded = true;
                 }
                 else
                 {
                     SaveHelper.setLastSave(); // Temp to load the init save with "Continue"
+                    CutsceneHelper.ClearAllCutsceneData();
                 }
             }
 
@@ -124,6 +128,30 @@ namespace OpenSeaOfStars
                 }
             }
 
+            if (sceneName.ToLower().Equals("mines_gameplay"))
+            {
+                LoggerInstance.Msg($"Scene {sceneName} with build index {buildIndex} has been loaded!");
+
+                GameObject blocker = GameObject.Find("GPI_AutosaveTrigger_BoucheTrou (C)");
+                if (blocker != null)
+                {
+                    blocker.SetActive(false);
+                    LoggerInstance.Msg($"Unloaded buggy autosave");
+                }
+                blocker = GameObject.Find("GPI_AutosaveTrigger_BoucheTrou (E)");
+                if (blocker != null)
+                {
+                    blocker.SetActive(false);
+                    LoggerInstance.Msg($"Unloaded buggy autosave");
+                }
+                blocker = GameObject.Find("GPI_AutosaveTrigger_BoucheTrou (G)");
+                if (blocker != null)
+                {
+                    blocker.SetActive(false);
+                    LoggerInstance.Msg($"Unloaded buggy autosave");
+                }
+            }
+
             if (sceneName.ToLower().Equals("forbiddencavern_gameplay"))
             {
                 GameObject bossSlots = GameObject.Find("ENCOUNTERS_STUFF/ENC_04 (Boss)/Encounter/PlayerSlots/FrontRowSlots");
@@ -147,6 +175,53 @@ namespace OpenSeaOfStars
                     LoggerInstance.Msg($"BOSS SLOTS NOT FOUND");
                 }
             }
+            
+            if (sceneName.ToLower().Equals("outpost_gameplay"))
+            {
+                // open outpost
+                BlackboardHelper.AddBlackboardValue("8dc814be1b11bee4fa2bbe5cd94479fd", 1);
+            }
+            
+            if (sceneName.ToLower().Equals("mines_gameplay"))
+            {
+                // if acolyte cutscene is not watched, make Malkomud fightable
+                if (BlackboardHelper.GetBlackboardValue("67c2e14989179794caa05fcba09c99f3", out int value) && value == 0)
+                {
+                    BlackboardHelper.AddBlackboardValue("8dc814be1b11bee4fa2bbe5cd94479fd", 0);
+                    Il2CppArrayBase<Transform>? encounters = GameObject.Find("ENCOUNTER_STUFF").GetComponentsInChildren<Transform>(true);
+                    if (encounters == null || encounters.Count <= 0)
+                    {
+                        return;
+                    }
+                    Transform enc = encounters.First(enc => enc.gameObject.name == "ENC_Mines_Boss_Malkumud");
+                    if (enc)
+                    {
+                        enc.gameObject.SetActive(true);
+                    }
+                }
+            }
+
+            if (sceneName.ToLower().Equals("wizardlab_gameplay"))
+            {
+                GameObject blueTrigger = GameObject.Find("ROOMS_STUFF/BLUE_ROOM_STUFF/BluePortal_Stuff/TRIG_DisableBluePortal").gameObject;
+                GameObject cyanTrigger = GameObject.Find("ROOMS_STUFF/CYAN_ROOM_STUFF/TRIG_Disable_CyanPortal").gameObject;
+                if (blueTrigger)
+                {
+                    GameObject.Destroy(blueTrigger);
+                }
+
+                if (cyanTrigger)
+                {
+                    GameObject.Destroy(cyanTrigger);
+                }
+                
+                // disabling the dummy WizCroube because it hardlocks the game if you Graplou it
+                GameObject croube = GameObject.Find("ROOMS_STUFF/BLUE_ROOM_STUFF/MovingFloor_Stuff/Floors_Stuff/WizCroube04_Dummy");
+                if (croube)
+                {
+                    croube.SetActive(false);
+                }
+            }
 
             if (sceneName.ToLower().Equals("vespertine_cutscene_worldmap"))
             {
@@ -157,7 +232,7 @@ namespace OpenSeaOfStars
         public override void OnUpdate()
         {
             base.OnUpdate();
-            if (CutsceneHelper.currentCutsceneType == CutsceneHelper.CutsceneType.Story)
+            if (CutsceneHelper.currentCutsceneType == CutsceneHelper.CutsceneType.Story || CutsceneHelper.currentCutsceneType == CutsceneHelper.CutsceneType.StoryExt)
             {
                 CutsceneHelper.checkCutsceneFinished();
             }
@@ -165,7 +240,7 @@ namespace OpenSeaOfStars
             {
                 CutsceneHelper.skipWorldCutscene();
             }
-
+            
             if (loadDialogue.Length > 0)
             {
                 if (DialogueHelper.changeDialoguePerScene(loadDialogue))
@@ -174,11 +249,7 @@ namespace OpenSeaOfStars
                 }
             }
 
-            if (!debug)
-            {
-                return;
-            }
-            
+            #if DEBUG
             if (Input.GetKeyDown(KeyCode.K))
             {
                 SaveHelper.save();
@@ -203,7 +274,7 @@ namespace OpenSeaOfStars
                     if (t != null)
                     {
                         GameObject enc = t.gameObject;
-                        enc.SetActive(!enc.active);
+                        enc.SetActive(!enc.activeSelf);
                     }
                 }
                 catch (Exception)
@@ -250,6 +321,11 @@ namespace OpenSeaOfStars
                     ppm.AddCargoCharacter(CharacterDefinitionId.Teaks);
                 }
             }
+            else if (Input.GetKeyDown(KeyCode.I))
+            {
+                InventoryHelper.PrintInventoryItems();
+            }
+            #endif
         }
         
         private void AddPartyMember(CharacterDefinitionId character)
@@ -261,12 +337,41 @@ namespace OpenSeaOfStars
             }
             LoggerInstance.Msg($"Adding {character.ToString()} for debug");
             ppm.AddPartyMember(character, ppm.currentParty.Count < 3, true, true);
-            ppm.SetupParty(true);
+            if (character == CharacterDefinitionId.Zale && ppm.leader.CharacterDefinitionId != CharacterDefinitionId.Valere || character == CharacterDefinitionId.Valere && ppm.leader.CharacterDefinitionId != CharacterDefinitionId.Zale)
+            {
+                PlayerPartyCharacter old = ppm.leader;
+                ppm.SetMainCharacter(character);
+                ppm.RemovePartyMember(old.CharacterDefinitionId, true, true, false);
+                ppm.SetLeader(character);
+                ppm.SetLeaderFirstInParty();
+                ppm.leader.transform.position = old.transform.position;
+                CameraBehaviour cam = Camera.main.GetComponentInParent<CameraBehaviour>();
+                if (cam.currentContext.GetIl2CppType() == Il2CppType.Of<CharacterViewCameraContext>())
+                {
+                    string charObjName = SceneManager.GetActiveScene().name.ToLower().Contains("worldmap") ? CharacterObjectDict[character.ToString()].world : CharacterObjectDict[character.ToString()].main;
+                    cam.currentContext.Cast<CharacterViewCameraContext>().cameraLookAtPosition = GameObject.FindObjectsOfType<PlayerCameraLookAtPosition>(true).First(c => c.name.Equals(charObjName));
+                }
+                BlackboardHelper.AddBlackboardValue("eade193956f385243bbd0ab47aee2ee9", 1); // can fly with a Solstice Warrior
+
+                System.Collections.IEnumerator reAddCharAfterFrame()
+                {
+                    yield return null;
+                    ppm.AddPartyMember(old.CharacterDefinitionId, ppm.currentParty.Count < 3, true, true);
+                    ppm.SetupParty(!BoatManager.Instance.IsInBoatMode);
+                }
+                MelonCoroutines.Start(reAddCharAfterFrame());
+            }
+            else if (ppm.currentParty.Count <= 3)
+            {
+                ppm.followers.ToArray().First(c => c.characterDefinitionId.ToString() == character.ToString()).transform.position = ppm.leader.transform.position;
+            }
+            ppm.SetupParty(!BoatManager.Instance.IsInBoatMode);
             
-            randomizerParty.Add(character);
+            RandomizerParty.Add(character);
         }
 
-        #if HAS_UNITY_EXPLORER
+        
+        #if HAS_UNITY_EXPLORER && DEBUG
         /// <summary>
         /// Same as pressing F7 (or whatever keybind you've changed UE to)<br/>
         /// This exists because there's a bug with UE that prevents all inputs when opening game menus

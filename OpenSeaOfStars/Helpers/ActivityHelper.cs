@@ -1,6 +1,4 @@
 ﻿using Il2Cpp;
-using UnityEngine;
-using Il2CppSabotage.Blackboard;
 using Il2CppSabotage.Localization;
 
 namespace OpenSeaOfStars.Helpers
@@ -15,7 +13,7 @@ namespace OpenSeaOfStars.Helpers
             mod = mainMod;
         }
 
-        internal void initActivityManager(bool debug)
+        internal void initActivityManager()
         {
             try
             {
@@ -39,18 +37,17 @@ namespace OpenSeaOfStars.Helpers
                 // TODO: Make this actually work!
                 activityManager.allActivityData.Add(new ActivityReference("ce3bffc8dd7d47a4b9f49d5a85bb218d"), archipelagoActivity);
 
-                if (debug)
+                #if DEBUG
+                mod.LoggerInstance.Msg($"ALL ACTIVITIES: " + activityManager.allActivityData.Count);
+                foreach (Il2CppSystem.Collections.Generic.KeyValuePair<ActivityReference, ActivityData> entry in activityManager.allActivityData)
                 {
-                    mod.LoggerInstance.Msg($"ALL ACTIVITIES: " + activityManager.allActivityData.Count);
-                    foreach (Il2CppSystem.Collections.Generic.KeyValuePair<ActivityReference, ActivityData> entry in activityManager.allActivityData)
+                    try
                     {
-                        try
-                        {
-                            mod.LoggerInstance.Msg(entry.Key.activityGuid + "  " + entry.Value.name + "  " + entry.Value.activityIndex + "  " + entry.Value.subActivities.Count + "  " + entry.Value.guid);
-                        }
-                        catch (System.Exception ex) { mod.LoggerInstance.Msg($"cannot get activity: " + ex.Message + "\n" + ex.StackTrace.ToString()); }
+                        mod.LoggerInstance.Msg(entry.Key.activityGuid + "  " + entry.Value.name + "  " + entry.Value.activityIndex + "  " + entry.Value.subActivities.Count + "  " + entry.Value.guid);
                     }
+                    catch (System.Exception ex) { mod.LoggerInstance.Msg($"cannot get activity: " + ex.Message + "\n" + ex.StackTrace.ToString()); }
                 }
+                #endif
             }
         }
     }

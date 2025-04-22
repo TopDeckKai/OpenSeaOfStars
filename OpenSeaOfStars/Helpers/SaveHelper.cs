@@ -1,8 +1,7 @@
 ﻿using Il2Cpp;
-using Il2CppSystem;
 using UnityEngine;
 using Il2CppSabotage.Blackboard;
-using Il2CppInterop.Runtime;
+using Il2CppKVP = Il2CppSystem.Collections.Generic;
 
 namespace OpenSeaOfStars.Helpers
 {
@@ -27,7 +26,7 @@ namespace OpenSeaOfStars.Helpers
             saveManager.lastSelectedSlotIndex = index;
         }
 
-        internal void createOpenSaveSlot(List<CharacterDefinitionId> randomizerParty, bool debug = false)
+        internal void createOpenSaveSlot(List<CharacterDefinitionId> randomizerParty)
         {
             try
             {
@@ -73,6 +72,11 @@ namespace OpenSeaOfStars.Helpers
 
                     sgs.checkpointData = checkpointData;
 
+                    foreach (KeyValuePair<string, int> kvp in mod.InventoryHelper.startingItems)
+                    {
+                        sgs.inventorySaveData.ownedInventoryItems.Add(new Il2CppKVP.KeyValuePair<InventoryItemReference, int>(mod.InventoryHelper.inventoryItems[kvp.Key].Reference, kvp.Value));
+                    }
+
                     // Commenting out starting weapons for now
                     // InventoryItemReference weaponVal = new InventoryItemReference();
                     // weaponVal.itemGuid = "40b7062ac812c5d47bb1ff0df4987e8e";
@@ -83,17 +87,17 @@ namespace OpenSeaOfStars.Helpers
                     sgs.characterData[CharacterDefinitionId.Valere].gaveCharacterStartInventory = true;
                     sgs.characterData[CharacterDefinitionId.Valere].currentHP = 46;
                     sgs.characterData[CharacterDefinitionId.Valere].currentSP = 10;
-                    sgs.characterData[CharacterDefinitionId.Valere].currentVariant = 0;
+                    sgs.characterData[CharacterDefinitionId.Valere].currentVariant = EPartyCharacterVariant.DEFAULT;
                     /*sgs.characterData[CharacterDefinitionId.Valere].equippedWeapon = weaponVal; */
 
                     sgs.characterData[CharacterDefinitionId.Zale].gaveCharacterStartInventory = true;
                     sgs.characterData[CharacterDefinitionId.Zale].currentHP = 45;
                     sgs.characterData[CharacterDefinitionId.Zale].currentSP = 8;
-                    sgs.characterData[CharacterDefinitionId.Zale].currentVariant = 0;
+                    sgs.characterData[CharacterDefinitionId.Zale].currentVariant = EPartyCharacterVariant.DEFAULT;
                     /*sgs.characterData[CharacterDefinitionId.Zale].equippedWeapon = weaponZale;*/
 
                     sgs.characterData[CharacterDefinitionId.Serai].gaveCharacterStartInventory = true;
-                    sgs.characterData[CharacterDefinitionId.Serai].currentVariant = 0;
+                    sgs.characterData[CharacterDefinitionId.Serai].currentVariant = EPartyCharacterVariant.DEFAULT;
                     sgs.characterData[CharacterDefinitionId.Reshan].gaveCharacterStartInventory = true;
                     sgs.characterData[CharacterDefinitionId.Garl].gaveCharacterStartInventory = true;
                     sgs.characterData[CharacterDefinitionId.MasterMoraine].gaveCharacterStartInventory = true;
@@ -123,13 +127,12 @@ namespace OpenSeaOfStars.Helpers
                         {
                             sgs.combatParty.Add(randomizerParty[i]);
                         }
-                        if (debug)
-                        {
-                            sgs.characterData[randomizerParty[i]].currentHP = 999;
-                            sgs.characterData[randomizerParty[i]].currentSP = 999;
+                        #if DEBUG
+                        sgs.characterData[randomizerParty[i]].currentHP = 999;
+                        sgs.characterData[randomizerParty[i]].currentSP = 999;
 
-                            sgs.characterData[randomizerParty[i]].levelUpStatUpgrades = createDebugLevelUpList();
-                        }
+                        sgs.characterData[randomizerParty[i]].levelUpStatUpgrades = createDebugLevelUpList();
+                        #endif
                     }
 
                     saveManager.SetSaveSlotAtIndex(modInitSaveSlot, sgs);
@@ -164,19 +167,16 @@ namespace OpenSeaOfStars.Helpers
         {
             BlackboardDictionary ret = new BlackboardDictionary();
 
-            //Debug can fly
-            if (OpenSeaOfStarsMod.debug && party.Any(character => character == CharacterDefinitionId.Zale || character == CharacterDefinitionId.Valere))
+            #if DEBUG
+            if (party.Any(character => character == CharacterDefinitionId.Zale || character == CharacterDefinitionId.Valere))
             {
                 ret.Add("eade193956f385243bbd0ab47aee2ee9", 1);
             }
-            else
-            {
-                ret.Add("eade193956f385243bbd0ab47aee2ee9", 0);
-            }
+            #endif
 
             // Gameplay flags
             ret.Add("3d7bce7fa2d8dd047a99e54e6526423a", 1); // UnlockedBoat
-            ret.Add("9aee0be400eb37943991e9e95407b84b", 0); // CanSpawnLiveMana
+            ret.Add("9aee0be400eb37943991e9e95407b84b", 1); // CanSpawnLiveMana
             ret.Add("1b9a8febc97662c4abefc3990a8f3b13", 0); // NecromancerLair_GetGraplou_Done
             ret.Add("dd9e2a3bb5f9bb64b9474557c1bf132c", 0); // Bvar_Mines_GetPushBracelet_Done
             ret.Add("767078e1d423a5040b2c9cb4317da3b5", 1); // Evermist Docs
@@ -206,10 +206,8 @@ namespace OpenSeaOfStars.Helpers
             ret.Add("c65b65e48fc393a448d58ff1aac9644d", 1);
             ret.Add("8921232ab8bbbd648bcf0bf43c3eee8d", 1);
             ret.Add("d45db53dd7c1f3a4ea6143b0ebe5408d", 1);
-
-            // Abandoned Wizard Flags
-            ret.Add("cd680b2ad619ca14c869c23e8cfcc55b", 1);
-            ret.Add("f911c403f7589884b84287dee465fe72", 1);
+            ret.Add("50862854cc21e3745842a3845273ed41", 1);
+            ret.Add("97889ae144bd21b4bbf4316a28f2b1d3", 1);
 
             // Kiln Mountain flags
             ret.Add("23872d00c0fccc44b90faed2b33d7d4f", 1);
@@ -259,6 +257,19 @@ namespace OpenSeaOfStars.Helpers
             ret.Add("2f831b26713f4434e9c29474767cd29c", 1); // Serai spying after leaving Xtol area
             // Moorlands
             ret.Add("ae21436453a98f74f9b2839e9c8b9aab", 1); // meet Teaks
+            // Stonemasons Outpost
+            ret.Add("21609a20eefbf394c9c7fc145b87c385", 1); // Bvar_Outpost_EnterFirstTime_Done
+            ret.Add("def4ac542c3fc3a4496877c00921947f", 1); // Bvar_Mines_MeetingElder_Done
+            ret.Add("f243ba246f56bb7419932f918853184e", 0); // Bvar_Mines_ElderExitMine_Done
+            ret.Add("d69c8e3fa6966ab45812523c26235776", 1); // Bvar_Mines_Salamander_Done
+            ret.Add("daa715cbd0e1e5b4bae8c163230b6bf3", 1); // Bvar_Mines_ExitStair_Done
+            ret.Add("8dc814be1b11bee4fa2bbe5cd94479fd", 1); // Bvar_Mines_BossFight_Done // powers elevator as well
+            ret.Add("67c2e14989179794caa05fcba09c99f3", 0); // Bvar_ClockworkCastle_InterludeTwo_Done // use as key for Mine state
+            ret.Add("775d6e50cf2ef0f4d9d8a98a89bf4a02", 1); // Bvar_Outpost_ExitMine_Done // needs to be 0 when you beat Malkomud
+            ret.Add("d44f0265bc66e4145919ba811cc784aa", 1); // Bvar_SleeperElevator_SleepingSerpent_Done
+            // Abandoned Wizard Flags
+            ret.Add("cd680b2ad619ca14c869c23e8cfcc55b", 1); // Bvar_WizardLab_Entrance_Done
+            ret.Add("f911c403f7589884b84287dee465fe72", 1); // Bvar_WizardLab_LabIntro_Done
 
             return ret;
         }

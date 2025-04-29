@@ -74,7 +74,10 @@ namespace OpenSeaOfStars.Helpers
 
                     foreach (KeyValuePair<string, int> kvp in mod.InventoryHelper.startingItems)
                     {
-                        sgs.inventorySaveData.ownedInventoryItems.Add(new Il2CppKVP.KeyValuePair<InventoryItemReference, int>(mod.InventoryHelper.inventoryItems[kvp.Key].Reference, kvp.Value));
+                        if (!sgs.inventorySaveData.ownedInventoryItems.ContainsKey(mod.InventoryHelper.inventoryItems[kvp.Key].Reference))
+                        {
+                            sgs.inventorySaveData.ownedInventoryItems.Add(new Il2CppKVP.KeyValuePair<InventoryItemReference, int>(mod.InventoryHelper.inventoryItems[kvp.Key].Reference, kvp.Value));
+                        }
                     }
 
                     // Commenting out starting weapons for now
@@ -270,6 +273,11 @@ namespace OpenSeaOfStars.Helpers
             // Abandoned Wizard Flags
             ret.Add("cd680b2ad619ca14c869c23e8cfcc55b", 1); // Bvar_WizardLab_Entrance_Done
             ret.Add("f911c403f7589884b84287dee465fe72", 1); // Bvar_WizardLab_LabIntro_Done
+
+            //SeaOfNightmare
+            ret.Add("a6905e263b22db349b7cf1f346357256", 0); //Bvar_AirElementalSkyland_GetZephyrWind_Done
+            ret.Add("f99b3027ec96e2e4497a52432c6b0abc", 1); //Bvar_StormCallerIsland_GetPearl
+
 
             return ret;
         }

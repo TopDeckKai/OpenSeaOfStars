@@ -106,7 +106,6 @@ public class DialogueHelper : MelonLogger
 
                 if (LocalizationIdConstants.Any(s => s.Equals(choiceLocId.locId)))
                 {
-                    Msg("THIS WORKS 2");
                     if (!newDialogueOption[choiceLocId.locId].loadLevel.Equals(""))
                     {
                         OpenSeaOfStarsMod.OpenInstance.LevelHelper.loadLevel(newDialogueOption[choiceLocId.locId].loadLevel);

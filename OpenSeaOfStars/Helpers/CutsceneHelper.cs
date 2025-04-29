@@ -86,6 +86,12 @@ namespace OpenSeaOfStars.Helpers
             // wizard lab
             { "CUT_WizardLab_BossFight", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, isCustom = false} },
             { "CUT_BackToHub", new CutscenePatchData {requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, forceAnimations = true} },
+            // Sea of Nightmare
+            { "CUT_StormCaller_BeforeBossFight", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Serai}, isCustom = false, forceAnimations = true} },
+            { "CUT_StormCaller_AfterBossFight", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Serai }, isCustom = false, forceAnimations = true, onCutsceneEnd = () => {
+                OpenSeaOfStarsMod.OpenInstance.LevelHelper.loadLevel("StormCallerIslandDefinition");
+                return;
+            } } },
         };
         private static Dictionary<string, CutscenePatchData> teleCutsceneData = new()
         {
@@ -127,7 +133,11 @@ namespace OpenSeaOfStars.Helpers
                 }
             }} },
         };
-        
+        private static Dictionary<string, CutscenePatchData> cutscenesToCancel = new()
+        {
+            { "BEH_GetOut", new CutscenePatchData { } },
+        };
+
         private static List<CharacterDefinitionId> gameplayParty = new()
         {
             CharacterDefinitionId.Zale,
@@ -312,6 +322,8 @@ namespace OpenSeaOfStars.Helpers
                     if (!partychar.activeSelf)
                     {
                         partychar.SetActive(true);
+                        partychar.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").gameObject.SetActive(true);
+                        partychar.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").GetComponent<CharacterVisual>().enabled = true;
                     }
                 }
             }
@@ -563,16 +575,23 @@ namespace OpenSeaOfStars.Helpers
         private static class StartCutscenePatch
         {
             [HarmonyPrefix]
-            private static void Prefix(GraphControllerBase __instance)
+            private static bool Prefix(GraphControllerBase __instance)
             {
                 if (__instance == null || __instance.gameObject == null)
                 {
-                    return;
+                    return true;
                 }
-                
+
+                #if DEBUG
                 OpenInstance.LoggerInstance.Msg($"CUTSCENE: {__instance.gameObject.name}");
+                #endif
                 PlayerPartyManager ppm = PlayerPartyManager.Instance;
-                if (storyCutsceneData.TryGetValue(__instance.gameObject.name, out CutscenePatchData data))
+                if (cutscenesToCancel.TryGetValue(__instance.gameObject.name, out CutscenePatchData data))
+                {
+                    OpenInstance.LoggerInstance.Msg($"Cancelling {__instance.gameObject.name}");
+                    return false;
+                }
+                else if (storyCutsceneData.TryGetValue(__instance.gameObject.name, out data))
                 {
                     List<CharacterDefinitionId> chars = data.cutsceneCharacters;
                     if (data.requiredCharacters?.Count > 0)
@@ -617,6 +636,8 @@ namespace OpenSeaOfStars.Helpers
                     __instance.SkipTree();
                     data.onCutsceneEnd?.Invoke();
                 }
+
+                return true;
             }
 
             [HarmonyPostfix]

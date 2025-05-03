@@ -6,11 +6,6 @@ using UnityEngine;
 using OpenSeaOfStars.Helpers;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using UnityEngine.SceneManagement;
-using Il2CppSabotage.Blackboard;
-using HarmonyLib;
-using Il2CppSabotage.Imposter;
-using Il2CppSabotage.Graph.Core;
-using Il2CppSabotage.Localization;
 
 namespace OpenSeaOfStars
 {
@@ -20,14 +15,15 @@ namespace OpenSeaOfStars
         
         private ActivityHelper ActivityHelper;
         private SaveHelper SaveHelper;
-        private BlackboardHelper BlackboardHelper;
+        public BlackboardHelper BlackboardHelper { get; }
         private CutsceneHelper CutsceneHelper;
         public InventoryHelper InventoryHelper { get; }
         private DialogueHelper DialogueHelper;
         public LevelHelper LevelHelper { get; }
         
         private bool initLoaded;
-        public static List<CharacterDefinitionId> RandomizerParty = new() { CharacterDefinitionId.Zale };
+        public static List<CharacterDefinitionId> RandomizerParty = new() { CharacterDefinitionId.Bst };
+        public static List<CharacterDefinitionId> ShelvedParty = new();
         private string loadDialogue = "";
         
         public static Dictionary<string, (string main, string world)> CharacterObjectDict { get; } = new()
@@ -223,6 +219,44 @@ namespace OpenSeaOfStars
                 }
             }
 
+            if (sceneName.ToLower().Equals("hauntedmansion_gameplay"))
+            {
+                if (BlackboardHelper.GetBlackboardValue("bdc337c5de03029489eae9e077ce63e2", out int doorOpen) && doorOpen == 1) // Bvar_HauntedMansion_DiningRoom_KitchenDoor_Open
+                {
+                    CutsceneHelper.storyCutsceneData.Remove("CUT_HauntedMansion_Sandwitch_Quest_Start");
+                }
+
+                Transform kitchen = GameObject.Find("GPI_STUFF/New Kitchen_Stuff").transform;
+                GameObject trig = kitchen.Find("Triggers/TRIG_Start_Sandwitch_Quest_Kitchen").gameObject;
+                trig.SetActive(false);
+                
+                BlackboardHelper.GetBlackboardValue("59ae26c275bb1ae49ba66ed9198ac5cc", out int questDone);
+                BlackboardHelper.GetBlackboardValue("f4a3c6c07d9a1db499481f11fdd64a20", out int sandwichValue);
+                
+                GameObject garl = kitchen.Find("NPC_Garl").gameObject;
+                garl.SetActive(questDone != 1 && sandwichValue <= 0);
+                GameObject kitchenTriggers = kitchen.Find("Triggers").gameObject;
+                kitchenTriggers.SetActive(questDone != 1 && sandwichValue <= 0);
+            }
+
+            if (sceneName.ToLower().Equals("hauntedmansion_cutscene"))
+            {
+                System.Collections.IEnumerator RemoveNode()
+                {
+                    yield return null;
+                    CutsceneTreeController cut = GameObject.Find("DIALOGUES/DinnerSnackQuest/CUT_HauntedMansion_GarlPrepareSnack").GetComponent<CutsceneTreeController>();
+                    int[] skips = { 12, 13, 14, 15 };
+                    for (int i = cut.currentGraph.nodes.Count - 1; i >= 0; i--)
+                    {
+                        if (!skips.Contains(i))
+                        {
+                            cut.currentGraph.nodes.RemoveAt(i);
+                        }
+                    }
+                }
+                MelonCoroutines.Start(RemoveNode());
+            }
+
             if (sceneName.ToLower().Equals("vespertine_cutscene_worldmap"))
             {
                 // This does not work on first frame of load. TODO refactor.
@@ -250,6 +284,10 @@ namespace OpenSeaOfStars
             }
 
             #if DEBUG
+            if (!Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift))
+            {
+                return;
+            }
             if (Input.GetKeyDown(KeyCode.K))
             {
                 SaveHelper.save();
@@ -269,7 +307,7 @@ namespace OpenSeaOfStars
                 var list = GameObject.FindObjectsOfType<Transform>(true);
                 try
                 {
-                    List<string> encounterNames = new() {"ENCOUNTER_STUFF", "ENCOUNTERS_STUFF", "ENC_YeetGolem_01"};
+                    List<string> encounterNames = new() {"ENCOUNTER_STUFF", "ENCOUNTERS_STUFF", "ENC_YeetGolem_01", "ENCOUNTERS"};
                     Transform t = list.First(obj => encounterNames.Contains(obj.name));
                     if (t != null)
                     {
@@ -281,11 +319,6 @@ namespace OpenSeaOfStars
                 {
                     return;
                 }
-            }
-            
-            else if (Input.GetKeyDown(KeyCode.Alpha2))
-            {
-                BlackboardHelper.AddBlackboardValue("e531806b7c2ae3840b743077f1167609", 0);
             }
             
             else if (Input.GetKeyDown(KeyCode.Z))
@@ -324,6 +357,10 @@ namespace OpenSeaOfStars
             else if (Input.GetKeyDown(KeyCode.I))
             {
                 InventoryHelper.PrintInventoryItems();
+            }
+            else if (Input.GetKeyDown(KeyCode.C))
+            {
+                CutsceneHelper.PrintCutsceneData();
             }
             #endif
         }

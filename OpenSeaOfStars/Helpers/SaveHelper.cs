@@ -74,7 +74,10 @@ namespace OpenSeaOfStars.Helpers
 
                     foreach (KeyValuePair<string, int> kvp in mod.InventoryHelper.startingItems)
                     {
-                        sgs.inventorySaveData.ownedInventoryItems.Add(new Il2CppKVP.KeyValuePair<InventoryItemReference, int>(mod.InventoryHelper.inventoryItems[kvp.Key].Reference, kvp.Value));
+                        if (!sgs.inventorySaveData.ownedInventoryItems.ContainsKey(mod.InventoryHelper.inventoryItems[kvp.Key].Reference))
+                        {
+                            sgs.inventorySaveData.ownedInventoryItems.Add(new Il2CppKVP.KeyValuePair<InventoryItemReference, int>(mod.InventoryHelper.inventoryItems[kvp.Key].Reference, kvp.Value));
+                        }
                     }
 
                     // Commenting out starting weapons for now
@@ -318,6 +321,11 @@ namespace OpenSeaOfStars.Helpers
             ret.Add("6ef6c263c3529dd429ddda8c2f45b74d", 1); // Bvar_Mirth_Phase02_Done
             ret.Add("2e27bf7d3fb0c5946a6c29ed4a74828b", 1); // Bvar_Mirth_Phase03_Done
             ret.Add("53473040c15e1e94f902a5a60d64227c", 1); // Bvar_Crypt_Intro_Done
+
+            //SeaOfNightmare
+            ret.Add("a6905e263b22db349b7cf1f346357256", 0); //Bvar_AirElementalSkyland_GetZephyrWind_Done
+            ret.Add("f99b3027ec96e2e4497a52432c6b0abc", 1); //Bvar_StormCallerIsland_GetPearl
+
 
             return ret;
         }

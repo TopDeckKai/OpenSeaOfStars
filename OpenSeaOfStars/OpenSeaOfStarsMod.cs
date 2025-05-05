@@ -78,6 +78,19 @@ namespace OpenSeaOfStars
                 BlackboardHelper.FindNewBlackboardVars();
             }
 
+            if (sceneName.ToLower().Equals("stormcallerisland_cutscene"))
+            {
+                LoggerInstance.Msg($"Scene {sceneName} with build index {buildIndex} has been loaded!");
+                GameObject trigCutscene = GameObject.Find("TRIG_CantGoBack");
+                if (trigCutscene != null)
+                {
+                    GameObject.Destroy(trigCutscene);
+                    #if DEBUG
+                    LoggerInstance.Msg("Turned off blocker");
+                    #endif
+                }
+            }
+
             if (sceneName.ToLower().Equals("eldermisttrials_gameplay"))
             {
                 LoggerInstance.Msg($"Scene {sceneName} with build index {buildIndex} has been loaded!");
@@ -89,7 +102,9 @@ namespace OpenSeaOfStars
                 if (tutEnemy != null)
                 {
                     tutEnemy.SetActive(false);
+                    #if DEBUG   
                     LoggerInstance.Msg("Turned off blocking tutorial enemy");
+                    #endif
                 }
             }
 
@@ -101,7 +116,9 @@ namespace OpenSeaOfStars
                 if (blocker != null)
                 {
                     GameObject.Destroy(blocker);
+                    #if DEBUG
                     LoggerInstance.Msg($"Unloaded blocking cutscene");
+                    #endif
                 }
             }
 
@@ -113,14 +130,18 @@ namespace OpenSeaOfStars
                 if (bridgeBlocker != null)
                 {
                     GameObject.Destroy(bridgeBlocker);
+                    #if DEBUG
                     LoggerInstance.Msg($"Unloaded blocking cutscene");
+                    #endif
                 }
 
                 GameObject bossBlocker = GameObject.Find("Cutscene_LuslugBoss/TRIG_LetsCamp");
                 if (bossBlocker != null)
                 {
                     GameObject.Destroy(bossBlocker);
+                    #if DEBUG
                     LoggerInstance.Msg($"Unloaded blocking cutscene");
+                    #endif
                 }
             }
 
@@ -132,19 +153,25 @@ namespace OpenSeaOfStars
                 if (blocker != null)
                 {
                     blocker.SetActive(false);
+                    #if DEBUG
                     LoggerInstance.Msg($"Unloaded buggy autosave");
+                    #endif
                 }
                 blocker = GameObject.Find("GPI_AutosaveTrigger_BoucheTrou (E)");
                 if (blocker != null)
                 {
                     blocker.SetActive(false);
+                    #if DEBUG
                     LoggerInstance.Msg($"Unloaded buggy autosave");
+                    #endif
                 }
                 blocker = GameObject.Find("GPI_AutosaveTrigger_BoucheTrou (G)");
                 if (blocker != null)
                 {
                     blocker.SetActive(false);
+                    #if DEBUG
                     LoggerInstance.Msg($"Unloaded buggy autosave");
+                    #endif
                 }
             }
 
@@ -177,7 +204,7 @@ namespace OpenSeaOfStars
                 // open outpost
                 BlackboardHelper.AddBlackboardValue("8dc814be1b11bee4fa2bbe5cd94479fd", 1);
             }
-            
+
             if (sceneName.ToLower().Equals("mines_gameplay"))
             {
                 // if acolyte cutscene is not watched, make Malkomud fightable

@@ -108,7 +108,6 @@ public class DialogueHelper
 
                 if (LocalizationIdConstants.Any(s => s.Equals(choiceLocId.locId)))
                 {
-                    OpenInstance.LoggerInstance.Msg("THIS WORKS 2");
                     if (!newDialogueOption[choiceLocId.locId].loadLevel.Equals(""))
                     {
                         OpenInstance.LevelHelper.loadLevel(newDialogueOption[choiceLocId.locId].loadLevel);

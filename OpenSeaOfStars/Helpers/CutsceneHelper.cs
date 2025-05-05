@@ -87,7 +87,11 @@ namespace OpenSeaOfStars.Helpers
             // wizard lab
             { "CUT_WizardLab_BossFight", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, isCustom = false} },
             { "CUT_BackToHub", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, forceAnimations = true} },
-            
+            { "CUT_StormCaller_BeforeBossFight", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Serai}, isCustom = false, forceAnimations = true} },
+            { "CUT_StormCaller_AfterBossFight", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Serai }, isCustom = false, forceAnimations = true, onCutsceneEnd = () => {
+                OpenSeaOfStarsMod.OpenInstance.LevelHelper.loadLevel("StormCallerIslandDefinition");
+                return;
+            } } },
             // Wraith Island
             // Lucent
             { "CUT_Lucent_IntroInn", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
@@ -240,8 +244,12 @@ namespace OpenSeaOfStars.Helpers
                 GameObject.Find("NPC_Garl").SetActive(false);
             }} },
         };
+        private static Dictionary<string, CutscenePatchData> cutscenesToCancel = new()
+        {
+            { "BEH_GetOut", new CutscenePatchData { } },
+        };
         #endregion
-        
+
         public static readonly List<CharacterDefinitionId> gameplayParty = new()
         {
             CharacterDefinitionId.Zale,
@@ -441,6 +449,8 @@ namespace OpenSeaOfStars.Helpers
                     if (!partychar.activeSelf)
                     {
                         partychar.SetActive(true);
+                        partychar.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").gameObject.SetActive(true);
+                        partychar.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").GetComponent<CharacterVisual>().enabled = true;
                     }
                 }
             }
@@ -687,16 +697,23 @@ namespace OpenSeaOfStars.Helpers
         private static class StartCutscenePatch
         {
             [HarmonyPrefix]
-            private static void Prefix(GraphControllerBase __instance)
+            private static bool Prefix(GraphControllerBase __instance)
             {
                 if (__instance == null || __instance.gameObject == null)
                 {
-                    return;
+                    return true;
                 }
-                
+
+                #if DEBUG
                 OpenInstance.LoggerInstance.Msg($"CUTSCENE: {__instance.gameObject.name}");
+                #endif
                 PlayerPartyManager ppm = PlayerPartyManager.Instance;
-                if (storyCutsceneData.TryGetValue(__instance.gameObject.name, out CutscenePatchData data))
+                if (cutscenesToCancel.TryGetValue(__instance.gameObject.name, out CutscenePatchData data))
+                {
+                    OpenInstance.LoggerInstance.Msg($"Cancelling {__instance.gameObject.name}");
+                    return false;
+                }
+                else if (storyCutsceneData.TryGetValue(__instance.gameObject.name, out data))
                 {
                     data.onCutsceneAboutToStart?.Invoke();
                     List<CharacterDefinitionId> chars = data.cutsceneCharacters;
@@ -757,6 +774,8 @@ namespace OpenSeaOfStars.Helpers
                     currentCutsceneGraph = __instance;
                     currentCutsceneType = CutsceneType.Story;
                 }
+
+                return true;
             }
 
             [HarmonyPostfix]

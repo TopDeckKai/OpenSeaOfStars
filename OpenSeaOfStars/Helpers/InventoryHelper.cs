@@ -25,7 +25,8 @@ public class InventoryHelper
         { "c9447122a421a2640b315d36b2562ad2", 1 }, // graplou
         { "5b77e66a1d52fce4cbab840d6dd157c4", 1 }, // mistral bracelet
         { "31525df92a16eb94ba068dff6876c562", 1 }, // trader's signet
-        { "f0faa32c4f2b19e4d9a1c825c5a23771", 1 }, // upgraded coral hammer
+        { "3de9715179fe13d44bf0ac2d38ce5db4", 1 }, // coral hammer
+        { "f0faa32c4f2b19e4d9a1c825c5a23771", 1 }, // cobalt hammer
         { "70b52ef97031bd74fa467314fbcb11e6", 1 }, // green flame
         { "64bf3ab125f071e4785b7a00150ac1b7", 1 }, // yellow flame
         // { "b901a02219536cf43af09aa7ae1d7326", 1 }, // locket

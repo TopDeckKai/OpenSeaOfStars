@@ -147,6 +147,8 @@ namespace OpenSeaOfStars.Helpers
                     }
                     #endif
 
+                    sgs.cryptSaveManagerSaveData.favoriteMemorials[7] = 912617;
+
                     saveManager.SetSaveSlotAtIndex(modInitSaveSlot, sgs);
                     Il2CppSystem.Threading.Tasks.Task<bool> res = saveManager.SaveSlotFile(sgs);
                     mod.LoggerInstance.Msg($"Testing if save successful");

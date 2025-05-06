@@ -199,7 +199,7 @@ namespace OpenSeaOfStars.Helpers
             { "TEL_OUT_Room2", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, isCustom = false, hideSprite = false, swapLeader = true} },
             { "TEL_OUT_Room3", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, isCustom = false, hideSprite = false, swapLeader = true} },
             // haunted mansion
-            { "TEL_IN_BotanicRoom", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, isCustom = false, hideSprite = false} },
+            // { "TEL_IN_BotanicRoom", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, isCustom = false, hideSprite = false} },
         };
         private static Dictionary<string, CutscenePatchData> toDockCutsceneData = new()
         {
@@ -214,7 +214,7 @@ namespace OpenSeaOfStars.Helpers
             "BEH_FloorA_PingPongWindTunnel",
             "BEH_RightTunnel_PingPong",
             "BEH_PingPongWind_LeftTunnel",
-            "BEH_IntroBotanicalHorror",
+            // "BEH_IntroBotanicalHorror",
         };
         private static List<string> endingCutscenes = new()
         {
@@ -246,7 +246,18 @@ namespace OpenSeaOfStars.Helpers
         };
         private static Dictionary<string, CutscenePatchData> cutscenesToCancel = new()
         {
-            { "BEH_GetOut", new CutscenePatchData { } },
+            { "BEH_GetOut", new CutscenePatchData() },
+            { "BEH_IntroBotanicalHorror", new CutscenePatchData {onCutsceneEnd = () => {
+                if (OpenInstance.BlackboardHelper.GetBlackboardValue("a1b83bdc7debc3548b900b21af499958", out int value) && value == 1)
+                {
+                    return;
+                }
+                
+                Transform leader = GameObject.Find("CapsuleParty(Clone)").transform.Find(CharacterObjectDict[PlayerPartyManager.instance.leaderID.ToString()].main);
+                Vector3 newPos = leader.position;
+                newPos.z = 271;
+                leader.position = newPos;
+            }} },
         };
         #endregion
 
@@ -585,7 +596,6 @@ namespace OpenSeaOfStars.Helpers
         // This method is the starting point for handling the game's objects in such a way that only the intended characters show for a cutscene 
         private static void resetCharactersForCutscenes(PlayerPartyManager ppm, GameObject partyHandler, List<CharacterDefinitionId> enabledList, bool forceAnimations, bool isCustomCode = true, bool hideSprite = false)
         {
-
             if (isCustomCode)
             {
                 foreach (CharacterDefinitionId partyChar in RandomizerParty)
@@ -711,6 +721,10 @@ namespace OpenSeaOfStars.Helpers
                 if (cutscenesToCancel.TryGetValue(__instance.gameObject.name, out CutscenePatchData data))
                 {
                     OpenInstance.LoggerInstance.Msg($"Cancelling {__instance.gameObject.name}");
+                    data.onCutsceneAboutToStart?.Invoke();
+                    data.onCutsceneStart?.Invoke();
+                    data.onCutsceneAboutToEnd?.Invoke();
+                    data.onCutsceneEnd?.Invoke();
                     return false;
                 }
                 else if (storyCutsceneData.TryGetValue(__instance.gameObject.name, out data))

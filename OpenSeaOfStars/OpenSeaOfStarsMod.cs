@@ -211,16 +211,7 @@ namespace OpenSeaOfStars
                 if (BlackboardHelper.GetBlackboardValue("67c2e14989179794caa05fcba09c99f3", out int value) && value == 0)
                 {
                     BlackboardHelper.AddBlackboardValue("8dc814be1b11bee4fa2bbe5cd94479fd", 0);
-                    Il2CppArrayBase<Transform>? encounters = GameObject.Find("ENCOUNTER_STUFF").GetComponentsInChildren<Transform>(true);
-                    if (encounters == null || encounters.Count <= 0)
-                    {
-                        return;
-                    }
-                    Transform enc = encounters.First(enc => enc.gameObject.name == "ENC_Mines_Boss_Malkumud");
-                    if (enc)
-                    {
-                        enc.gameObject.SetActive(true);
-                    }
+                    GameObject.Find("ENCOUNTER_STUFF").transform.Find("ENC_Mines_Boss_Malkumud").gameObject.SetActive(true);
                 }
             }
 
@@ -268,7 +259,15 @@ namespace OpenSeaOfStars
 
             if (sceneName.ToLower().Equals("hauntedmansion_cutscene"))
             {
-                System.Collections.IEnumerator RemoveNode()
+                MelonCoroutines.Start(CutSandwitch());
+                // light up Botanical Horror room
+                Transform candles = GameObject.Find("CUTSCENES/Botanical_BossBattle/BossHiddingObject").transform;
+                for (int i = 1; i <= 6; i++)
+                {
+                    candles.Find($"OBJ_CandleRoom0{i}/Candles0{i}").gameObject.SetActive(true);
+                }
+                
+                System.Collections.IEnumerator CutSandwitch()
                 {
                     yield return null;
                     CutsceneTreeController cut = GameObject.Find("DIALOGUES/DinnerSnackQuest/CUT_HauntedMansion_GarlPrepareSnack").GetComponent<CutsceneTreeController>();
@@ -281,7 +280,6 @@ namespace OpenSeaOfStars
                         }
                     }
                 }
-                MelonCoroutines.Start(RemoveNode());
             }
 
             if (sceneName.ToLower().Equals("vespertine_cutscene_worldmap"))

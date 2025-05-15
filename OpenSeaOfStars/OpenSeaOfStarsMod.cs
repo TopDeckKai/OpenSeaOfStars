@@ -25,6 +25,7 @@ namespace OpenSeaOfStars
         public InventoryHelper InventoryHelper { get; }
         private DialogueHelper DialogueHelper;
         public LevelHelper LevelHelper { get; }
+        public readonly PreferencesHelper PreferencesHelper;
         
         private bool initLoaded;
         public static List<CharacterDefinitionId> RandomizerParty = new() { CharacterDefinitionId.Zale };
@@ -51,6 +52,13 @@ namespace OpenSeaOfStars
             InventoryHelper = new InventoryHelper(this);
             DialogueHelper = new DialogueHelper();
             LevelHelper = new LevelHelper();
+            PreferencesHelper = new PreferencesHelper();
+        }
+
+        public override void OnInitializeMelon()
+        {
+            base.OnInitializeMelon();
+            PreferencesHelper.InitMelonPreferences();
         }
 
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
@@ -89,9 +97,10 @@ namespace OpenSeaOfStars
                 if (trigCutscene != null)
                 {
                     GameObject.Destroy(trigCutscene);
-                    #if DEBUG
-                    LoggerInstance.Msg("Turned off blocker");
-                    #endif
+                    if (PreferencesHelper.TryDebugModeValue)
+                    {
+                        LoggerInstance.Msg("Turned off blocker");
+                    }
                 }
             }
 
@@ -106,9 +115,10 @@ namespace OpenSeaOfStars
                 if (tutEnemy != null)
                 {
                     tutEnemy.SetActive(false);
-                    #if DEBUG   
-                    LoggerInstance.Msg("Turned off blocking tutorial enemy");
-                    #endif
+                    if (PreferencesHelper.TryDebugModeValue)
+                    {
+                        LoggerInstance.Msg("Turned off blocking tutorial enemy");
+                    }
                 }
             }
 
@@ -120,9 +130,10 @@ namespace OpenSeaOfStars
                 if (blocker != null)
                 {
                     GameObject.Destroy(blocker);
-                    #if DEBUG
-                    LoggerInstance.Msg($"Unloaded blocking cutscene");
-                    #endif
+                    if (PreferencesHelper.TryDebugModeValue)
+                    {
+                        LoggerInstance.Msg($"Unloaded blocking cutscene");
+                    }
                 }
             }
 
@@ -134,18 +145,20 @@ namespace OpenSeaOfStars
                 if (bridgeBlocker != null)
                 {
                     GameObject.Destroy(bridgeBlocker);
-                    #if DEBUG
-                    LoggerInstance.Msg($"Unloaded blocking cutscene");
-                    #endif
+                    if (PreferencesHelper.TryDebugModeValue)
+                    {
+                        LoggerInstance.Msg($"Unloaded blocking cutscene");
+                    }
                 }
 
                 GameObject bossBlocker = GameObject.Find("Cutscene_LuslugBoss/TRIG_LetsCamp");
                 if (bossBlocker != null)
                 {
                     GameObject.Destroy(bossBlocker);
-                    #if DEBUG
-                    LoggerInstance.Msg($"Unloaded blocking cutscene");
-                    #endif
+                    if (PreferencesHelper.TryDebugModeValue)
+                    {
+                        LoggerInstance.Msg($"Unloaded blocking cutscene");
+                    }
                 }
             }
 
@@ -157,25 +170,28 @@ namespace OpenSeaOfStars
                 if (blocker != null)
                 {
                     blocker.SetActive(false);
-                    #if DEBUG
-                    LoggerInstance.Msg($"Unloaded buggy autosave");
-                    #endif
+                    if (PreferencesHelper.TryDebugModeValue)
+                    {
+                        LoggerInstance.Msg($"Unloaded buggy autosave");
+                    }
                 }
                 blocker = GameObject.Find("GPI_AutosaveTrigger_BoucheTrou (E)");
                 if (blocker != null)
                 {
                     blocker.SetActive(false);
-                    #if DEBUG
-                    LoggerInstance.Msg($"Unloaded buggy autosave");
-                    #endif
+                    if (PreferencesHelper.TryDebugModeValue)
+                    {
+                        LoggerInstance.Msg($"Unloaded buggy autosave");
+                    }
                 }
                 blocker = GameObject.Find("GPI_AutosaveTrigger_BoucheTrou (G)");
                 if (blocker != null)
                 {
                     blocker.SetActive(false);
-                    #if DEBUG
-                    LoggerInstance.Msg($"Unloaded buggy autosave");
-                    #endif
+                    if (PreferencesHelper.TryDebugModeValue)
+                    {
+                        LoggerInstance.Msg($"Unloaded buggy autosave");
+                    }
                 }
             }
 
@@ -276,7 +292,11 @@ namespace OpenSeaOfStars
                 }
             }
 
-            #if DEBUG
+            if (!PreferencesHelper.TryDebugModeValue)
+            {
+                return;
+            }
+
             if (Input.GetKeyDown(KeyCode.K))
             {
                 SaveHelper.save();
@@ -352,7 +372,6 @@ namespace OpenSeaOfStars
             {
                 InventoryHelper.PrintInventoryItems();
             }
-            #endif
         }
         
         private void AddPartyMember(CharacterDefinitionId character)
@@ -398,13 +417,18 @@ namespace OpenSeaOfStars
         }
 
         
-        #if HAS_UNITY_EXPLORER && DEBUG
+        #if HAS_UNITY_EXPLORER
         /// <summary>
         /// Same as pressing F7 (or whatever keybind you've changed UE to)<br/>
         /// This exists because there's a bug with UE that prevents all inputs when opening game menus
         /// </summary>
-        public static void HideUnityExplorer()
+        public void HideUnityExplorer()
         {
+            if (!PreferencesHelper.TryDebugModeValue)
+            {
+                return;
+            }
+
             MelonBase ue = FindMelon("UnityExplorer", "Sinai");
             if (ue != null)
             {

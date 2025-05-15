@@ -130,12 +130,13 @@ namespace OpenSeaOfStars.Helpers
                         {
                             sgs.combatParty.Add(randomizerParty[i]);
                         }
-                        #if DEBUG
-                        sgs.characterData[randomizerParty[i]].currentHP = 999;
-                        sgs.characterData[randomizerParty[i]].currentSP = 999;
+                        if (mod.PreferencesHelper.TryDebugModeValue)
+                        {
+                            sgs.characterData[randomizerParty[i]].currentHP = 999;
+                            sgs.characterData[randomizerParty[i]].currentSP = 999;
 
-                        sgs.characterData[randomizerParty[i]].levelUpStatUpgrades = createDebugLevelUpList();
-                        #endif
+                            sgs.characterData[randomizerParty[i]].levelUpStatUpgrades = createDebugLevelUpList();
+                        }
                     }
 
                     saveManager.SetSaveSlotAtIndex(modInitSaveSlot, sgs);
@@ -170,12 +171,10 @@ namespace OpenSeaOfStars.Helpers
         {
             BlackboardDictionary ret = new BlackboardDictionary();
 
-            #if DEBUG
-            if (party.Any(character => character == CharacterDefinitionId.Zale || character == CharacterDefinitionId.Valere))
+            if (mod.PreferencesHelper.TryDebugModeValue && party.Any(character => character == CharacterDefinitionId.Zale || character == CharacterDefinitionId.Valere))
             {
                 ret.Add("eade193956f385243bbd0ab47aee2ee9", 1);
             }
-            #endif
 
             // Gameplay flags
             ret.Add("3d7bce7fa2d8dd047a99e54e6526423a", 1); // UnlockedBoat

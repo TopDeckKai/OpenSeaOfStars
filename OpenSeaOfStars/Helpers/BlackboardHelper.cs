@@ -71,7 +71,11 @@ namespace OpenSeaOfStars.Helpers
         
         internal void FindNewBlackboardVars()
         {
-            #if DEBUG
+            if (!mod.PreferencesHelper.TryDebugModeValue)
+            {
+                return;
+            }
+
             Il2CppReferenceArray<Object> objs = ResourcesAPIInternal.FindObjectsOfTypeAll(Il2CppType.From(typeof(BlackboardVariable)));
             int added = 0;
             foreach (Object obj in objs)
@@ -91,7 +95,6 @@ namespace OpenSeaOfStars.Helpers
             {
                 mod.LoggerInstance.Msg($"Found {added} new bVars");
             }
-            #endif
         }
 
         public bool GetBlackboardValue(string key, out int value)
@@ -139,12 +142,10 @@ namespace OpenSeaOfStars.Helpers
         {
             private static void Postfix(BlackboardVariable variable, int value)
             {
-                #if DEBUG
-                if (variable != null)
+                if (OpenSeaOfStarsMod.OpenInstance.PreferencesHelper.TryDebugModeValue && variable != null)
                 {
                     OpenSeaOfStarsMod.OpenInstance.LoggerInstance.Msg($"SET: {variable.guid} {variable.name}: {value}");
                 }
-                #endif
             }
         }
         [HarmonyPatch(typeof(BlackboardManager), "SetBlackboardValue", typeof(string), typeof(int))]
@@ -160,10 +161,10 @@ namespace OpenSeaOfStars.Helpers
                 {
                     return;
                 }
-                
-                #if DEBUG
-                OpenSeaOfStarsMod.OpenInstance.LoggerInstance.Msg($"SET: {guid} {blackboardVariables[guid]}: {value}");
-                #endif
+
+                if (OpenSeaOfStarsMod.OpenInstance.PreferencesHelper.TryDebugModeValue) {
+                    OpenSeaOfStarsMod.OpenInstance.LoggerInstance.Msg($"SET: {guid} {blackboardVariables[guid]}: {value}");
+                }
                 
                 if (triggers.TryGetValue((guid, value), out Dictionary<string, int> bVars))
                 {

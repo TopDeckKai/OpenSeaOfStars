@@ -204,7 +204,7 @@ namespace OpenSeaOfStars.Helpers
                 follower.transform.FindChild("CharacterOffset").FindChild("Character").GetComponent<Animator>().enabled = false;
                 follower.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").gameObject.SetActive(false);
                 follower.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").GetComponent<CharacterVisual>().enabled = false;
-                // if (OpenSeaOfStarsMod.debug) { OpenSeaOfStarsMod.OpenInstance.LoggerInstance.Msg($"HIDE SPRITE IN HIDE CODE: {characterObjectDict[id.ToString()].main}"); }
+                // if (OpenInstance.PreferencesHelper.TryDebugModeValue) { OpenSeaOfStarsMod.OpenInstance.LoggerInstance.Msg($"HIDE SPRITE IN HIDE CODE: {characterObjectDict[id.ToString()].main}"); }
             }
             else
             {
@@ -226,9 +226,10 @@ namespace OpenSeaOfStars.Helpers
                 {
                     ppm.AddPartyMember(id, true, true, false);
                     partyHandler.transform.FindChild(CharacterObjectDict[id.ToString()].main).position = ppm.leader.gameObject.transform.position;
-                    #if DEBUG
-                    OpenInstance.LoggerInstance.Msg("DEBUG NON CUSTOM CHARACTER SPAWNED: " + id.ToString());
-                    #endif
+                    if (OpenInstance.PreferencesHelper.TryDebugModeValue)
+                    {
+                        OpenInstance.LoggerInstance.Msg("DEBUG NON CUSTOM CHARACTER SPAWNED: " + id.ToString());
+                    }
 
                     foreach (CharacterDefinitionId charId in gameplayParty)
                     {
@@ -253,9 +254,10 @@ namespace OpenSeaOfStars.Helpers
                     GameObject leader = partyHandler.transform.FindChild(CharacterObjectDict[ppm.Leader.CharacterDefinitionId.ToString()].main).gameObject;
                     GameObject follower = partyHandler.transform.FindChild(CharacterObjectDict[id.ToString()].main).gameObject;
 
-                    #if DEBUG
-                    OpenInstance.LoggerInstance.Msg("DEBUG CHARACTER SPAWNED: " + id.ToString());
-                    #endif
+                    if (OpenInstance.PreferencesHelper.TryDebugModeValue)
+                    {
+                        OpenInstance.LoggerInstance.Msg("DEBUG CHARACTER SPAWNED: " + id.ToString());
+                    }
 
                     follower.SetActive(true);
                     follower.GetComponent<PartyCharacterFollower>().enabled = true;
@@ -430,9 +432,10 @@ namespace OpenSeaOfStars.Helpers
                 //set rpg camera
                 setRPGCameraToLeader(ppm, partyHandler, RandomizerParty[0]);
 
-                #if DEBUG
-                Msg("LEADER SWAPPED BACK: " + CharacterObjectDict[RandomizerParty[0].ToString()].main);
-                #endif
+                if (mod.PreferencesHelper.TryDebugModeValue)
+                {
+                    Msg("LEADER SWAPPED BACK: " + CharacterObjectDict[RandomizerParty[0].ToString()].main);
+                }
             }
 
             currentCutsceneCallback?.Invoke();
@@ -474,9 +477,10 @@ namespace OpenSeaOfStars.Helpers
                         if (partyCharObj != null && partyCharObj.activeSelf && ppm.combatParty.Contains(partyChar))
                         {
                             partyCharObj.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").gameObject.SetActive(false);
-                            #if DEBUG 
-                            OpenInstance.LoggerInstance.Msg($"HIDE SPRITE IN CUSTOM CODE: {CharacterObjectDict[partyChar.ToString()].main}");
-                            #endif
+                            if (OpenInstance.PreferencesHelper.TryDebugModeValue)
+                            {
+                                OpenInstance.LoggerInstance.Msg($"HIDE SPRITE IN CUSTOM CODE: {CharacterObjectDict[partyChar.ToString()].main}");
+                            }
                         }
                     }
                 }
@@ -519,8 +523,7 @@ namespace OpenSeaOfStars.Helpers
                     return;
                 }
 
-                #if DEBUG
-                if (__instance != null)
+                if (OpenInstance.PreferencesHelper.TryDebugModeValue && __instance != null)
                 {
                     if (__instance.transform.parent != null && __instance.transform.parent.parent != null && __instance.transform.parent.parent.gameObject != null)
                     {
@@ -535,7 +538,6 @@ namespace OpenSeaOfStars.Helpers
                         OpenInstance.LoggerInstance.Msg($"TELE PLAYER: {__instance.gameObject.name}");
                     }
                 }
-                #endif
 
                 if (currentCutsceneType == CutsceneType.None)
                 {
@@ -562,9 +564,10 @@ namespace OpenSeaOfStars.Helpers
                                 }
                             }
 
-                            #if DEBUG
-                            OpenInstance.LoggerInstance.Msg("LEADER SWAPPED: " + CharacterObjectDict[tele.cutsceneCharacters[0].ToString()].main);
-                            #endif
+                            if (OpenInstance.PreferencesHelper.TryDebugModeValue)
+                            {
+                                OpenInstance.LoggerInstance.Msg("LEADER SWAPPED: " + CharacterObjectDict[tele.cutsceneCharacters[0].ToString()].main);
+                            }
                         }
                     }
                 }
@@ -582,9 +585,10 @@ namespace OpenSeaOfStars.Helpers
                     return true;
                 }
 
-                #if DEBUG
-                OpenInstance.LoggerInstance.Msg($"CUTSCENE: {__instance.gameObject.name}");
-                #endif
+                if (OpenInstance.PreferencesHelper.TryDebugModeValue)
+                {
+                    OpenInstance.LoggerInstance.Msg($"CUTSCENE: {__instance.gameObject.name}");
+                }
                 PlayerPartyManager ppm = PlayerPartyManager.Instance;
                 if (cutscenesToCancel.TryGetValue(__instance.gameObject.name, out CutscenePatchData data))
                 {

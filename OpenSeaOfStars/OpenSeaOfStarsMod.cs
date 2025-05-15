@@ -283,7 +283,7 @@ namespace OpenSeaOfStars
             {
                 CutsceneHelper.skipWorldCutscene();
             }
-            
+
             if (loadDialogue.Length > 0)
             {
                 if (DialogueHelper.changeDialoguePerScene(loadDialogue))
@@ -292,17 +292,22 @@ namespace OpenSeaOfStars
                 }
             }
 
+            CheckDebugCommands();
+        }
+
+        private void CheckDebugCommands()
+        { 
             if (!PreferencesHelper.TryDebugModeValue)
             {
                 return;
             }
 
-            if (Input.GetKeyDown(KeyCode.K))
+            if (Input.GetKeyDown(PreferencesHelper.TrySaveKeyValue))
             {
                 SaveHelper.save();
             }
 
-            else if (Input.GetKeyDown(KeyCode.P))
+            else if (Input.GetKeyDown(PreferencesHelper.TryReturnToTitleKeyValue))
             {
                 #if HAS_UNITY_EXPLORER
                 HideUnityExplorer();
@@ -311,7 +316,7 @@ namespace OpenSeaOfStars
                 GameObject.FindObjectOfType<PauseMenu>(true).ReturnToTitle();
             }
 
-            else if (Input.GetKeyDown(KeyCode.E))
+            else if (Input.GetKeyDown(PreferencesHelper.TryToggleEncountersKeyValue))
             {
                 var list = GameObject.FindObjectsOfType<Transform>(true);
                 try
@@ -330,36 +335,36 @@ namespace OpenSeaOfStars
                 }
             }
             
-            else if (Input.GetKeyDown(KeyCode.Alpha2))
+            else if (Input.GetKeyDown(PreferencesHelper.TryResetTimeOfDayFlagKeyValue))
             {
                 BlackboardHelper.AddBlackboardValue("e531806b7c2ae3840b743077f1167609", 0);
             }
             
-            else if (Input.GetKeyDown(KeyCode.Z))
+            else if (Input.GetKeyDown(PreferencesHelper.TryAddZaleKeyValue))
             {
                 AddPartyMember(CharacterDefinitionId.Zale);
             }
-            else if (Input.GetKeyDown(KeyCode.V))
+            else if (Input.GetKeyDown(PreferencesHelper.TryAddValereKeyValue))
             {
                 AddPartyMember(CharacterDefinitionId.Valere);
             }
-            else if (Input.GetKeyDown(KeyCode.G))
+            else if (Input.GetKeyDown(PreferencesHelper.TryAddGarlKeyValue))
             {
                 AddPartyMember(CharacterDefinitionId.Garl);
             }
-            else if (Input.GetKeyDown(KeyCode.S))
+            else if (Input.GetKeyDown(PreferencesHelper.TryAddSeraiKeyValue))
             {
                 AddPartyMember(CharacterDefinitionId.Serai);
             }
-            else if (Input.GetKeyDown(KeyCode.R))
+            else if (Input.GetKeyDown(PreferencesHelper.TryAddReshanKeyValue))
             {
                 AddPartyMember(CharacterDefinitionId.Reshan);
             }
-            else if (Input.GetKeyDown(KeyCode.B))
+            else if (Input.GetKeyDown(PreferencesHelper.TryAddBstKeyValue))
             {
                 AddPartyMember(CharacterDefinitionId.Bst);
             }
-            else if (Input.GetKeyDown(KeyCode.T))
+            else if (Input.GetKeyDown(PreferencesHelper.TryAddTeaksKeyValue))
             {
                 PlayerPartyManager ppm = PlayerPartyManager.Instance;
                 if (!ppm.cargoCharacters.Contains(CharacterDefinitionId.Teaks))
@@ -368,7 +373,7 @@ namespace OpenSeaOfStars
                     ppm.AddCargoCharacter(CharacterDefinitionId.Teaks);
                 }
             }
-            else if (Input.GetKeyDown(KeyCode.I))
+            else if (Input.GetKeyDown(PreferencesHelper.TryLogInventoryKeyValue))
             {
                 InventoryHelper.PrintInventoryItems();
             }

@@ -61,7 +61,7 @@ namespace OpenSeaOfStars.Helpers
             if (initialized) { return; }
 
             general = MelonPreferences.CreateCategory("OpenSeaOfStars_General");
-            DebugMode = general.CreateEntry("DebugMode", true, description: "Whether to enable the plugin's debug mode. This enables debugging key commands and some extra logging.");
+            DebugMode = general.CreateEntry("DebugMode", true, description: "Whether to enable the mod's debug mode. This enables debugging key commands and some extra logging.");
 
             commands = MelonPreferences.CreateCategory("OpenSeaOfStars_Commands");
             SaveKey = commands.CreateEntry("Save", DEFAULT_SAVE_KEY);
@@ -72,7 +72,7 @@ namespace OpenSeaOfStars.Helpers
             ToggleEncountersKey.Comment = "Toggle enemy encounters on or off";
             ResetTimeOfDayFlagKey = commands.CreateEntry("ResetTimeOfDayFlag", DEFAULT_RESET_TIME_OF_DAY_FLAG_KEY);
             ResetTimeOfDayFlagKey.Comment = "Disable Time of Day powers";
-            AddZaleKey = commands.CreateEntry("AddZarl", DEFAULT_ADD_ZALE_KEY);
+            AddZaleKey = commands.CreateEntry("AddZale", DEFAULT_ADD_ZALE_KEY);
             AddZaleKey.Comment = "Add Zale to the party";
             AddValereKey = commands.CreateEntry("AddValere", DEFAULT_ADD_VALERE_KEY);
             AddValereKey.Comment = "Add Valere to the party";

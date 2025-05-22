@@ -119,19 +119,19 @@ namespace OpenSeaOfStars.Helpers
 
                     sgs.activitySaveData = activitySaveData;
 
-                    sgs.currentParty.Clear();
-                    sgs.combatParty.Clear();
+                    sgs.playerPartyManagerSaveData.partyLineups[0].currentParty.Clear();
+                    sgs.playerPartyManagerSaveData.partyLineups[0].combatParty.Clear();
                     for (int i = 0; i < randomizerParty.Count; i++)
                     {
-                        sgs.currentParty.Add(randomizerParty[i]);
+                        sgs.playerPartyManagerSaveData.partyLineups[0].currentParty.Add(randomizerParty[i]);
                         if (i == 0)
                         {
-                            sgs.mainCharacter = randomizerParty[i];
-                            sgs.leader = randomizerParty[i];
+                            sgs.playerPartyManagerSaveData.partyLineups[0].mainCharacter = randomizerParty[i];
+                            sgs.playerPartyManagerSaveData.partyLineups[0].leader = randomizerParty[i];
                         }
                         if (i < 3)
                         {
-                            sgs.combatParty.Add(randomizerParty[i]);
+                            sgs.playerPartyManagerSaveData.partyLineups[0].combatParty.Add(randomizerParty[i]);
                         }
                     }
 

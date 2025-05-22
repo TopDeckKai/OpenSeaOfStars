@@ -6,11 +6,6 @@ using UnityEngine;
 using OpenSeaOfStars.Helpers;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using UnityEngine.SceneManagement;
-using Il2CppSabotage.Blackboard;
-using HarmonyLib;
-using Il2CppSabotage.Imposter;
-using Il2CppSabotage.Graph.Core;
-using Il2CppSabotage.Localization;
 
 namespace OpenSeaOfStars
 {
@@ -20,14 +15,15 @@ namespace OpenSeaOfStars
         
         private ActivityHelper ActivityHelper;
         private SaveHelper SaveHelper;
-        private BlackboardHelper BlackboardHelper;
+        public BlackboardHelper BlackboardHelper { get; }
         private CutsceneHelper CutsceneHelper;
         public InventoryHelper InventoryHelper { get; }
         private DialogueHelper DialogueHelper;
         public LevelHelper LevelHelper { get; }
         
         private bool initLoaded;
-        public static List<CharacterDefinitionId> RandomizerParty = new() { CharacterDefinitionId.Zale };
+        public static List<CharacterDefinitionId> RandomizerParty = new() { CharacterDefinitionId.Bst };
+        public static List<CharacterDefinitionId> ShelvedParty = new();
         private string loadDialogue = "";
         
         public static Dictionary<string, (string main, string world)> CharacterObjectDict { get; } = new()
@@ -215,16 +211,7 @@ namespace OpenSeaOfStars
                 if (BlackboardHelper.GetBlackboardValue("67c2e14989179794caa05fcba09c99f3", out int value) && value == 0)
                 {
                     BlackboardHelper.AddBlackboardValue("8dc814be1b11bee4fa2bbe5cd94479fd", 0);
-                    Il2CppArrayBase<Transform>? encounters = GameObject.Find("ENCOUNTER_STUFF").GetComponentsInChildren<Transform>(true);
-                    if (encounters == null || encounters.Count <= 0)
-                    {
-                        return;
-                    }
-                    Transform enc = encounters.First(enc => enc.gameObject.name == "ENC_Mines_Boss_Malkumud");
-                    if (enc)
-                    {
-                        enc.gameObject.SetActive(true);
-                    }
+                    GameObject.Find("ENCOUNTER_STUFF").transform.Find("ENC_Mines_Boss_Malkumud").gameObject.SetActive(true);
                 }
             }
 
@@ -247,6 +234,51 @@ namespace OpenSeaOfStars
                 if (croube)
                 {
                     croube.SetActive(false);
+                }
+            }
+
+            if (sceneName.ToLower().Equals("hauntedmansion_gameplay"))
+            {
+                if (BlackboardHelper.GetBlackboardValue("bdc337c5de03029489eae9e077ce63e2", out int doorOpen) && doorOpen == 1) // Bvar_HauntedMansion_DiningRoom_KitchenDoor_Open
+                {
+                    CutsceneHelper.storyCutsceneData.Remove("CUT_HauntedMansion_Sandwitch_Quest_Start");
+                }
+
+                Transform kitchen = GameObject.Find("GPI_STUFF/New Kitchen_Stuff").transform;
+                GameObject trig = kitchen.Find("Triggers/TRIG_Start_Sandwitch_Quest_Kitchen").gameObject;
+                trig.SetActive(false);
+                
+                BlackboardHelper.GetBlackboardValue("59ae26c275bb1ae49ba66ed9198ac5cc", out int questDone);
+                BlackboardHelper.GetBlackboardValue("f4a3c6c07d9a1db499481f11fdd64a20", out int sandwichValue);
+                
+                GameObject garl = kitchen.Find("NPC_Garl").gameObject;
+                garl.SetActive(questDone != 1 && sandwichValue <= 0);
+                GameObject kitchenTriggers = kitchen.Find("Triggers").gameObject;
+                kitchenTriggers.SetActive(questDone != 1 && sandwichValue <= 0);
+            }
+
+            if (sceneName.ToLower().Equals("hauntedmansion_cutscene"))
+            {
+                MelonCoroutines.Start(CutSandwitch());
+                // light up Botanical Horror room
+                Transform candles = GameObject.Find("CUTSCENES/Botanical_BossBattle/BossHiddingObject").transform;
+                for (int i = 1; i <= 6; i++)
+                {
+                    candles.Find($"OBJ_CandleRoom0{i}/Candles0{i}").gameObject.SetActive(true);
+                }
+                
+                System.Collections.IEnumerator CutSandwitch()
+                {
+                    yield return null;
+                    CutsceneTreeController cut = GameObject.Find("DIALOGUES/DinnerSnackQuest/CUT_HauntedMansion_GarlPrepareSnack").GetComponent<CutsceneTreeController>();
+                    int[] skips = { 12, 13, 14, 15 };
+                    for (int i = cut.currentGraph.nodes.Count - 1; i >= 0; i--)
+                    {
+                        if (!skips.Contains(i))
+                        {
+                            cut.currentGraph.nodes.RemoveAt(i);
+                        }
+                    }
                 }
             }
 
@@ -277,6 +309,10 @@ namespace OpenSeaOfStars
             }
 
             #if DEBUG
+            if (!Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift))
+            {
+                return;
+            }
             if (Input.GetKeyDown(KeyCode.K))
             {
                 SaveHelper.save();
@@ -296,7 +332,7 @@ namespace OpenSeaOfStars
                 var list = GameObject.FindObjectsOfType<Transform>(true);
                 try
                 {
-                    List<string> encounterNames = new() {"ENCOUNTER_STUFF", "ENCOUNTERS_STUFF", "ENC_YeetGolem_01"};
+                    List<string> encounterNames = new() {"ENCOUNTER_STUFF", "ENCOUNTERS_STUFF", "ENC_YeetGolem_01", "ENCOUNTERS"};
                     Transform t = list.First(obj => encounterNames.Contains(obj.name));
                     if (t != null)
                     {
@@ -308,11 +344,6 @@ namespace OpenSeaOfStars
                 {
                     return;
                 }
-            }
-            
-            else if (Input.GetKeyDown(KeyCode.Alpha2))
-            {
-                BlackboardHelper.AddBlackboardValue("e531806b7c2ae3840b743077f1167609", 0);
             }
             
             else if (Input.GetKeyDown(KeyCode.Z))
@@ -342,7 +373,7 @@ namespace OpenSeaOfStars
             else if (Input.GetKeyDown(KeyCode.T))
             {
                 PlayerPartyManager ppm = PlayerPartyManager.Instance;
-                if (!ppm.cargoCharacters.Contains(CharacterDefinitionId.Teaks))
+                if (!ppm.CargoCharacters.Contains(CharacterDefinitionId.Teaks))
                 {
                     LoggerInstance.Msg($"Adding {CharacterDefinitionId.Teaks.ToString()} to cargo for debug");
                     ppm.AddCargoCharacter(CharacterDefinitionId.Teaks);
@@ -352,18 +383,22 @@ namespace OpenSeaOfStars
             {
                 InventoryHelper.PrintInventoryItems();
             }
+            else if (Input.GetKeyDown(KeyCode.C))
+            {
+                CutsceneHelper.PrintCutsceneData();
+            }
             #endif
         }
         
         private void AddPartyMember(CharacterDefinitionId character)
         {
             PlayerPartyManager ppm = PlayerPartyManager.Instance;
-            if (ppm.currentParty.Contains(character))
+            if (ppm.CurrentParty.Contains(character))
             {
                 return;
             }
             LoggerInstance.Msg($"Adding {character.ToString()} for debug");
-            ppm.AddPartyMember(character, ppm.currentParty.Count < 3, true, true);
+            ppm.AddPartyMember(character, ppm.CurrentParty.Count < 3, true, true);
             if (character == CharacterDefinitionId.Zale && ppm.leader.CharacterDefinitionId != CharacterDefinitionId.Valere || character == CharacterDefinitionId.Valere && ppm.leader.CharacterDefinitionId != CharacterDefinitionId.Zale)
             {
                 PlayerPartyCharacter old = ppm.leader;
@@ -383,12 +418,12 @@ namespace OpenSeaOfStars
                 System.Collections.IEnumerator reAddCharAfterFrame()
                 {
                     yield return null;
-                    ppm.AddPartyMember(old.CharacterDefinitionId, ppm.currentParty.Count < 3, true, true);
+                    ppm.AddPartyMember(old.CharacterDefinitionId, ppm.CurrentParty.Count < 3, true, true);
                     ppm.SetupParty(!BoatManager.Instance.IsInBoatMode);
                 }
                 MelonCoroutines.Start(reAddCharAfterFrame());
             }
-            else if (ppm.currentParty.Count <= 3)
+            else if (ppm.CurrentParty.Count <= 3)
             {
                 ppm.followers.ToArray().First(c => c.characterDefinitionId.ToString() == character.ToString()).transform.position = ppm.leader.transform.position;
             }

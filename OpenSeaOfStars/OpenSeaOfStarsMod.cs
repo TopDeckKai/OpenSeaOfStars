@@ -373,7 +373,7 @@ namespace OpenSeaOfStars
             else if (Input.GetKeyDown(KeyCode.T))
             {
                 PlayerPartyManager ppm = PlayerPartyManager.Instance;
-                if (!ppm.cargoCharacters.Contains(CharacterDefinitionId.Teaks))
+                if (!ppm.CargoCharacters.Contains(CharacterDefinitionId.Teaks))
                 {
                     LoggerInstance.Msg($"Adding {CharacterDefinitionId.Teaks.ToString()} to cargo for debug");
                     ppm.AddCargoCharacter(CharacterDefinitionId.Teaks);
@@ -393,12 +393,12 @@ namespace OpenSeaOfStars
         private void AddPartyMember(CharacterDefinitionId character)
         {
             PlayerPartyManager ppm = PlayerPartyManager.Instance;
-            if (ppm.currentParty.Contains(character))
+            if (ppm.CurrentParty.Contains(character))
             {
                 return;
             }
             LoggerInstance.Msg($"Adding {character.ToString()} for debug");
-            ppm.AddPartyMember(character, ppm.currentParty.Count < 3, true, true);
+            ppm.AddPartyMember(character, ppm.CurrentParty.Count < 3, true, true);
             if (character == CharacterDefinitionId.Zale && ppm.leader.CharacterDefinitionId != CharacterDefinitionId.Valere || character == CharacterDefinitionId.Valere && ppm.leader.CharacterDefinitionId != CharacterDefinitionId.Zale)
             {
                 PlayerPartyCharacter old = ppm.leader;
@@ -418,12 +418,12 @@ namespace OpenSeaOfStars
                 System.Collections.IEnumerator reAddCharAfterFrame()
                 {
                     yield return null;
-                    ppm.AddPartyMember(old.CharacterDefinitionId, ppm.currentParty.Count < 3, true, true);
+                    ppm.AddPartyMember(old.CharacterDefinitionId, ppm.CurrentParty.Count < 3, true, true);
                     ppm.SetupParty(!BoatManager.Instance.IsInBoatMode);
                 }
                 MelonCoroutines.Start(reAddCharAfterFrame());
             }
-            else if (ppm.currentParty.Count <= 3)
+            else if (ppm.CurrentParty.Count <= 3)
             {
                 ppm.followers.ToArray().First(c => c.characterDefinitionId.ToString() == character.ToString()).transform.position = ppm.leader.transform.position;
             }

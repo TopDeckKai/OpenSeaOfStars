@@ -253,7 +253,7 @@ namespace OpenSeaOfStars.Helpers
                     return;
                 }
                 
-                Transform leader = GameObject.Find("CapsuleParty(Clone)").transform.Find(CharacterObjectDict[PlayerPartyManager.instance.leaderID.ToString()].main);
+                Transform leader = GameObject.Find("CapsuleParty(Clone)").transform.Find(CharacterObjectDict[PlayerPartyManager.instance.LeaderID.ToString()].main);
                 Vector3 newPos = leader.position;
                 newPos.z = 271;
                 leader.position = newPos;
@@ -364,7 +364,7 @@ namespace OpenSeaOfStars.Helpers
 
             if (!isCustom) //If it is not custom, take the character and hide the sprite
             {
-                if (ppm.currentParty.Count < 3)
+                if (ppm.CurrentParty.Count < 3)
                 {
                     ppm.AddPartyMember(id, true, true, false);
                     partyHandler.transform.Find(CharacterObjectDict[id.ToString()].main).position = ppm.leader.gameObject.transform.position;
@@ -376,7 +376,7 @@ namespace OpenSeaOfStars.Helpers
                     {
                         if (!RandomizerParty.Any(c => c.Equals(charId)))
                         {
-                            ppm.combatParty.Remove(charId);
+                            ppm.CombatParty.Remove(charId);
                         }
                     }
 
@@ -385,9 +385,9 @@ namespace OpenSeaOfStars.Helpers
             }
             else
             {
-                if (!ppm.currentParty.Contains(id))
+                if (!ppm.CurrentParty.Contains(id))
                 {
-                    ppm.currentParty.Add(id);
+                    ppm.CurrentParty.Add(id);
                 }
 
                 if (partyHandler != null)
@@ -472,9 +472,9 @@ namespace OpenSeaOfStars.Helpers
                 GameObject partyHandler = GameObject.Find("CapsuleParty(Clone)");
                 foreach (CharacterDefinitionId charId in gameplayParty)
                 {
-                    if (!RandomizerParty.Any(c => c.Equals(charId)) && ppm.currentParty.Contains(charId))
+                    if (!RandomizerParty.Any(c => c.Equals(charId)) && ppm.CurrentParty.Contains(charId))
                     {
-                        ppm.combatParty.Remove(charId);
+                        ppm.CombatParty.Remove(charId);
                         hidePartyMember(charId, partyHandler, true);
                     }
                 }
@@ -488,28 +488,28 @@ namespace OpenSeaOfStars.Helpers
             keepActive = new List<CharacterDefinitionId>();
             PlayerPartyManager ppm = PlayerPartyManager.Instance;
             GameObject partyHandler = GameObject.Find("CapsuleParty(Clone)");
-            Vector3 pos = partyHandler.transform.Find(CharacterObjectDict[ppm.currentParty[0].ToString()].main).transform.position;
+            Vector3 pos = partyHandler.transform.Find(CharacterObjectDict[ppm.CurrentParty[0].ToString()].main).transform.position;
 
             foreach (CharacterDefinitionId id in gameplayParty)
             {
                 if (isCustom)
                 {
-                    if (ppm.currentParty.Contains(id))
+                    if (ppm.CurrentParty.Contains(id))
                     {
-                        if (RandomizerParty.Any(c => c.Equals(id)) && ppm.combatParty.Contains(id))
+                        if (RandomizerParty.Any(c => c.Equals(id)) && ppm.CombatParty.Contains(id))
                         {
                             GameObject partychar = partyHandler.transform.Find(CharacterObjectDict[id.ToString()].main).gameObject;
                             partychar.transform.Find("CharacterOffset").Find("Character").Find("Sprite").gameObject.SetActive(true);
                         }
                         else
                         {
-                            bool inCombat = ppm.combatParty.ToArray().Any(c => c.Equals(id));
+                            bool inCombat = ppm.CombatParty.ToArray().Any(c => c.Equals(id));
                             bool inParty = RandomizerParty.Any(c => c.Equals(id));
                             if (!inParty)
                             {
                                 GameObject follower = partyHandler.transform.Find(CharacterObjectDict[id.ToString()].main).gameObject;
-                                ppm.currentParty.Remove(id);
-                                ppm.combatParty.Remove(id);
+                                ppm.CurrentParty.Remove(id);
+                                ppm.CombatParty.Remove(id);
                                 if (follower.activeSelf && partyHandler != null)
                                 {
                                     follower.SetActive(false);
@@ -518,7 +518,7 @@ namespace OpenSeaOfStars.Helpers
                             else if (!inCombat)
                             {
                                 GameObject follower = partyHandler.transform.Find(CharacterObjectDict[id.ToString()].main).gameObject;
-                                ppm.combatParty.Remove(id);
+                                ppm.CombatParty.Remove(id);
                                 if (follower.activeSelf && partyHandler != null)
                                 {
                                     follower.SetActive(false);
@@ -531,16 +531,16 @@ namespace OpenSeaOfStars.Helpers
                 {
                     if (RandomizerParty.Any(c => c.Equals(id)))
                     {
-                        if (ppm.currentParty.Contains(id))
+                        if (ppm.CurrentParty.Contains(id))
                         {
                             ppm.RemovePartyMember(id, true, false, false);
                         }
-                        ppm.AddPartyMember(id, ppm.currentParty.Count < 3, ppm.currentParty.Count < 3, ppm.currentParty.Count < 3);
+                        ppm.AddPartyMember(id, ppm.CurrentParty.Count < 3, ppm.CurrentParty.Count < 3, ppm.CurrentParty.Count < 3);
                         partyHandler.transform.Find(CharacterObjectDict[id.ToString()].main).transform.position = pos;
                     }
                     else
                     {
-                        if (ppm.currentParty.Contains(id))
+                        if (ppm.CurrentParty.Contains(id))
                         {
                             ppm.RemovePartyMember(id, true, false, false);
                         }
@@ -555,14 +555,14 @@ namespace OpenSeaOfStars.Helpers
 
                 GameObject leader = partyHandler.transform.Find(CharacterObjectDict[ppm.Leader.CharacterDefinitionId.ToString()].main).gameObject;
 
-                if (ppm.combatParty.Count > 1)
+                if (ppm.CombatParty.Count > 1)
                 {
-                    GameObject follower = partyHandler.transform.Find(CharacterObjectDict[ppm.combatParty.ToArray()[1].characterId].main).gameObject;
+                    GameObject follower = partyHandler.transform.Find(CharacterObjectDict[ppm.CombatParty.ToArray()[1].characterId].main).gameObject;
                     follower.GetComponent<PartyCharacterFollower>().FollowTarget(leader.GetComponent<FollowerLeader>(), true, true);  
                 }
-                if (ppm.combatParty.Count > 2)
+                if (ppm.CombatParty.Count > 2)
                 {
-                    GameObject follower = partyHandler.transform.Find(CharacterObjectDict[ppm.combatParty.ToArray()[2].characterId].main).gameObject;
+                    GameObject follower = partyHandler.transform.Find(CharacterObjectDict[ppm.CombatParty.ToArray()[2].characterId].main).gameObject;
                     follower.GetComponent<PartyCharacterFollower>().FollowTarget(leader.GetComponent<FollowerLeader>(), true, true);
                 }
 
@@ -603,7 +603,7 @@ namespace OpenSeaOfStars.Helpers
                     if (!enabledList.Any(c => c.Equals(partyChar)))
                     {
                         GameObject partyCharObj = partyHandler.transform.Find(CharacterObjectDict[partyChar.ToString()].main).gameObject;
-                        if (partyCharObj != null && partyCharObj.activeSelf && ppm.combatParty.Contains(partyChar))
+                        if (partyCharObj != null && partyCharObj.activeSelf && ppm.CombatParty.Contains(partyChar))
                         {
                             partyCharObj.transform.Find("CharacterOffset").Find("Character").Find("Sprite").gameObject.SetActive(false);
                             #if DEBUG 
@@ -626,7 +626,7 @@ namespace OpenSeaOfStars.Helpers
 
             foreach (CharacterDefinitionId cutsceneChar in enabledList)
             {
-                if (!ppm.combatParty.Contains(cutsceneChar))
+                if (!ppm.CombatParty.Contains(cutsceneChar))
                 {
                     loadCharacterForCutscene(cutsceneChar, isCustomCode, hideSprite);
                 }
@@ -687,9 +687,9 @@ namespace OpenSeaOfStars.Helpers
 
                             foreach (CharacterDefinitionId charId in gameplayParty)
                             {
-                                if (!RandomizerParty.Any(c => c.Equals(charId)) && ppm.currentParty.Contains(charId))
+                                if (!RandomizerParty.Any(c => c.Equals(charId)) && ppm.CurrentParty.Contains(charId))
                                 {
-                                    ppm.combatParty.Remove(charId);
+                                    ppm.CombatParty.Remove(charId);
                                     hidePartyMember(charId, partyHandler, tele.hideSprite);
                                 }
                             }
@@ -733,8 +733,8 @@ namespace OpenSeaOfStars.Helpers
                     List<CharacterDefinitionId> chars = data.cutsceneCharacters;
                     if (data.requiredCharacters?.Count > 0)
                     {
-                        List<CharacterDefinitionId> intersect = data.requiredCharacters.IntersectBy(ppm.currentParty.ToArray().Select(c1 => c1.ToString()), c2 => c2.ToString()).ToList();
-                        if ((intersect.Count == 0 || intersect.Count < data.requiredCharacters.Count && data.requiredCharacterType == CutscenePatchData.RequiredCharacterType.ALL) && ppm.currentParty.Count < 2)
+                        List<CharacterDefinitionId> intersect = data.requiredCharacters.IntersectBy(ppm.CurrentParty.ToArray().Select(c1 => c1.ToString()), c2 => c2.ToString()).ToList();
+                        if ((intersect.Count == 0 || intersect.Count < data.requiredCharacters.Count && data.requiredCharacterType == CutscenePatchData.RequiredCharacterType.ALL) && ppm.CurrentParty.Count < 2)
                         {
                             chars = data.backupCharacters;
                         }

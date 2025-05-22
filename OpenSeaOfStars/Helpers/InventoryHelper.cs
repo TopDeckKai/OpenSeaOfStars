@@ -62,14 +62,14 @@ public class InventoryHelper
         foreach (Object obj in objs)
         {
             InventoryItem item = obj.Cast<InventoryItem>();
-            inventoryItems.Add(item.guid, item);
+            inventoryItems.TryAdd(item.guid, item);
         }
 
         objs = ResourcesAPIInternal.FindObjectsOfTypeAll(Il2CppType.From(typeof(PlayerCombatMoveDefinition)));
         foreach (Object obj in objs)
         {
             PlayerCombatMoveDefinition skill = obj.Cast<PlayerCombatMoveDefinition>();
-            skillUnlocks.Add(skill.combatMoveId, skill);
+            skillUnlocks.TryAdd(skill.combatMoveId, skill);
         }
     }
 

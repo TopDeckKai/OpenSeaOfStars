@@ -14,7 +14,8 @@ public class LevelHelper
 
     private Dictionary<string, LevelPatch> levelReferences = new() {
         { "SeaOfNightmare_WorldMap" , new LevelPatch { levelUUID = "539d52ad02b071c45837d1329f8cbcc5", isBoat = true, position = new Vector3(6.5f, 0f, -15f) } },
-        { "StormCallerIslandDefinition" , new LevelPatch { levelUUID = "3d1c3e6c6c2511743ac0278f551d299c", isBoat = false, position = new Vector3(17.7412f, 21.002f, 15.5927f) } }
+        { "StormCallerIslandDefinition" , new LevelPatch { levelUUID = "3d1c3e6c6c2511743ac0278f551d299c", isBoat = false, position = new Vector3(17.7412f, 21.002f, 15.5927f) } },
+        { "ReturnToVespertine" , new LevelPatch { levelUUID = "4776b2f6ccdb0fe4195c6c0d89206875", isBoat = true, position = new Vector3(232f, 1.1f, 193.5f)} }
     };
 
     public void loadLevel(string levelName)

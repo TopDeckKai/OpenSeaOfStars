@@ -1,4 +1,5 @@
-﻿using Il2Cpp;
+﻿using HarmonyLib;
+using Il2Cpp;
 using Il2CppTMPro;
 using MelonLoader;
 using UnityEngine;
@@ -15,7 +16,9 @@ public class ReturnToVespertineHelper : MelonLogger
     private GameObject contentList = null;
     private GameObject topText = null;
     private GameObject refButton = null;
+    private GameObject campButton = null;
     private GameObject returnButton = null;
+    private bool onReturnButton = false;
 
     private float newButtonLocalPo = 126f;
 
@@ -25,13 +28,15 @@ public class ReturnToVespertineHelper : MelonLogger
 
         if (gameMenu != null)
         {
-            contentList = gameMenu.transform.FindChild("HomeSection/SelectionList/BackgroundVisual/Content").gameObject;
-            topText = gameMenu.transform.FindChild("TopBar/TopBarBackground/BackgroundContent/DescriptionMask/DescriptionLabel").gameObject;
+            Transform contentListTransform = gameMenu.transform.FindChild("HomeSection/SelectionList/BackgroundVisual/Content");
+            Transform topTextTransform = gameMenu.transform.FindChild("TopBar/TopBarBackground/BackgroundVisual/BackgroundContent/DescriptionMask/DescriptionLabel");
 
-            if (contentList != null && topText != null)
+            if (contentListTransform != null && topTextTransform != null)
             {
+                contentList = contentListTransform.gameObject;
+                topText = topTextTransform.gameObject;
                 refButton = contentList.transform.GetChild(0).gameObject;
-
+                campButton = contentList.transform.GetChild(6).gameObject;
 
                 if (refButton != null)
                 {
@@ -40,7 +45,7 @@ public class ReturnToVespertineHelper : MelonLogger
                     returnButton.transform.parent = contentList.transform;
                     returnButton.transform.localPosition = new Vector3(0f, newButtonLocalPo, 0f);
                     returnButton.transform.localScale = Vector3.one;
-                    returnButton.GetComponent<UITextButton>().disabled = true;
+                    returnButton.GetComponent<UITextButton>().disabled = false;
 
                     menuLoaded = true;
 
@@ -61,7 +66,7 @@ public class ReturnToVespertineHelper : MelonLogger
             if (!ret)
             {
                 #if DEBUG
-                OpenInstance.LoggerInstance.Msg("DEBUG: Vespertine Text changed!!");
+                // OpenInstance.LoggerInstance.Msg("DEBUG: Vespertine Text changed!!");
                 #endif
             }
         }
@@ -74,31 +79,42 @@ public class ReturnToVespertineHelper : MelonLogger
     {
         if (returnButton != null)
         {
-            returnButton.GetComponent<UITextButton>().SetText("Vespertine");
+            if (!isVespertineText())
+            {
+                returnButton.GetComponent<UITextButton>().SetText("Vespertine");
+            }
             if (topText != null)
             {
-                if (returnButton.transform.FindChild("BackgroundDisabled").gameObject.activeSelf || returnButton.transform.FindChild("BackgroundHighlight").gameObject.activeSelf)
+                if ((returnButton.transform.FindChild("BackgroundDisabled").gameObject.activeSelf || returnButton.transform.FindChild("BackgroundHighlight").gameObject.activeSelf))
                 {
-                    if (!topText.GetComponent<TextMeshProUGUI>().text.Equals("Return to the Vespertine."))
+                    if (!topText.GetComponent<TextMeshProUGUI>().text.Equals("Return to the Vespertine.") && !onReturnButton)
                     {
                         topText.GetComponent<TextMeshProUGUI>().SetText("Return to the Vespertine.");
+                        onReturnButton = true;
+                    }
+                    else if (!topText.GetComponent<TextMeshProUGUI>().text.Equals("Return to the Vespertine."))
+                    {
+                        onReturnButton = false;
                     }
                 }
             }
         }
     }
 
-    /*
-    [HarmonyPatch(typeof(PlayDialogNode), "OnDialogCompleted")]
+    
+    [HarmonyPatch(typeof(UIButton), "OnSubmit")]
     private static class ReturnToVespertineButtonPatch
     {
         [HarmonyPrefix]
-        private static void Prefix(PlayDialogNode __instance)
+        private static bool Prefix(UIButton __instance)
         {
-            if (__instance.dialogBoxData.value.ContainsChoice()) {
-                
+            if (__instance.gameObject.name.Equals("ReturnButton")) {
+                OpenSeaOfStarsMod.OpenInstance.LevelHelper.loadLevel("ReturnToVespertine");
+
+                return false;
             }
+
+            return true;
         }
     }
-    */
 }

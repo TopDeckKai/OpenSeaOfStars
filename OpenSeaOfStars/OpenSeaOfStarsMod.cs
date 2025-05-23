@@ -297,7 +297,7 @@ namespace OpenSeaOfStars
             {
                 ReturnToVespertineHelper.attemptMenuSetup();
             }
-            else if (!ReturnToVespertineHelper.isVespertineText())
+            else 
             {
                 ReturnToVespertineHelper.updateText();
             }

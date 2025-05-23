@@ -32,17 +32,18 @@ Run Melon Loader and follow its instructions to install version 0.7.0 to Sea of 
 If you are just wanting to play around with OpenSeaOfStars, wait for a release and then install the .dll from that release to the mods folder that Melon Loader created. You will then be able to explore the OpenSeaOfStars mod.
 As for development, here is what you will need to do:
 
-1. Follow the instructions for Unity Explorer to install the mods and userlibs folders to your sea of stars location.
-2. Download the OpenSeaOfStars project by cloning the repository in git bash or through visual studio.
-3. Open the OpenSeaOfStars project in visual studio by opening the .sln if you haven't done so.
-4. A lot of dependencies will be needed, do this by going to the "Dependencies" in solution explorer, right clicking, and selecting add project dependencies. There will be a tab to browse for dependencies to add.
+1. Run Sea of Stars once, until you reach the game menu, then exit. This will generate the needed dependencies.
+2. Follow the instructions for Unity Explorer to install the mods and userlibs folders to your sea of stars location.
+3. Download the OpenSeaOfStars project by cloning the repository in git bash or through visual studio.
+4. Open the OpenSeaOfStars project in visual studio by opening the .sln if you haven't done so.
+5. A lot of dependencies will be needed, do this by going to the "Dependencies" in solution explorer, right clicking, and selecting add project dependencies. There will be a tab to browse for dependencies to add.
 ![image](https://github.com/user-attachments/assets/8356ba7f-d956-4b9a-97b9-8965d7dce101)
 
 Several dependencies will need to be added. These will be found under SeaOfStars/MelonLoader/Il2CppAssemblies and SeaOfStars/MelonLoader/net6. The list of dependencies needed from these folders should be found under .csproj
 
-5. Once you have verified all dependencies are built, build your solution. Once that is built successfully, find your .dll under OpenSeaOfStars/OpenSeaOfStars/obj/debug/net6.0/OpenSeaOfStars.dll in your OpenSeaOfStars C# project. Copy that to your sea of stars mods folder.
+6. Once you have verified all dependencies are built, build your solution. Once that is built successfully, find your .dll under OpenSeaOfStars/OpenSeaOfStars/obj/debug/net6.0/OpenSeaOfStars.dll in your OpenSeaOfStars C# project. Copy that to your sea of stars mods folder.
 
-6. Run Sea of Stars!
+7. Run Sea of Stars!
 
 ## Working with UnityExplorer
 Unity Explorer is finicky with sea of stars. There are a few tips to keep in mind when working with the UnityExplorer mod:

@@ -3,12 +3,12 @@ using Il2Cpp;
 using Il2CppRewired;
 using Il2CppSabotage.Graph.Core;
 using Il2CppSabotage.Localization;
-using MelonLoader;
 using UnityEngine;
+using static OpenSeaOfStars.OpenSeaOfStarsMod;
 
 namespace OpenSeaOfStars.Helpers;
 
-public class DialogueHelper : MelonLogger
+public class DialogueHelper
 {
     public static List<string> LocalizationIdConstants = new() {
         "OPEN_SEA_OF_STARS_VESPERTINE_SEA_OF_NIGHTMARE"
@@ -76,9 +76,11 @@ public class DialogueHelper : MelonLogger
                                 dc.localizationId = sonLocId;
                                 dbd.dialogChoices.Insert(dpd.slot, dc);
                                 dialogueNode.dialogBoxData.value = dbd;
-
-                                Msg("Loaded " + LocalizationIdConstants[0]);
                                 success++;
+
+                                #if DEBUG
+                                OpenInstance.LoggerInstance.Msg("Loaded " + LocalizationIdConstants[0]);
+                                #endif
                             }
                             catch (Exception ex) { }
                         }
@@ -108,7 +110,7 @@ public class DialogueHelper : MelonLogger
                 {
                     if (!newDialogueOption[choiceLocId.locId].loadLevel.Equals(""))
                     {
-                        OpenSeaOfStarsMod.OpenInstance.LevelHelper.loadLevel(newDialogueOption[choiceLocId.locId].loadLevel);
+                        OpenInstance.LevelHelper.loadLevel(newDialogueOption[choiceLocId.locId].loadLevel);
                     }
                 }
             }

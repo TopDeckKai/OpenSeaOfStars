@@ -3,26 +3,26 @@ using Il2CppSabotage.Blackboard;
 using HarmonyLib;
 using Il2CppInterop.Runtime;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
-using MelonLoader;
 using File = Il2CppSystem.IO.File;
 using Object = UnityEngine.Object;
 
 namespace OpenSeaOfStars.Helpers
 {
-    public class BlackboardHelper : MelonLogger
+    public class BlackboardHelper
     {
         private OpenSeaOfStarsMod mod;
         private BlackboardManager blackboardManager;
 
         private static Dictionary<string, int> skipSetGuids = new()
         {
-            {"7d2f0bce0c57c4b4cbb6c525e5b6bc2b", 0} // Teaks camping, sometimes turns off after cutscenes
+            {"7d2f0bce0c57c4b4cbb6c525e5b6bc2b", 0}, // Teaks camping, sometimes turns off after cutscenes
         };
 
         private static Dictionary<(string guid, int value), Dictionary<string, int>> triggers = new()
         {
 
-            { ("67c2e14989179794caa05fcba09c99f3", 1), new Dictionary<string, int> {{"775d6e50cf2ef0f4d9d8a98a89bf4a02", 0}} } // beating Malkomud (watching the acolyte cutscene)
+            { ("67c2e14989179794caa05fcba09c99f3", 1), new Dictionary<string, int> {{"775d6e50cf2ef0f4d9d8a98a89bf4a02", 0}} }, // beating Malkomud (watching the acolyte cutscene)
+            { ("fe9c5c7227b87714eb9f6d87ea89faed", 1), new Dictionary<string, int> {{"c67751f7421cee147afc1cb7d643e952", 1}} }, // beating Dweller of Woe
         };
 
         private static Dictionary<string, string> blackboardVariables = new();

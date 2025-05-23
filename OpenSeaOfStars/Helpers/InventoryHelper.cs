@@ -10,6 +10,13 @@ public class InventoryHelper
 {
     private OpenSeaOfStarsMod mod;
     public Dictionary<string, InventoryItem> inventoryItems { get; private set; }
+
+    private readonly List<string> wheelsGuids = new()
+    {
+        "d7f92ecb9e4da7b418070285c25d86e1"
+    };
+    public List<InventoryItem> WheelsItems => inventoryItems.IntersectBy(wheelsGuids, wheel => wheel.Key).Select(item => item.Value).ToList();
+    public Dictionary<string, PlayerCombatMoveDefinition> skillUnlocks { get; private set; }
     public Dictionary<string, int> startingItems { get; private set; } = new()
     {
         // key items
@@ -18,7 +25,11 @@ public class InventoryHelper
         { "c9447122a421a2640b315d36b2562ad2", 1 }, // graplou
         { "5b77e66a1d52fce4cbab840d6dd157c4", 1 }, // mistral bracelet
         { "31525df92a16eb94ba068dff6876c562", 1 }, // trader's signet
-        { "f0faa32c4f2b19e4d9a1c825c5a23771", 1 }, // upgraded coral hammer
+        { "3de9715179fe13d44bf0ac2d38ce5db4", 1 }, // coral hammer
+        { "f0faa32c4f2b19e4d9a1c825c5a23771", 1 }, // cobalt hammer
+        { "70b52ef97031bd74fa467314fbcb11e6", 1 }, // green flame
+        { "64bf3ab125f071e4785b7a00150ac1b7", 1 }, // yellow flame
+        // { "b901a02219536cf43af09aa7ae1d7326", 1 }, // locket
         
         // relics
         { "1554ef53341beea43ab50edbe869f560", 1 }, // salient sails
@@ -42,6 +53,7 @@ public class InventoryHelper
     {
         this.mod = mod;
         inventoryItems = new Dictionary<string, InventoryItem>();
+        skillUnlocks = new Dictionary<string, PlayerCombatMoveDefinition>();
     }
 
     public void GetInventoryItems()
@@ -50,15 +62,28 @@ public class InventoryHelper
         foreach (Object obj in objs)
         {
             InventoryItem item = obj.Cast<InventoryItem>();
-            inventoryItems.Add(item.guid, item);
+            inventoryItems.TryAdd(item.guid, item);
+        }
+
+        objs = ResourcesAPIInternal.FindObjectsOfTypeAll(Il2CppType.From(typeof(PlayerCombatMoveDefinition)));
+        foreach (Object obj in objs)
+        {
+            PlayerCombatMoveDefinition skill = obj.Cast<PlayerCombatMoveDefinition>();
+            skillUnlocks.TryAdd(skill.combatMoveId, skill);
         }
     }
 
     public void PrintInventoryItems()
     {
+        mod.LoggerInstance.Msg("INVENTORY");
         foreach (InventoryItem item in inventoryItems.Values)
         {
             mod.LoggerInstance.Msg($"{item.name}, {item.guid}");
+        }
+        mod.LoggerInstance.Msg("SKILLS");
+        foreach (PlayerCombatMoveDefinition item in skillUnlocks.Values)
+        {
+            mod.LoggerInstance.Msg($"{item.name}, {item.combatMoveId}");
         }
     }
 }

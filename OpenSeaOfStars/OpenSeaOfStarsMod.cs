@@ -25,7 +25,8 @@ namespace OpenSeaOfStars
         public InventoryHelper InventoryHelper { get; }
         private DialogueHelper DialogueHelper;
         public LevelHelper LevelHelper { get; }
-        
+        public ReturnToVespertineHelper ReturnToVespertineHelper { get; }
+
         private bool initLoaded;
         public static List<CharacterDefinitionId> RandomizerParty = new() { CharacterDefinitionId.Zale };
         private string loadDialogue = "";
@@ -51,6 +52,7 @@ namespace OpenSeaOfStars
             InventoryHelper = new InventoryHelper(this);
             DialogueHelper = new DialogueHelper();
             LevelHelper = new LevelHelper();
+            ReturnToVespertineHelper = new ReturnToVespertineHelper();
         }
 
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
@@ -259,6 +261,15 @@ namespace OpenSeaOfStars
         public override void OnUpdate()
         {
             base.OnUpdate();
+            if (!ReturnToVespertineHelper.menuLoaded)
+            {
+                ReturnToVespertineHelper.attemptMenuSetup();
+            }
+            else if (!ReturnToVespertineHelper.isVespertineText())
+            {
+                ReturnToVespertineHelper.updateText();
+            }
+
             if (CutsceneHelper.currentCutsceneType == CutsceneHelper.CutsceneType.Story || CutsceneHelper.currentCutsceneType == CutsceneHelper.CutsceneType.StoryExt)
             {
                 CutsceneHelper.checkCutsceneFinished();

@@ -5,6 +5,7 @@ using Il2CppInterop.Runtime;
 using UnityEngine;
 using OpenSeaOfStars.Helpers;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
+using Il2CppSabotage.Graph.Core;
 using UnityEngine.SceneManagement;
 
 namespace OpenSeaOfStars
@@ -266,6 +267,17 @@ namespace OpenSeaOfStars
                 {
                     candles.Find($"OBJ_CandleRoom0{i}/Candles0{i}").gameObject.SetActive(true);
                 }
+
+                // remove Dweller trigger if both Solstice Warriors aren't in your party
+                // int count = RandomizerParty.Count(c => c == CharacterDefinitionId.Zale || c == CharacterDefinitionId.Valere);
+                // if (count < 2)
+                // {
+                //     GameObject sealTrigger = GameObject.Find("CUTSCENES/Breaking_Door_Seal").transform.Find("TRIG_removeSeal").gameObject;
+                //     sealTrigger.SetActive(false);
+                //     Transform traitors = GameObject.Find("NPC_Cutscene").transform;
+                //     traitors.Find("NPC_Brugaves").gameObject.SetActive(false);
+                //     traitors.Find("NPC_Erlina").gameObject.SetActive(false);
+                // }
                 
                 System.Collections.IEnumerator CutSandwitch()
                 {
@@ -275,6 +287,67 @@ namespace OpenSeaOfStars
                     for (int i = cut.currentGraph.nodes.Count - 1; i >= 0; i--)
                     {
                         if (!skips.Contains(i))
+                        {
+                            cut.currentGraph.nodes.RemoveAt(i);
+                        }
+                    }
+                    
+                    //TESTING
+                    // (cut.currentGraph.nodes[0] as CutsceneDecoratorNode).cutsceneStep = CutsceneDecoratorNode.CutsceneStep.None | CutsceneDecoratorNode.CutsceneStep.CutsceneBars | CutsceneDecoratorNode.CutsceneStep.LockFollowers;
+                    // AddPartyMemberNode testNode = new()
+                    // {
+                    //     toAdd = new GraphVariable<EDynamicPlayerPartyCharacter>(EDynamicPlayerPartyCharacter.Reshan),
+                    //     activateGameObject = new GraphVariable<bool>(true),
+                    //     addToFollowerList = new GraphVariable<bool>(true),
+                    //     refreshFollowerSetup = new GraphVariable<bool>(true),
+                    //     currentGraph = cut.CurrentGraph
+                    // };
+                    // SpawnPartyMemberNode testNode = new()
+                    // {
+                    //     partyMember = new GraphVariable<EDynamicPlayerPartyCharacter>(EDynamicPlayerPartyCharacter.Reshan),
+                    //     teleportAlreadyActiveCharacters = new GraphVariable<bool>(true),
+                    //     currentGraph = cut.CurrentGraph
+                    // };
+                    // GraphNodeLink testLink = new(testNode, cut.currentGraph.nodes[0]);
+                    // testNode.parentLinks.Add(testLink);
+                    // cut.currentGraph.nodes.Insert(0, testNode);
+                    // cut.currentGraph.links.Insert(0, testLink);
+                    // CutsceneDecoratorNode testSomething = new()
+                    // {
+                    //     currentGraph = cut.CurrentGraph,
+                    //     availableStates = CutsceneDecoratorNode.CutsceneStates.StartState,
+                    //     clearFollowersPath = new GraphVariable<bool>(true)
+                    // };
+                    // testSomething.availableStates = CutsceneDecoratorNode.CutsceneStates.StartState;
+                    // CutsceneManager.instance.RegisterCutsceneStart(testSomething, false);
+                }
+            }
+
+            if (sceneName.ToLower().Equals("watcherisland_tormentpeak_cutscene"))
+            {
+                MelonCoroutines.Start(SkipAddSerai());
+
+                System.Collections.IEnumerator SkipAddSerai()
+                {
+                    yield return null;
+                    CutsceneTreeController cut = GameObject.Find("CUTSCENES/DwellerOfTorment/CUT_ItsSeraiTime").GetComponent<CutsceneTreeController>();
+                    cut.currentGraph.nodes.RemoveAt(23);
+                }
+            }
+
+            if (sceneName.ToLower().Equals("archivistroom_cutscene"))
+            {
+                MelonCoroutines.Start(SkipAddReshan());
+
+                System.Collections.IEnumerator SkipAddReshan()
+                {
+                    yield return null;
+                    int[] removals = { 87, 105, /*106,*/ 107, 110, 111 }; // 106 removes vial of time, 111 unlocks combat move
+                    CutsceneTreeController cut = GameObject.Find("CUTSCENE/GiveVial/CUT__GiveVial").GetComponent<CutsceneTreeController>();
+                    
+                    for (int i = cut.currentGraph.nodes.Count - 1; i >= 0; i--)
+                    {
+                        if (removals.Contains(i))
                         {
                             cut.currentGraph.nodes.RemoveAt(i);
                         }
@@ -332,7 +405,7 @@ namespace OpenSeaOfStars
                 var list = GameObject.FindObjectsOfType<Transform>(true);
                 try
                 {
-                    List<string> encounterNames = new() {"ENCOUNTER_STUFF", "ENCOUNTERS_STUFF", "ENC_YeetGolem_01", "ENCOUNTERS"};
+                    List<string> encounterNames = new() {"ENCOUNTER_STUFF", "ENCOUNTERS_STUFF", "ENC_YeetGolem_01", "ENCOUNTERS", "ENCOUNTER"};
                     Transform t = list.First(obj => encounterNames.Contains(obj.name));
                     if (t != null)
                     {
@@ -387,6 +460,11 @@ namespace OpenSeaOfStars
             {
                 CutsceneHelper.PrintCutsceneData();
             }
+            else if (Input.GetKeyDown(KeyCode.U))
+            {
+                Behaviour ui = GameObject.Find("UICanvas(Clone)").GetComponentByName("CanvasUpscaleViewport") as Behaviour;
+                ui.enabled = !ui.enabled;
+            }
             #endif
         }
         
@@ -414,6 +492,8 @@ namespace OpenSeaOfStars
                     cam.currentContext.Cast<CharacterViewCameraContext>().cameraLookAtPosition = GameObject.FindObjectsOfType<PlayerCameraLookAtPosition>(true).First(c => c.name.Equals(charObjName));
                 }
                 BlackboardHelper.AddBlackboardValue("eade193956f385243bbd0ab47aee2ee9", 1); // can fly with a Solstice Warrior
+                
+                RandomizerParty.Insert(0, character);
 
                 System.Collections.IEnumerator reAddCharAfterFrame()
                 {
@@ -428,8 +508,11 @@ namespace OpenSeaOfStars
                 ppm.followers.ToArray().First(c => c.characterDefinitionId.ToString() == character.ToString()).transform.position = ppm.leader.transform.position;
             }
             ppm.SetupParty(!BoatManager.Instance.IsInBoatMode);
-            
-            RandomizerParty.Add(character);
+
+            if (RandomizerParty.All(c => c != character))
+            {
+                RandomizerParty.Add(character);
+            }
         }
 
         

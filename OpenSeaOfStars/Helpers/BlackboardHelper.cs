@@ -125,9 +125,16 @@ namespace OpenSeaOfStars.Helpers
         [HarmonyPatch(typeof(BlackboardManager), "GetBlackboardValue", typeof(BlackboardVariable))]
         private static class GetBlackboardPatch
         {
+            private static List<string> skipLogs = new()
+            {
+                "8ff406c2ce93c624c8d5a41cfa444937",
+                "eade193956f385243bbd0ab47aee2ee9",
+                "50ad3ccfe0b369f4abc1fda25bcc49e4",
+                "3d7bce7fa2d8dd047a99e54e6526423a"
+            };
             private static void Postfix(BlackboardVariable variable, int __result)
             {
-                if (variable != null && (!variable.guid.Equals("8ff406c2ce93c624c8d5a41cfa444937") && !variable.guid.Equals("eade193956f385243bbd0ab47aee2ee9"))) //update thread logs excluded
+                if (variable != null && !skipLogs.Contains(variable.guid)) //update thread logs excluded
                 {
                     OpenSeaOfStarsMod.OpenInstance.LoggerInstance.Msg($"GET {variable.guid} {variable.name}: {__result}");
                 }

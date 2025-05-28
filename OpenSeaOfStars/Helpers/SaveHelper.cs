@@ -79,6 +79,9 @@ namespace OpenSeaOfStars.Helpers
                             sgs.inventorySaveData.ownedInventoryItems.Add(new Il2CppKVP.KeyValuePair<InventoryItemReference, int>(mod.InventoryHelper.inventoryItems[kvp.Key].Reference, kvp.Value));
                         }
                     }
+                    #if DEBUG
+                    sgs.relicSaveData.enabledRelics.Add("1554ef53341beea43ab50edbe869f560");
+                    #endif
 
                     // Commenting out starting weapons for now
                     // InventoryItemReference weaponVal = new InventoryItemReference();
@@ -111,6 +114,7 @@ namespace OpenSeaOfStars.Helpers
                     
                     sgs.progressionSaveData.unlockedCombatMoves.Add(mod.InventoryHelper.skillUnlocks["LunarShield"].Reference);
                     sgs.progressionSaveData.unlockedCombatMoves.Add(mod.InventoryHelper.skillUnlocks["DashStrike"].Reference);
+                    // sgs.progressionSaveData.unlockedCombatMoves.Add(mod.InventoryHelper.skillUnlocks["PhoenixBlend"].Reference);
 
                     sgs.blackboardDictionary = createDefaultBlackboardData(randomizerParty);
                     ActivitySaveData activitySaveData = new ActivitySaveData();
@@ -194,6 +198,7 @@ namespace OpenSeaOfStars.Helpers
             ret.Add("767078e1d423a5040b2c9cb4317da3b5", 1); // Evermist Docs
             ret.Add("7d2f0bce0c57c4b4cbb6c525e5b6bc2b", 1); // Bvar_Global_TeaksCamping_On
             ret.Add("0143bd6816480ba4982009e7b52f9099", 1); // CookSnacksUnlocked
+            ret.Add("8ff406c2ce93c624c8d5a41cfa444937", 1); // ToDUnlocked
             
             // Map fog of war
             ret.Add("bdf72b15ca6426b41b8a789b8a2b2f29", 1); // Bvar_FogUnlocked_IslandShrine04
@@ -304,7 +309,7 @@ namespace OpenSeaOfStars.Helpers
             ret.Add("8103ac9a2d3553242876908322f9221d", 1); // Bvar_CursedWood_BarrierRemoved_Done
             ret.Add("d28e7b922864f054580267bc52d93d29", 1); // Bvar_HautnedMansion_Intro_Done
             ret.Add("2bc1931d02bb5484682fe21aa768f03c", 1); // Bvar_HautnedMansion_SeraiJoined_Done
-            ret.Add("a1b83bdc7debc3548b900b21af499958", 0); // Bvar_HauntedMansion_BotanicalHorror_Done
+            ret.Add("a1b83bdc7debc3548b900b21af499958", 1); // Bvar_HauntedMansion_BotanicalHorror_Done
             ret.Add("c05881039602dec49a5760b43b81150a", 1); // Bvar_HauntedMansion_SeraiLeave_Done
             ret.Add("8d1beea3c7d2890499ce6e38029fb940", 0); // Bvar_HauntedMansion_SealRemoved_Done
             ret.Add("fe9c5c7227b87714eb9f6d87ea89faed", 0); // Bvar_HauntedMansion_DwellerDefeated_Done
@@ -312,7 +317,7 @@ namespace OpenSeaOfStars.Helpers
             ret.Add("c67751f7421cee147afc1cb7d643e952", 1); // Bvar_Lucent_Act3_Done // use as key for Lucent state // 0 prevents player from leaving inn if Moraine is in bed?
             ret.Add("164de693261d45541b04c3e0ff4ac7fb", 1); // Bvar_ArchivistRoom_InterludeAct3_Done
             
-            // ??? Island
+            // Settlers Island
             // Mirth
             ret.Add("c1a6bc90eed602f4d99338fd87f7e76e", 1); // Bvar_Mirth_EndAct4_Done
             ret.Add("3e4083d8c99ea5c4e897d24f9a8c79b1", 1); // Bvar_Mirth_BoatFadeOut_Done
@@ -322,12 +327,40 @@ namespace OpenSeaOfStars.Helpers
             ret.Add("415047891f21a1c4eb03c90832e51192", 1); // Bvar_Mirth_CryptFound_Done
             ret.Add("6ef6c263c3529dd429ddda8c2f45b74d", 1); // Bvar_Mirth_Phase02_Done
             ret.Add("2e27bf7d3fb0c5946a6c29ed4a74828b", 1); // Bvar_Mirth_Phase03_Done
+            // Crypt
             ret.Add("53473040c15e1e94f902a5a60d64227c", 1); // Bvar_Crypt_Intro_Done
 
             //SeaOfNightmare
             ret.Add("a6905e263b22db349b7cf1f346357256", 0); //Bvar_AirElementalSkyland_GetZephyrWind_Done
             ret.Add("f99b3027ec96e2e4497a52432c6b0abc", 1); //Bvar_StormCallerIsland_GetPearl
 
+            // Watcher Island
+            ret.Add("b234d96c65c3d594bbe81cbf75182b01", 0); // Bvar_JunglePath_AcolyteBossFight_Done
+            // Lake Docarria
+            ret.Add("9367e4058060e994995201622e742727", 1); // Bvar_DocarriVillage_VillageIntro_Done
+            ret.Add("302a60526f08f8040a3ff4d0b9575237", 0); // Bvar_DocarriVillage_TempleIntro_Done
+            ret.Add("f3c28c842759e0c4c890e6a507d4d92d", 1); // Bvar_DocarriVillage_ExitDoor_Done
+            ret.Add("061f7815ab3b1cc4e80e2afbb3d1b9dd", 1); // Bvar_DocarriVillage_FirstDiveAppears_Done
+            // Sacred Grove
+            ret.Add("670f47750f2f4e24abe2332cd2fdebe1", 1); // Bvar_sacredGrove_UnlockedDive_Done
+            // Docarri Village
+            ret.Add("a3a14792d266bd74abf11753d4d0208e", 1); // Bvar_SideQuest_ConchShopIntro_Done
+            ret.Add("64118af8f10aa234aba028f352dea80f", 1); // Bvar_DocarriVillage_OracleIntro_Done
+            // Tower of Antsudlo
+            ret.Add("5a4f15dd3f0e28944af254e87bde6edb", 1); // Bvar_WaterTemple_ArchivistDoor_Done
+            ret.Add("b7c37a412d988d045a3c058cf26ffffa", 1); // Bvar_ArchivistRoom_GroupIntro_Done
+            ret.Add("e0b11054cc3c39a4c8426f840b767c16", 0); // Bvar_ArchivistRoom_ReturnFromGlacious_Done
+            // Glacial Peak
+            ret.Add("c2bc8102325576149b0a22bb3960f080", 0); // Bvar_GlacialPeak_AcolyteBoss_Done
+            ret.Add("06dd330051667d3469f6352485d41d34", 0); // Bvar_GlacialPeak_SoslticeAmulet_Done
+            // Torment Peak
+            ret.Add("27af64addab69d341a5c2939ac0d4b1b", 1); // Bvar_TormentPeak_DiscoverBabyGorilla_Done
+            ret.Add("4d06e24cdf7f4b74b8dedf86ff97638d", 1); // Bvar_TormentPeak_MomGorilla_Done
+            ret.Add("c2c173cfe4b99274e83d0b6fdf206288", 0); // Bvar_Vespertine_EndAct5_Done
+            
+            // Mesa Island
+            ret.Add("3e6fbe3b014448a459ef775ef2ccf48e", 0); // Bvar_MesaHike_BarrierRemoved_Done
+            ret.Add("b25adfcd01dd9724cb9de78f201fd32c", 0); // Bvar_MesaHike_KhukharrIntro_Done
 
             return ret;
         }

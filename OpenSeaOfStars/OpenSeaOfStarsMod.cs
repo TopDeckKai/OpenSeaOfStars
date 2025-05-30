@@ -92,6 +92,39 @@ namespace OpenSeaOfStars
                 }
             }
 
+            if (sceneName.ToLower().Equals("mesaisland_worldmap_art"))
+            {
+                LoggerInstance.Msg($"Scene {sceneName} with build index {buildIndex} has been loaded!");
+                GameObject forcefield = GameObject.Find("WorldMap_MesaIslandForceField_01");
+
+                if (forcefield != null)
+                {
+                    GameObject forcefieldChild = forcefield.transform.GetChild(0).gameObject;
+
+                    if (forcefieldChild != null)
+                    { 
+                        GameObject particleChild = forcefieldChild.transform.GetChild(0).gameObject;
+                        if (particleChild != null)
+                        {
+                            GameObject.Destroy(particleChild);
+                            GameObject.Destroy(forcefieldChild);
+                            GameObject.Destroy(forcefield); 
+                        }
+                    }
+                }
+            }
+
+            if (sceneName.ToLower().Equals("mesahike_gameplay"))
+            {
+                LoggerInstance.Msg($"Scene {sceneName} with build index {buildIndex} has been loaded!");
+                GameObject rocks = GameObject.Find("GPI_STUFF/OBJ_RockWall");
+
+                if (rocks != null)
+                {
+                    GameObject.Destroy(rocks);
+                }
+            }
+
             if (sceneName.ToLower().Equals("eldermisttrials_gameplay"))
             {
                 LoggerInstance.Msg($"Scene {sceneName} with build index {buildIndex} has been loaded!");

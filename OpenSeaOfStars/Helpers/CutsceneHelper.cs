@@ -386,7 +386,7 @@ namespace OpenSeaOfStars.Helpers
             {
                 CutsceneBars bars = myUI.transform.FindChild("Main/CutsceneBars(Clone)").gameObject.GetComponent<CutsceneBars>();
 
-                if (bars != null)
+                if (bars != null && bars.isActiveAndEnabled)
                 {
                     bars.Close();
                 }

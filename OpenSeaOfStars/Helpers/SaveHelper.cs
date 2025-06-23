@@ -252,7 +252,7 @@ namespace OpenSeaOfStars.Helpers
             ret.Add("14c3e4f34da06e646a90fb8605e6fe99", 1); // Bvar_Mooncradle_IntroTuto_Done
             // Forbidden Cavern/Mountain Trail
             ret.Add("42dd882ecad4c304f98556b30c1ad1f5", 1); // Bvar_ForbiddenCavern_EntranceDoor_Done
-            ret.Add("5cbf24a710e8156409bffb38edec491d", 1); // Bvar_ForbiddenCavern_LightBridge_Done
+            ret.Add("5cbf24a710e8156409bffb38edec491d", 0); // Bvar_ForbiddenCavern_LightBridge_Done
             ret.Add("58eaa8afa08ba5b4ca5d27fbdafb993a", 1); // Bvar_ClockworkCastle_InterludeOne_Done
             ret.Add("ebb3bbf4405b7b4459ee45d1bf1eb812", 1); // Bvar_MountainTrail_ReplayIntro_Done // campfire cooking tutorial
             ret.Add("a162c5e3299382b41a2affd9dd7bf2e4", 1); // Bvar_MountainTrail_ElderMistIntro_Done

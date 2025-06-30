@@ -246,7 +246,14 @@ namespace OpenSeaOfStars.Helpers
             { "CUT_DwellerDefeated", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl, CharacterDefinitionId.Serai}, forceAnimations = true} },
             { "CUT_MatriachFree", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl, CharacterDefinitionId.Serai}} },
             { "CUT__GiveVial", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl, CharacterDefinitionId.Serai}} },
-        };
+            // Mesa Island
+            { "BEH_Water_SwimSpin_Surface_Left", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere }, isCustom = false, forceAnimations = true} },
+            { "BEH_Water_SwimUp", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere }, isCustom = false, forceAnimations = true} },
+            { "BEH_BossDoor_Entering", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere }, isCustom = false, forceAnimations = true} },
+            { "CUT_ShowMinstrel", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere }, isCustom = false, forceAnimations = true} },
+            { "CUT_GoToPast", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere }, isCustom = false } },
+            
+        }; 
         private static Dictionary<string, CutscenePatchData> teleCutsceneData = new()
         {
             // mines
@@ -268,14 +275,14 @@ namespace OpenSeaOfStars.Helpers
         {
             "BEH_FloorA_PingPongWindTunnel",
             "BEH_RightTunnel_PingPong",
-            "BEH_PingPongWind_LeftTunnel",
+            "BEH_PingPongWind_LeftTunnel"
             // "BEH_IntroBotanicalHorror",
         };
         private static List<string> endingCutscenes = new()
         {
             "BEH_OutWindTunnel_FloorA",
             "BEH_OutTunnel_Right",
-            "BEH_OutTunnel_Left",
+            "BEH_OutTunnel_Left"
         };
         private static Dictionary<string, CutscenePatchData> cutscenesToSkip = new()
         {
@@ -314,9 +321,13 @@ namespace OpenSeaOfStars.Helpers
                 leader.position = newPos;
             }} },
         };
-        private static Dictionary<string, int> DecoratorNodeCutsceneData = new()
+        private static Dictionary<string, int> minimumNeededCutsceneData = new()
         {
             { "CUT_JunglePath_BossFight", 4 }
+        };
+        private static List<string> rerunEndStoryCutscene = new()
+        {
+            { "CUT_ReturnFromPast" }
         };
         #endregion
 
@@ -526,14 +537,17 @@ namespace OpenSeaOfStars.Helpers
             else if (keepActiveFix)
             {
                 GameObject partyHandler = GameObject.Find("CapsuleParty(Clone)");
-                foreach (CharacterDefinitionId id in keepActive)
+                if (partyHandler != null)
                 {
-                    GameObject partychar = partyHandler.transform.Find(CharacterObjectDict[id.ToString()].main).gameObject;
-                    if (!partychar.activeSelf)
+                    foreach (CharacterDefinitionId id in keepActive)
                     {
-                        partychar.SetActive(true);
-                        partychar.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").gameObject.SetActive(true);
-                        partychar.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").GetComponent<CharacterVisual>().enabled = true;
+                        GameObject partychar = partyHandler.transform.Find(CharacterObjectDict[id.ToString()].main).gameObject;
+                        if (!partychar.activeSelf)
+                        {
+                            partychar.SetActive(true);
+                            partychar.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").gameObject.SetActive(true);
+                            partychar.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").GetComponent<CharacterVisual>().enabled = true;
+                        }
                     }
                 }
             }
@@ -548,6 +562,36 @@ namespace OpenSeaOfStars.Helpers
                     {
                         ppm.CombatParty.Remove(charId);
                         hidePartyMember(charId, partyHandler, true);
+                    }
+                }
+            }
+        }
+
+        private static void endStoryCutsceneDefault()
+        {
+            currentCutsceneAboutToEndCallback?.Invoke();
+            keepActiveFix = false;
+            keepActive = new List<CharacterDefinitionId>();
+            PlayerPartyManager ppm = PlayerPartyManager.Instance;
+            GameObject partyHandler = GameObject.Find("CapsuleParty(Clone)");
+            Vector3 pos = partyHandler.transform.Find(CharacterObjectDict[ppm.CurrentParty[0].ToString()].main).transform.position;
+
+            foreach (CharacterDefinitionId id in gameplayParty)
+            {
+                if (RandomizerParty.Any(c => c.Equals(id)))
+                {
+                    if (ppm.CurrentParty.Contains(id))
+                    {
+                        ppm.RemovePartyMember(id, true, false, false);
+                    }
+                    ppm.AddPartyMember(id, ppm.CurrentParty.Count < 3, ppm.CurrentParty.Count < 3, ppm.CurrentParty.Count < 3);
+                    partyHandler.transform.Find(CharacterObjectDict[id.ToString()].main).transform.position = pos;
+                }
+                else
+                {
+                    if (ppm.CurrentParty.Contains(id))
+                    {
+                        ppm.RemovePartyMember(id, true, false, false);
                     }
                 }
             }
@@ -863,8 +907,12 @@ namespace OpenSeaOfStars.Helpers
                     currentCutsceneGraph = __instance;
                     currentCutsceneType = CutsceneType.Story;
                 }
+                else if (rerunEndStoryCutscene.Contains(__instance.gameObject.name))
+                {
+                    endStoryCutsceneDefault();
+                }
 
-                return true;
+                    return true;
             }
 
             [HarmonyPostfix]
@@ -892,7 +940,7 @@ namespace OpenSeaOfStars.Helpers
                     return true;
                 }
 
-                if (DecoratorNodeCutsceneData.TryGetValue(__instance.currentGraph.name, out int neededMembers))
+                if (minimumNeededCutsceneData.TryGetValue(__instance.currentGraph.name, out int neededMembers))
                 {
                     PlayerPartyManager ppm = PlayerPartyManager.instance;
 

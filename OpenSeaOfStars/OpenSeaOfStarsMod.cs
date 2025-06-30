@@ -24,7 +24,7 @@ namespace OpenSeaOfStars
         public ReturnToVespertineHelper ReturnToVespertineHelper { get; }
 
         private bool initLoaded;
-        public static List<CharacterDefinitionId> RandomizerParty = new() { CharacterDefinitionId.Bst };
+        public static List<CharacterDefinitionId> RandomizerParty = new() { CharacterDefinitionId.Valere };
         public static List<CharacterDefinitionId> ShelvedParty = new();
         private string loadDialogue = "";
         
@@ -394,6 +394,21 @@ namespace OpenSeaOfStars
             {
                 // This does not work on first frame of load. TODO refactor.
                 loadDialogue = sceneName.ToLower();
+            }
+
+            if (sceneName.ToLower().Equals("autumnhills_gameplay"))
+            {
+                LoggerInstance.Msg($"Scene {sceneName} with build index {buildIndex} has been loaded!");
+
+                GameObject blocker = GameObject.Find("GPI_AutosaveTrigger");
+                if (blocker != null)
+                {
+                    blocker.SetActive(false);
+                    #if DEBUG
+                    LoggerInstance.Msg($"Unloaded buggy autosave");
+                    #endif
+                }
+                
             }
         }
         public override void OnUpdate()

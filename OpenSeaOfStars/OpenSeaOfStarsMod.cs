@@ -410,6 +410,45 @@ namespace OpenSeaOfStars
                 }
                 
             }
+
+            if (sceneName.ToLower().Equals("clockworkcastle_gameplay"))
+            {
+                LoggerInstance.Msg($"Scene {sceneName} with build index {buildIndex} has been loaded!");
+
+                GameObject blocker = GameObject.Find("ENCOUNTERS/ENC_03 (Erlina&Brugaves) (P)/Enemies");
+                if (blocker != null)
+                {
+                    if (!BlackboardHelper.GetBlackboardValue("cce8da599742f4249930f9038b4f9e8d", out int num))
+                    {
+                        blocker.SetActive(true);
+#if DEBUG
+                        LoggerInstance.Msg($"Set encounter characters to active");
+#endif
+                    }
+
+                }
+
+                GameObject bossSlots = GameObject.Find("ENCOUNTERS/ENC_03 (Erlina&Brugaves) (P)/PlayerSlots/FrontRowSlots/");
+                GameObject encounterObj = GameObject.Find("ENCOUNTERS/ENC_03 (Erlina&Brugaves) (P)");
+                if (bossSlots != null && encounterObj != null)
+                {
+                    GameObject bossSlot3 = new GameObject("EncounterPlayerSlot2");
+
+                    bossSlot3.AddComponent<GameObjectSpriteDrawer>();
+                    bossSlot3.transform.parent = bossSlots.transform;
+                    bossSlot3.transform.position = new Vector3(15f, 25f, 68f);
+                    EncounterCharacterSlot thirdSlot = bossSlot3.AddComponent<EncounterCharacterSlot>();
+
+                    Encounter encounter = encounterObj.GetComponent<Encounter>();
+                    Il2CppSystem.Collections.Generic.List<EncounterCharacterSlot> slots = encounter.playerSlots;
+                    slots.Add(thirdSlot);
+                    encounter.playerSlots = slots;
+                }
+                else
+                {
+                    LoggerInstance.Msg($"BOSS SLOTS NOT FOUND");
+                }
+            }
         }
         public override void OnUpdate()
         {

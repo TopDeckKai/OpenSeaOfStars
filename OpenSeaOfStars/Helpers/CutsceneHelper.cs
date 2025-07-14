@@ -239,7 +239,9 @@ namespace OpenSeaOfStars.Helpers
             { "BEH_BossDoor_Entering", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere }, isCustom = false, forceAnimations = true} },
             { "CUT_ShowMinstrel", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere }, isCustom = false, forceAnimations = true} },
             { "CUT_GoToPast", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere }, isCustom = false } },
-            
+            { "CUT_YomaraIntro", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl, CharacterDefinitionId.Serai, CharacterDefinitionId.Reshan }, isCustom = true } },
+            // { "CUT_CastleEntrance", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl, CharacterDefinitionId.Serai, CharacterDefinitionId.Reshan }, isCustom = true } },
+            { "CUT_AfterFight", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl, CharacterDefinitionId.Serai, CharacterDefinitionId.Reshan }, isCustom = true } },
         }; 
         private static Dictionary<string, CutscenePatchData> teleCutsceneData = new()
         {
@@ -310,7 +312,8 @@ namespace OpenSeaOfStars.Helpers
         };
         private static Dictionary<string, int> minimumNeededCutsceneData = new()
         {
-            { "CUT_JunglePath_BossFight", 4 }
+            { "CUT_JunglePath_BossFight", 4 },
+            { "CUT_ClockworkCastle_CastleEntrance", 7 },
         };
         private static List<string> rerunEndStoryCutscene = new()
         {
@@ -949,6 +952,7 @@ namespace OpenSeaOfStars.Helpers
             }
         }
 
+        /*
         [HarmonyPatch(typeof(CutsceneDecoratorNode), "WaitForFollowers")]
         private static class cutsceneStepPatchWaitForFollowers
         {
@@ -973,6 +977,37 @@ namespace OpenSeaOfStars.Helpers
                 }
 
                 return true;
+            }
+        } */
+
+        [HarmonyPatch(typeof(CutsceneDecoratorNode), "Execute")]
+        private static class cutsceneStepPatchExecute
+        {
+            private static void Postfix(CutsceneDecoratorNode __instance)
+            {
+                if (__instance == null || __instance.currentGraph == null)
+                {
+                    return;
+                }
+
+                if (minimumNeededCutsceneData.TryGetValue(__instance.currentGraph.name, out int neededMembers))
+                {
+                    PlayerPartyManager ppm = PlayerPartyManager.instance;
+
+                    bool isEnoughPartyMembers = ppm.CurrentParty._size >= neededMembers;
+                    if (!isEnoughPartyMembers)
+                    {
+                        __instance.UnlockFollowers();
+                        if (__instance.currentGraph.name.Equals("CUT_ClockworkCastle_CastleEntrance"))
+                        {
+                            GameObject door = GameObject.Find("GPI_STUFF/EXTERIOR/OBJ_Exterior/EntranceGate");
+                            if (door != null)
+                            {
+                                door.SetActive(false);
+                            }
+                        }
+                    }
+                }
             }
         }
     }

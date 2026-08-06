@@ -55,7 +55,8 @@ If you are wanting to help with development but are on a Linux machine, you can 
 5. Open the OpenSeaOfStars folder in your favorite text editor. VS Code or VS Codium work great.
 6. A lot of dependencies will be needed. Once you have Melon Loader installed and you've ran the game once, you will have access to all of them. Go to the .csproj file and find and replace `D:\SteamLibrary` to your local Steam Library path. The rest should follow. It should be something similar to `\home\<username>\.steam\steam`. This is the default location on a Debian system but you can easily find it by right clicking on Sea of Stars in Steam, browsing local files, and copying everything before `/steamapps/`. Note the direction of the slash.
 7. Once you have completed all this, you should be able to run `dotnet build` from the terminal in the OpenSeaOfStars folder and it should build successfully. Find your .dll under `OpenSeaOfStars/OpenSeaOfStars/obj/debug/net6.0/OpenSeaOfStars.dll` in your OpenSeaOfStars C# project. Copy that to your sea of stars mods folder.
-8. Run Sea of Stars!
+8. Before you run the game, you will need to set Compatibility to a Proton version. As of writing this, Proton 10.0-4 works. You also need to add `WINEDLLOVERRIDES="version=n,b" %command%` to the Launch Options as well.
+9. Run Sea of Stars!
 
 ### About the .csproj
 Don't commit these changes to the repo. There isn't a way to ignore changes on the remote side but you can do some untracking locally so it won't ever get committed if that would help you.

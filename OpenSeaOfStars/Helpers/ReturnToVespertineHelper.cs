@@ -11,6 +11,7 @@ namespace OpenSeaOfStars.Helpers;
 public class ReturnToVespertineHelper : MelonLogger
 {
     public bool menuLoaded = false;
+    public Vector3? lastVespertineLocation = null;
 
     private GameObject gameMenu = null;
     private GameObject contentList = null;
@@ -101,6 +102,14 @@ public class ReturnToVespertineHelper : MelonLogger
         }
     }
 
+    ///<summary>
+    /// Sets the last known Vespertine location so when you return to the ship it's in the
+    /// last place you left it.
+    /// </summary>
+    public void setLastVespertineLocation(Vector3 position)
+    {
+        lastVespertineLocation = position;
+    }
     
     [HarmonyPatch(typeof(UIButton), "OnSubmit")]
     private static class ReturnToVespertineButtonPatch

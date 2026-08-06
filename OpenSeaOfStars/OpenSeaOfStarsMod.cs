@@ -14,19 +14,23 @@ namespace OpenSeaOfStars
     {
         public static OpenSeaOfStarsMod OpenInstance { get; private set; }
         
-        private ActivityHelper ActivityHelper;
-        private SaveHelper SaveHelper;
         public BlackboardHelper BlackboardHelper { get; }
-        private CutsceneHelper CutsceneHelper;
         public InventoryHelper InventoryHelper { get; }
-        private DialogueHelper DialogueHelper;
         public LevelHelper LevelHelper { get; }
         public ReturnToVespertineHelper ReturnToVespertineHelper { get; }
 
-        private bool initLoaded;
-        public static List<CharacterDefinitionId> RandomizerParty = new() { CharacterDefinitionId.Valere };
+        private DialogueHelper DialogueHelper;
+        private CutsceneHelper CutsceneHelper;
+        private ActivityHelper ActivityHelper;
+        private SaveHelper SaveHelper;
+
+        public static List<CharacterDefinitionId> RandomizerParty = new() { CharacterDefinitionId.Bst };
         public static List<CharacterDefinitionId> ShelvedParty = new();
+
         private string loadDialogue = "";
+        private bool initLoaded;
+        private Vector3? vespertineLocation = null;
+
         
         public static Dictionary<string, (string main, string world)> CharacterObjectDict { get; } = new()
         {
@@ -395,7 +399,6 @@ namespace OpenSeaOfStars
                 // This does not work on first frame of load. TODO refactor.
                 loadDialogue = sceneName.ToLower();
             }
-
             if (sceneName.ToLower().Equals("autumnhills_gameplay"))
             {
                 LoggerInstance.Msg($"Scene {sceneName} with build index {buildIndex} has been loaded!");
@@ -450,17 +453,12 @@ namespace OpenSeaOfStars
                 }
             }
         }
+        
         public override void OnUpdate()
         {
             base.OnUpdate();
-            if (!ReturnToVespertineHelper.menuLoaded)
-            {
-                ReturnToVespertineHelper.attemptMenuSetup();
-            }
-            else 
-            {
-                ReturnToVespertineHelper.updateText();
-            }
+
+            SetupReturnToVespertine();
 
             if (CutsceneHelper.currentCutsceneType == CutsceneHelper.CutsceneType.Story || CutsceneHelper.currentCutsceneType == CutsceneHelper.CutsceneType.StoryExt)
             {
@@ -479,16 +477,108 @@ namespace OpenSeaOfStars
                 }
             }
 
+            var boatObj = GameObject.Find("Boat(Clone)");
+            if (boatObj != null) 
+            {
+                var boatPos = boatObj.transform.position;
+                ReturnToVespertineHelper.setLastVespertineLocation(boatPos);
+                //LoggerInstance.Msg(boatPos);
+            }
+            
+            // Don't put anything below this. 
             #if DEBUG
+            DebugOptions();
+            #endif
+        }
+
+        /// <summary>
+        /// Sets up the Vespertine menu
+        /// </summary>
+        private void SetupReturnToVespertine() 
+        {
+            if (!ReturnToVespertineHelper.menuLoaded)
+            {
+                ReturnToVespertineHelper.attemptMenuSetup();
+            }
+            else 
+            {
+                ReturnToVespertineHelper.updateText();
+            }
+        }
+        
+        /// <summary>
+        /// Adds a character to the party.
+        /// </summary>
+        private void AddPartyMember(CharacterDefinitionId character)
+        {
+            PlayerPartyManager ppm = PlayerPartyManager.Instance;
+            if (ppm.CurrentParty.Contains(character))
+            {
+                return;
+            }
+
+            LoggerInstance.Msg($"Adding {character.ToString()} for debug");
+            ppm.AddPartyMember(character, ppm.CurrentParty.Count < 3, true, true);
+            if (character == CharacterDefinitionId.Zale && ppm.leader.CharacterDefinitionId != CharacterDefinitionId.Valere || character == CharacterDefinitionId.Valere && ppm.leader.CharacterDefinitionId != CharacterDefinitionId.Zale)
+            {
+                PlayerPartyCharacter old = ppm.leader;
+                ppm.SetMainCharacter(character);
+                ppm.RemovePartyMember(old.CharacterDefinitionId, true, true, false);
+                ppm.SetLeader(character);
+                ppm.SetLeaderFirstInParty();
+                ppm.leader.transform.position = old.transform.position;
+                CameraBehaviour cam = Camera.main.GetComponentInParent<CameraBehaviour>();
+                if (cam.currentContext.GetIl2CppType() == Il2CppType.Of<CharacterViewCameraContext>())
+                {
+                    string charObjName = SceneManager.GetActiveScene().name.ToLower().Contains("worldmap") ? CharacterObjectDict[character.ToString()].world : CharacterObjectDict[character.ToString()].main;
+                    cam.currentContext.Cast<CharacterViewCameraContext>().cameraLookAtPosition = GameObject.FindObjectsOfType<PlayerCameraLookAtPosition>(true).First(c => c.name.Equals(charObjName));
+                }
+                BlackboardHelper.AddBlackboardValue("eade193956f385243bbd0ab47aee2ee9", 1); // can fly with a Solstice Warrior
+
+                System.Collections.IEnumerator reAddCharAfterFrame()
+                {
+                    yield return null;
+                    ppm.AddPartyMember(old.CharacterDefinitionId, ppm.CurrentParty.Count < 3, true, true);
+                    ppm.SetupParty(!BoatManager.Instance.IsInBoatMode);
+                }
+                MelonCoroutines.Start(reAddCharAfterFrame());
+            }
+            else if (ppm.CurrentParty.Count <= 3)
+            {
+                ppm.followers.ToArray().First(c => c.characterDefinitionId.ToString() == character.ToString()).transform.position = ppm.leader.transform.position;
+            }
+            ppm.SetupParty(!BoatManager.Instance.IsInBoatMode);
+            
+            RandomizerParty.Add(character);
+        }
+
+        /// <summary>
+        /// Debug options to help with development.
+        /// You must be holding left and right shift at the same time to perform these actions.
+        /// K - Save the game
+        /// P - Return to title. If using Unity Explorer, it will get around the bug with the menu freezing.
+        /// E - Messes with Encounters.
+        /// Z - Add Zale to the party.
+        /// V - Add Valere to the party.
+        /// G - Add Garl to the party.
+        /// S - Add Serai to the party.
+        /// R - Add Reshan to the party.
+        /// B - Add Bst to the party.
+        /// T - Add Teaks to Cargo.
+        /// I - Print Inventory details.
+        /// C - Print Cutscene details.
+        /// </summary>
+        private void DebugOptions() 
+        {
             if (!Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift))
             {
                 return;
             }
+
             if (Input.GetKeyDown(KeyCode.K))
             {
                 SaveHelper.save();
             }
-
             else if (Input.GetKeyDown(KeyCode.P))
             {
                 #if HAS_UNITY_EXPLORER
@@ -497,7 +587,6 @@ namespace OpenSeaOfStars
                 
                 GameObject.FindObjectOfType<PauseMenu>(true).ReturnToTitle();
             }
-
             else if (Input.GetKeyDown(KeyCode.E))
             {
                 var list = GameObject.FindObjectsOfType<Transform>(true);
@@ -516,7 +605,6 @@ namespace OpenSeaOfStars
                     return;
                 }
             }
-            
             else if (Input.GetKeyDown(KeyCode.Z))
             {
                 AddPartyMember(CharacterDefinitionId.Zale);

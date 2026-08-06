@@ -25,13 +25,20 @@ public class LevelHelper
             return;
         }
             
-        LevelPatch levelPatch = levelReferences[levelName];
+        LevelPatch levelPatch = levelReferences[levelName];  
 
         Il2CppSystem.Collections.Generic.Dictionary<LevelReference, LevelDefinition>.KeyCollection levelDefinitionKeys = LevelManager.Instance.levelDefinitionPerLevel.Keys;
+
         foreach (LevelReference levRef in levelDefinitionKeys)
         {
             if (levRef.levelDefinitionGuid.Equals(levelPatch.levelUUID))
             {
+                Vector3? boatPos = null;
+                if (levelName.ToLower().Equals("returntovespertine"))
+                {
+                    boatPos = OpenSeaOfStarsMod.OpenInstance.ReturnToVespertineHelper.lastVespertineLocation;
+                }   
+
                 LevelLoading levelLoading = new()
                 {
                     levelToLoad = levRef,
@@ -42,7 +49,7 @@ public class LevelHelper
                 GameplayLevelInitializerParams initializerParams = new()
                 {
                     isBoat = levelPatch.isBoat,
-                    spawnPosition = levelPatch.position,
+                    spawnPosition = boatPos ?? levelPatch.position,
                     spawnPositionSet = true
                 };
 

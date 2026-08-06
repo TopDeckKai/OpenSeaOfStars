@@ -23,7 +23,7 @@ To run this mod, you will need:
 To develop for this mod, you will also need:
 - [Visual Studio Community](https://visualstudio.microsoft.com/vs/community/)
 - [.NET 6.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
-- [Unity Explorer](https://github.com/GrahamKracker/UnityExplorer)
+- [Unity Explorer 4.9.4](https://github.com/GrahamKracker/UnityExplorer)
 - [Git](https://git-scm.com/downloads)
 
 ## Setup for Mods
@@ -45,7 +45,28 @@ Several dependencies will need to be added. These will be found under SeaOfStars
 
 7. Run Sea of Stars!
 
+### Linux Setup
+If you are wanting to help with development but are on a Linux machine, you can still help out!
+
+1. You will need to make sure you have the [.Net 6 SDK](https://learn.microsoft.com/en-us/dotnet/core/install/linux?WT.mc_id=dotnet-35129-website) installed on your system. Since .Net 6 is an older version you might need to look into `ppa:dotnet/backports` to get it.
+2. Run Sea of Stars once, until you reach the game menu, then exit. This will generate the needed dependencies.
+3. Follow the instructions for Unity Explorer to install the mods and userlibs folders to your sea of stars location.
+4. Download the OpenSeaOfStars project by cloning the repository.
+5. Open the OpenSeaOfStars folder in your favorite text editor. VS Code or VS Codium work great.
+6. A lot of dependencies will be needed. Once you have Melon Loader installed and you've ran the game once, you will have access to all of them. Go to the .csproj file and find and replace `D:\SteamLibrary` to your local Steam Library path. The rest should follow. It should be something similar to `\home\<username>\.steam\steam`. This is the default location on a Debian system but you can easily find it by right clicking on Sea of Stars in Steam, browsing local files, and copying everything before `/steamapps/`. Note the direction of the slash.
+7. Once you have completed all this, you should be able to run `dotnet build` from the terminal in the OpenSeaOfStars folder and it should build successfully. Find your .dll under `OpenSeaOfStars/OpenSeaOfStars/obj/debug/net6.0/OpenSeaOfStars.dll` in your OpenSeaOfStars C# project. Copy that to your sea of stars mods folder.
+8. Run Sea of Stars!
+
+### About the .csproj
+Don't commit these changes to the repo. There isn't a way to ignore changes on the remote side but you can do some untracking locally so it won't ever get committed if that would help you.
+
 ## Working with UnityExplorer
 Unity Explorer is finicky with sea of stars. There are a few tips to keep in mind when working with the UnityExplorer mod:
 1. Menus will freeze when opened while UnityExplorer is active. To avoid this, turn of UnityExplorer using F7, then turn it back on when in game.
-2. Unity Explorer will be pixelated and not be legible at first. There are a few ways to resolve this: Either put your monitor to the lowest resolution, enable freecam when you wish to view the Object Explorer, or set up your game to put Sea of Stars on a second monitor. (Instructions for second monitor setup later)
+    - If you happen to get stuck, you can hold left and right shift and press P to close UnityExplorer and go back to the title menu. This will unlock the menus.
+2. Unity Explorer will be pixelated and not be legible at first. There are a few ways to resolve this: Either put your monitor to the lowest resolution, enable freecam when you wish to view the Object Explorer, or set up your UnityExplorer to be on a second monitor.
+    - To set up UnityExplorer on a second monitor with Melon Loader follow these steps.
+        1. Go to your Sea of Stars folder by browsing local files from Steam.
+        2. Go to `UserData/MelonPreferences.cfg`
+        3. Set `Target Display` to 1.
+        4. Relaunch Sea of Stars and you should see UnityExplorer open in a different window.

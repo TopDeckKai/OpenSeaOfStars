@@ -5,6 +5,7 @@ using Il2CppSabotage.Graph.Core;
 using MelonLoader;
 using Il2CppSabotage.Imposter;
 using static OpenSeaOfStars.OpenSeaOfStarsMod;
+using Il2CppSabotage.SeaOfStars.Script.Graph.BehaviorTree.Nodes;
 
 namespace OpenSeaOfStars.Helpers
 {
@@ -28,9 +29,10 @@ namespace OpenSeaOfStars.Helpers
                 ANY,
                 ALL
             }
-            public List<CharacterDefinitionId>? cutsceneCharacters;
+            public List<CharacterDefinitionId> cutsceneCharacters = new List<CharacterDefinitionId> { };
             public List<CharacterDefinitionId>? requiredCharacters;
             public List<CharacterDefinitionId>? backupCharacters;
+            public int minCharCount;
             public RequiredCharacterType requiredCharacterType;
             public bool forceAnimations;
             public Vector3 newPosition;
@@ -47,40 +49,25 @@ namespace OpenSeaOfStars.Helpers
         public static Dictionary<string, CutscenePatchData> storyCutsceneData = new()
         {
             // Evermist Island
-            { "BEH_ZenithElevator_GoingUp", new CutscenePatchData
-                {
-                    cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere},
-                    requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere},
-                    backupCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Garl, CharacterDefinitionId.Serai},
-                    requiredCharacterType = CutscenePatchData.RequiredCharacterType.ANY,
-                    isCustom = false
-                }
-            },
-            { "BEH_ZenithElevator_GoingDown", new CutscenePatchData
-                {
-                    cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere},
-                    requiredCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere},
-                    backupCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Garl, CharacterDefinitionId.Serai},
-                    requiredCharacterType = CutscenePatchData.RequiredCharacterType.ANY,
-                    isCustom = false
-                }
-            },
+            { "BEH_ZenithElevator_GoingUp", new CutscenePatchData {minCharCount = 2, isCustom = false} },
+            { "BEH_ZenithElevator_GoingDown", new CutscenePatchData {minCharCount = 2, isCustom = false} },
             // forbidden cavern
             { "CUT_IntroBossSlug", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere}} },
             { "CUT_GiantSlugDefeated", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere}, forceAnimations = true} },
             // mountain trail
+            { "CUT_Teleport_ToElderMist", new CutscenePatchData {minCharCount = 2, isCustom = false} },
+            { "CUT_TeleportMountainTrail", new CutscenePatchData {minCharCount = 2, isCustom = false} },
             { "CUT_ElderMistBoss", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
             { "CUT_ElderMistDefeated", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, forceAnimations = true} },
             { "CUT_YeetThrow", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere}, isCustom = false} },
             // Sleeper Island
             { "CUT_XtolThrow", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere}, isCustom = false} },
             // outpost/mines
-            { "CUT_SalamanderAppears", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl }, isCustom = false } },
+            { "CUT_SalamanderAppears", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, isCustom = false} },
             { "CUT_FightSalamanderDone", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, forceAnimations = true} },
             { "CUT_Mines_MeetingMalkomud", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
             { "CUT_Mines_MalkomudAfterBossFight", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
             { "CUT_Outpost_AfterSavingVillage", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
-            { "CUT_Elevator_TheSleepingSerpent", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
             // brisk
             // { "CUT_StartArena", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Bst, CharacterDefinitionId.Serai, CharacterDefinitionId.Reshan}} },
             // { "CUT_BronzeIntro", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Bst, CharacterDefinitionId.Valere, CharacterDefinitionId.Reshan}} },
@@ -114,7 +101,18 @@ namespace OpenSeaOfStars.Helpers
                 }
             },
             // { "BEH_IntroBotanicalHorror", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, isCustom = false} },
-            { "CUT_HauntedMansion_BotanicalDefeated", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere}, forceAnimations = true} },
+            { "CUT_HauntedMansion_BotanicalDefeated", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere}, forceAnimations = true, onCutsceneEnd = () => {
+                // remove Dweller trigger if both Solstice Warriors aren't in your party
+                int count = RandomizerParty.Count(c => c == CharacterDefinitionId.Zale || c == CharacterDefinitionId.Valere);
+                if (count < 2)
+                {
+                    GameObject sealTrigger = GameObject.Find("CUTSCENES/Breaking_Door_Seal").transform.Find("TRIG_removeSeal").gameObject;
+                    sealTrigger.SetActive(false);
+                    Transform traitors = GameObject.Find("NPC_Cutscene").transform;
+                    traitors.Find("NPC_Brugaves").gameObject.SetActive(false);
+                    traitors.Find("NPC_Erlina").gameObject.SetActive(false);
+                }
+            }} },
             { "CUT_HauntedMansion_BreakingDoorSeal", new CutscenePatchData 
                 {
                     cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl},
@@ -134,18 +132,18 @@ namespace OpenSeaOfStars.Helpers
                         RandomizerParty.Clear();
                         RandomizerParty.AddRange(reqChars);
                     },
-                    onCutsceneStart = () => {
-                        GameObject party = GameObject.Find("CapsuleParty(Clone)");
-                        party.transform.Find(CharacterObjectDict[CharacterDefinitionId.Garl.ToString()].main).gameObject.SetActive(true);
-                    },
-                    onCutsceneEnd = () => {
-                        GameObject party = GameObject.Find("CapsuleParty(Clone)");
-                        party.transform.Find(CharacterObjectDict[CharacterDefinitionId.Zale.ToString()].main).gameObject.SetActive(true);
-                        party.transform.Find(CharacterObjectDict[CharacterDefinitionId.Valere.ToString()].main).gameObject.SetActive(true);
-                    }
+                    // onCutsceneStart = () => {
+                    //     GameObject party = GameObject.Find("CapsuleParty(Clone)");
+                    //     party.transform.Find(CharacterObjectDict[CharacterDefinitionId.Garl.ToString()].main).gameObject.SetActive(true);
+                    // },
+                    // onCutsceneEnd = () => {
+                    //     GameObject party = GameObject.Find("CapsuleParty(Clone)");
+                    //     party.transform.Find(CharacterObjectDict[CharacterDefinitionId.Zale.ToString()].main).gameObject.SetActive(true);
+                    //     party.transform.Find(CharacterObjectDict[CharacterDefinitionId.Valere.ToString()].main).gameObject.SetActive(true);
+                    // }
                 }
             },
-            { "CUT_DwellerDefeated", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere/*, CharacterDefinitionId.MasterMoraine*/}} },
+            // { "CUT_DwellerDefeated", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere/*, CharacterDefinitionId.MasterMoraine*/}} },
             { "CUT_Lucent_AfterHauntedMansion", new CutscenePatchData 
                 {
                     cutsceneCharacters = new List<CharacterDefinitionId> { CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl },
@@ -163,6 +161,10 @@ namespace OpenSeaOfStars.Helpers
                         RandomizerParty.Clear();
                         RandomizerParty.AddRange(ShelvedParty);
                         ShelvedParty.Clear();
+                        ppm.SetLeader(RandomizerParty[0]);
+                        ppm.SetMainCharacter(RandomizerParty[0]);
+                        ppm.SetLeaderFirstInParty();
+                        ppm.SetupParty(true);
                     },
                     onCutsceneStart = () => {
                         GameObject party = GameObject.Find("CapsuleParty(Clone)");
@@ -191,7 +193,56 @@ namespace OpenSeaOfStars.Helpers
             { "CUT_FloodedGraveyard_DukeWander", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Serai, CharacterDefinitionId.Reshan, CharacterDefinitionId.Bst}} },
             { "Cut_romayaV2_Intro", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Serai, CharacterDefinitionId.Reshan, CharacterDefinitionId.Bst}} },
             { "Cut_romayaV2_Outro", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Serai, CharacterDefinitionId.Reshan, CharacterDefinitionId.Bst}, forceAnimations = true} },
-        };
+            
+            // Watcher Island
+            // Mesa Hike
+            { "CUT_BossFight", new CutscenePatchData {/*cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl, CharacterDefinitionId.Serai}, isCustom = false, sequenceIndex = 0*/} },
+            // { "CUT_AfterBossFight", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl, CharacterDefinitionId.Serai}, forceAnimations = true} },
+            // Lake Docarria
+            { "CUT_VillageIntro", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl, CharacterDefinitionId.Serai}} },
+            { "CUT_IntroTemple", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl, CharacterDefinitionId.Serai}} },
+            { "BEH_DiveDown", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, isCustom = false} },
+            // Sacred Grove
+            { "CUT_ReachAltar", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl, CharacterDefinitionId.Serai}} }, // require seashell
+            // Docarri Village
+            { "BEH_CancelDocarriCustomGeyser", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, isCustom = false} },
+            { "BEH_DiveUp", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}, isCustom = false} },
+            // { "CUT_ConchShop", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Serai}} },
+            { "CUT_Villager02", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
+            // { "CUT_OracleOfTides_Intro", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl, CharacterDefinitionId.Serai}} },
+            // Tower of Antsudlo
+            { "CUT_ActivateWaterTunnel", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
+            { "BEH_RoomC1_TakeTube01", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
+            { "CUT_RoomC2_ActivateReturnTunnel", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
+            { "BEH_RoomC2_TakeTubeReturn", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
+            { "BEH_RoomC1_TakeTube02", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
+            { "BEH_RoomC1_TakeTube03", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
+            { "BEH_TakeTubeUp", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
+            // these should both be skipped hopefully
+            // { "CUT_ArchivistDoor", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl, CharacterDefinitionId.Serai}, isCustom = false} },
+            // { "CUT_ReshanGroupIntro", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl, CharacterDefinitionId.Serai}, isCustom = false} },
+            { "CUT_AcolytesFight", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl, CharacterDefinitionId.Serai}} },
+            { "CUT_AfterAcolytesFight", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl, CharacterDefinitionId.Serai}, forceAnimations = true} },
+            { "CUT_SolsticeAmulet", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl, CharacterDefinitionId.Serai}} },
+            { "BEH_OpenPortal", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
+            { "CUT_DoorOpened", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl, CharacterDefinitionId.Serai}} },
+            { "CUT_OpenEntrance", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl, CharacterDefinitionId.Serai}} },
+            // { "CUT_BabyGorillas", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl, CharacterDefinitionId.Serai}} },
+            // { "CUT_MotherGorilla", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl, CharacterDefinitionId.Serai}} },
+            { "CUT_IntroDweller", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl}} },
+            { "CUT_DwellerDefeated", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl, CharacterDefinitionId.Serai}, forceAnimations = true} },
+            { "CUT_MatriachFree", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl, CharacterDefinitionId.Serai}} },
+            { "CUT__GiveVial", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl, CharacterDefinitionId.Serai}} },
+            // Mesa Island
+            { "BEH_Water_SwimSpin_Surface_Left", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere }, isCustom = false, forceAnimations = true} },
+            { "BEH_Water_SwimUp", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere }, isCustom = false, forceAnimations = true} },
+            { "BEH_BossDoor_Entering", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere }, isCustom = false, forceAnimations = true} },
+            { "CUT_ShowMinstrel", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere }, isCustom = false, forceAnimations = true} },
+            { "CUT_GoToPast", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere }, isCustom = false } },
+            { "CUT_YomaraIntro", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl, CharacterDefinitionId.Serai, CharacterDefinitionId.Reshan }, isCustom = true } },
+            // { "CUT_CastleEntrance", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl, CharacterDefinitionId.Serai, CharacterDefinitionId.Reshan }, isCustom = true } },
+            { "CUT_AfterFight", new CutscenePatchData {cutsceneCharacters = new List<CharacterDefinitionId> {CharacterDefinitionId.Zale, CharacterDefinitionId.Valere, CharacterDefinitionId.Garl, CharacterDefinitionId.Serai, CharacterDefinitionId.Reshan }, isCustom = true } },
+        }; 
         private static Dictionary<string, CutscenePatchData> teleCutsceneData = new()
         {
             // mines
@@ -213,14 +264,14 @@ namespace OpenSeaOfStars.Helpers
         {
             "BEH_FloorA_PingPongWindTunnel",
             "BEH_RightTunnel_PingPong",
-            "BEH_PingPongWind_LeftTunnel",
+            "BEH_PingPongWind_LeftTunnel"
             // "BEH_IntroBotanicalHorror",
         };
         private static List<string> endingCutscenes = new()
         {
             "BEH_OutWindTunnel_FloorA",
             "BEH_OutTunnel_Right",
-            "BEH_OutTunnel_Left",
+            "BEH_OutTunnel_Left"
         };
         private static Dictionary<string, CutscenePatchData> cutscenesToSkip = new()
         {
@@ -259,6 +310,15 @@ namespace OpenSeaOfStars.Helpers
                 leader.position = newPos;
             }} },
         };
+        private static Dictionary<string, int> minimumNeededCutsceneData = new()
+        {
+            { "CUT_JunglePath_BossFight", 4 },
+            { "CUT_ClockworkCastle_CastleEntrance", 7 },
+        };
+        private static List<string> rerunEndStoryCutscene = new()
+        {
+            { "CUT_ReturnFromPast" }
+        };
         #endregion
 
         public static readonly List<CharacterDefinitionId> gameplayParty = new()
@@ -268,7 +328,8 @@ namespace OpenSeaOfStars.Helpers
             CharacterDefinitionId.Garl,
             CharacterDefinitionId.Serai,
             CharacterDefinitionId.Reshan,
-            CharacterDefinitionId.Bst
+            CharacterDefinitionId.Bst,
+            // CharacterDefinitionId.Artificer
         };
 
         private static GraphControllerBase? currentCutsceneGraph;
@@ -319,6 +380,18 @@ namespace OpenSeaOfStars.Helpers
             currentCutsceneCallback = null;
             keepActiveFix = false;
             keepActive = null;
+
+            GameObject myUI = GameObject.Find("UICanvas(Clone)");
+
+            if (myUI != null)
+            {
+                CutsceneBars bars = myUI.transform.FindChild("Main/CutsceneBars(Clone)").gameObject.GetComponent<CutsceneBars>();
+
+                if (bars != null && bars.isActiveAndEnabled)
+                {
+                    bars.Close();
+                }
+            }
         }
 
         public void PrintCutsceneData()
@@ -440,7 +513,7 @@ namespace OpenSeaOfStars.Helpers
 
         public void checkCutsceneFinished()
         {
-            if (currentCutsceneType == CutsceneType.Story && currentCutsceneGraph != null && !currentCutsceneGraph.IsPlaying)
+            if (currentCutsceneType == CutsceneType.Story && (currentCutsceneGraph == null || !currentCutsceneGraph.IsPlaying))
             {
                 endStoryCutscene();
             }
@@ -454,14 +527,17 @@ namespace OpenSeaOfStars.Helpers
             else if (keepActiveFix)
             {
                 GameObject partyHandler = GameObject.Find("CapsuleParty(Clone)");
-                foreach (CharacterDefinitionId id in keepActive)
+                if (partyHandler != null)
                 {
-                    GameObject partychar = partyHandler.transform.Find(CharacterObjectDict[id.ToString()].main).gameObject;
-                    if (!partychar.activeSelf)
+                    foreach (CharacterDefinitionId id in keepActive)
                     {
-                        partychar.SetActive(true);
-                        partychar.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").gameObject.SetActive(true);
-                        partychar.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").GetComponent<CharacterVisual>().enabled = true;
+                        GameObject partychar = partyHandler.transform.Find(CharacterObjectDict[id.ToString()].main).gameObject;
+                        if (!partychar.activeSelf)
+                        {
+                            partychar.SetActive(true);
+                            partychar.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").gameObject.SetActive(true);
+                            partychar.transform.FindChild("CharacterOffset").FindChild("Character").FindChild("Sprite").GetComponent<CharacterVisual>().enabled = true;
+                        }
                     }
                 }
             }
@@ -481,7 +557,7 @@ namespace OpenSeaOfStars.Helpers
             }
         }
 
-        private void endStoryCutscene()
+        private static void endStoryCutsceneDefault()
         {
             currentCutsceneAboutToEndCallback?.Invoke();
             keepActiveFix = false;
@@ -489,6 +565,44 @@ namespace OpenSeaOfStars.Helpers
             PlayerPartyManager ppm = PlayerPartyManager.Instance;
             GameObject partyHandler = GameObject.Find("CapsuleParty(Clone)");
             Vector3 pos = partyHandler.transform.Find(CharacterObjectDict[ppm.CurrentParty[0].ToString()].main).transform.position;
+
+            foreach (CharacterDefinitionId id in gameplayParty)
+            {
+                if (RandomizerParty.Any(c => c.Equals(id)))
+                {
+                    if (ppm.CurrentParty.Contains(id))
+                    {
+                        ppm.RemovePartyMember(id, true, false, false);
+                    }
+                    ppm.AddPartyMember(id, ppm.CurrentParty.Count < 3, ppm.CurrentParty.Count < 3, ppm.CurrentParty.Count < 3);
+                    partyHandler.transform.Find(CharacterObjectDict[id.ToString()].main).transform.position = pos;
+                }
+                else
+                {
+                    if (ppm.CurrentParty.Contains(id))
+                    {
+                        ppm.RemovePartyMember(id, true, false, false);
+                    }
+                }
+            }
+        }
+
+        private void endStoryCutscene()
+        {
+            currentCutsceneAboutToEndCallback?.Invoke();
+            keepActiveFix = false;
+            keepActive = new List<CharacterDefinitionId>();
+            PlayerPartyManager ppm = PlayerPartyManager.Instance;
+            GameObject partyHandler = GameObject.Find("CapsuleParty(Clone)");
+            Vector3 pos;
+            try
+            {
+                pos = partyHandler.transform.Find(CharacterObjectDict[ppm.CurrentParty[0].ToString()].main).transform.position;
+            }
+            catch (NullReferenceException)
+            {
+                return;
+            }
 
             foreach (CharacterDefinitionId id in gameplayParty)
             {
@@ -598,17 +712,20 @@ namespace OpenSeaOfStars.Helpers
         {
             if (isCustomCode)
             {
-                foreach (CharacterDefinitionId partyChar in RandomizerParty)
+                if (enabledList.Count > 0)
                 {
-                    if (!enabledList.Any(c => c.Equals(partyChar)))
+                    foreach (CharacterDefinitionId partyChar in RandomizerParty)
                     {
-                        GameObject partyCharObj = partyHandler.transform.Find(CharacterObjectDict[partyChar.ToString()].main).gameObject;
-                        if (partyCharObj != null && partyCharObj.activeSelf && ppm.CombatParty.Contains(partyChar))
+                        if (!enabledList.Any(c => c.Equals(partyChar)))
                         {
-                            partyCharObj.transform.Find("CharacterOffset").Find("Character").Find("Sprite").gameObject.SetActive(false);
-                            #if DEBUG 
-                            OpenInstance.LoggerInstance.Msg($"HIDE SPRITE IN CUSTOM CODE: {CharacterObjectDict[partyChar.ToString()].main}");
-                            #endif
+                            GameObject partyCharObj = partyHandler.transform.Find(CharacterObjectDict[partyChar.ToString()].main).gameObject;
+                            if (partyCharObj != null && partyCharObj.activeSelf && ppm.CombatParty.Contains(partyChar))
+                            {
+                                partyCharObj.transform.Find("CharacterOffset").Find("Character").Find("Sprite").gameObject.SetActive(false);
+                                #if DEBUG
+                                OpenInstance.LoggerInstance.Msg($"HIDE SPRITE IN CUSTOM CODE: {CharacterObjectDict[partyChar.ToString()].main}");
+                                #endif
+                            }
                         }
                     }
                 }
@@ -734,13 +851,37 @@ namespace OpenSeaOfStars.Helpers
                     if (data.requiredCharacters?.Count > 0)
                     {
                         List<CharacterDefinitionId> intersect = data.requiredCharacters.IntersectBy(ppm.CurrentParty.ToArray().Select(c1 => c1.ToString()), c2 => c2.ToString()).ToList();
-                        if ((intersect.Count == 0 || intersect.Count < data.requiredCharacters.Count && data.requiredCharacterType == CutscenePatchData.RequiredCharacterType.ALL) && ppm.CurrentParty.Count < 2)
+                        if (intersect.Count == 0 || intersect.Count < data.requiredCharacters.Count && data.requiredCharacterType == CutscenePatchData.RequiredCharacterType.ALL)
                         {
                             chars = data.backupCharacters;
                         }
                     }
+
+                    if (ppm.currentPartyCharacters.Count < data.minCharCount)
+                    {
+                        int current = ppm.currentPartyCharacters.Count;
+                        if (data.cutsceneCharacters.Count > 0)
+                        {
+                            current += data.cutsceneCharacters.Count;
+                        }
+                        OpenInstance.LoggerInstance.Msg($"Cutscene Chars: {data.cutsceneCharacters.Count}");
+                        if (data.cutsceneCharacters.Count == 0)
+                        {
+                            chars = ppm.currentPartyCharacters.ToArray().Select(c => c.CharacterDefinitionId).ToList();
+                            OpenInstance.LoggerInstance.Msg($"Chars: {chars.Count}");
+                        }
+                        for (int i = current; i < data.minCharCount; i++)
+                        {
+                            List<CharacterDefinitionId> others = gameplayParty.ExceptBy(chars.Select(c1 => c1.ToString()), c2 => c2.ToString()).ToList();
+                            OpenInstance.LoggerInstance.Msg(others.Count);
+                            chars.Add(others[0]);
+                        }
+                    }
                     GameObject partyHandler = GameObject.Find("CapsuleParty(Clone)");
-                    resetCharactersForCutscenes(ppm, partyHandler, chars, data.forceAnimations, data.isCustom, data.hideSprite);
+                    if (chars.Count > 0)
+                    {
+                        resetCharactersForCutscenes(ppm, partyHandler, chars, data.forceAnimations, data.isCustom, data.hideSprite);
+                    }
                     currentCutsceneAboutToEndCallback = data.onCutsceneAboutToEnd;
                     currentCutsceneCallback = data.onCutsceneEnd;
                     currentCutsceneGraph = __instance;
@@ -788,8 +929,12 @@ namespace OpenSeaOfStars.Helpers
                     currentCutsceneGraph = __instance;
                     currentCutsceneType = CutsceneType.Story;
                 }
+                else if (rerunEndStoryCutscene.Contains(__instance.gameObject.name))
+                {
+                    endStoryCutsceneDefault();
+                }
 
-                return true;
+                    return true;
             }
 
             [HarmonyPostfix]
@@ -803,6 +948,65 @@ namespace OpenSeaOfStars.Helpers
                 {
                     endingCutsceneGraph = __instance;
                     didEndingPlay = true;
+                }
+            }
+        }
+
+        /*
+        [HarmonyPatch(typeof(CutsceneDecoratorNode), "WaitForFollowers")]
+        private static class cutsceneStepPatchWaitForFollowers
+        {
+            private static bool Prefix(CutsceneDecoratorNode __instance)
+            {
+                if (__instance == null || __instance.currentGraph == null)
+                {
+                    return true;
+                }
+
+                if (minimumNeededCutsceneData.TryGetValue(__instance.currentGraph.name, out int neededMembers))
+                {
+                    PlayerPartyManager ppm = PlayerPartyManager.instance;
+
+                    bool isEnoughPartyMembers = ppm.CurrentParty._size >= neededMembers;
+
+                    #if DEBUG
+                    OpenInstance.LoggerInstance.Msg($"DEBUG WAITFORFOLLOWERS CURRENT = {ppm.CurrentParty._size} NEEDED = {neededMembers}");
+                    #endif
+
+                    return isEnoughPartyMembers;
+                }
+
+                return true;
+            }
+        } */
+
+        [HarmonyPatch(typeof(CutsceneDecoratorNode), "Execute")]
+        private static class cutsceneStepPatchExecute
+        {
+            private static void Postfix(CutsceneDecoratorNode __instance)
+            {
+                if (__instance == null || __instance.currentGraph == null)
+                {
+                    return;
+                }
+
+                if (minimumNeededCutsceneData.TryGetValue(__instance.currentGraph.name, out int neededMembers))
+                {
+                    PlayerPartyManager ppm = PlayerPartyManager.instance;
+
+                    bool isEnoughPartyMembers = ppm.CurrentParty._size >= neededMembers;
+                    if (!isEnoughPartyMembers)
+                    {
+                        __instance.UnlockFollowers();
+                        if (__instance.currentGraph.name.Equals("CUT_ClockworkCastle_CastleEntrance"))
+                        {
+                            GameObject door = GameObject.Find("GPI_STUFF/EXTERIOR/OBJ_Exterior/EntranceGate");
+                            if (door != null)
+                            {
+                                door.SetActive(false);
+                            }
+                        }
+                    }
                 }
             }
         }

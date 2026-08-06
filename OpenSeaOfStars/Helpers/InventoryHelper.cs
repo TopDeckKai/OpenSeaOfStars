@@ -30,6 +30,8 @@ public class InventoryHelper
         { "70b52ef97031bd74fa467314fbcb11e6", 1 }, // green flame
         { "64bf3ab125f071e4785b7a00150ac1b7", 1 }, // yellow flame
         // { "b901a02219536cf43af09aa7ae1d7326", 1 }, // locket
+        // { "2295d1bfeec0f8844b477f95c919c74f", 1 }, // seashell
+        { "b391f0c6724c8d443adec6105be71661", 1 }, // magic seashell
         
         // relics
         { "1554ef53341beea43ab50edbe869f560", 1 }, // salient sails
@@ -71,6 +73,16 @@ public class InventoryHelper
             PlayerCombatMoveDefinition skill = obj.Cast<PlayerCombatMoveDefinition>();
             skillUnlocks.TryAdd(skill.combatMoveId, skill);
         }
+    }
+
+    public int GetItemCount(string guid)
+    {
+        if (inventoryItems.TryGetValue(guid, out InventoryItem item))
+        {
+            return InventoryManager.instance.GetOwnedQuantity(item.Reference);
+        }
+
+        return 0;
     }
 
     public void PrintInventoryItems()
